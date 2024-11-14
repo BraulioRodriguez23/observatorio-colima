@@ -1,7 +1,5 @@
-import React from 'react'
+import React from 'react';
 
-export default function barometer() {
-  return (
-    <div>barometer</div>
-  )
+export default function Barometer() {
+  return <div>barometer</div>;
 }
