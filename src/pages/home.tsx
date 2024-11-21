@@ -1,5 +1,14 @@
-import React from 'react';
+import '../index.css';
+import Hero from '../components/hero'
+import Mision from '../components/mision'
+import HomeGraph from '../components/HomeGraph';
 
 export default function Home() {
-  return <div>home</div>;
+  return (
+<>
+<Hero/>
+<Mision/>
+<HomeGraph/>
+</>
+  );
 }
