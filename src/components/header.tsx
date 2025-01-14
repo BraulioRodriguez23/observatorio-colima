@@ -12,7 +12,7 @@ export default function Home() {
         <img 
           src={logo} 
           alt="logo secretaria de turismo" 
-          className="w-[80px] md:w-[150px] ml-1 mt-2" // Añadir margen para moverlo
+          className="w-[80px] md:w-[150px] ml-1 mt-2"
         />
         <HorizontalMenu />
       </div>

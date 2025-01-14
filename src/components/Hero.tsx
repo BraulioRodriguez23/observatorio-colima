@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Hero() {
   return (
-    <div className=" bg-hero-pattern bg-cover w-screen h-screen"> {/* Agrega `px-4` para un poco de espacio lateral */}
+    <div className=" bg-hero-pattern bg-cover "> {}
       <h1 className=" mt-20 p-8 text-3xl font-semibold text-center max-w-2xl mx-auto">
         OBSERVATORIO TURÍSTICO DEL ESTADO DE COLIMA
       </h1>

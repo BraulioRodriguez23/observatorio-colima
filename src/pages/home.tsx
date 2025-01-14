@@ -1,6 +1,6 @@
 import '../index.css';
-import Hero from '../components/hero'
-import Mision from '../components/mision'
+import Hero from '../components/Hero'
+import Mision from '../components/Mision'
 import HomeGraph from '../components/HomeGraph';
 
 export default function Home() {
