@@ -8,9 +8,8 @@ const HorizontalMenu: React.FC = () => {
     { name: 'Inicio', path: '/' },
     { name: 'Inventario Turístico', path: '/inventario' },
     { name: 'Barómetro', path: '/barometro' },
-    { name: 'Indicadores', path: '/indicadores' },
     { name: 'Publicaciones', path: '/publicaciones' },
-    { name: 'Prueba', path: '/prueba' },
+
 
   ];
 
