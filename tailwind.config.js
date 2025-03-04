@@ -10,6 +10,7 @@ export default {
     extend: {
       backgroundImage: {
         'hero-pattern': "url('./src/images/fondo.jpg')",
+        'top-pattern': "url('./src/images/fondo.jpg')",
       },
       keyframes: {
         hide: {

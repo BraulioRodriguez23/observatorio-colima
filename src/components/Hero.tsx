@@ -1,22 +1,28 @@
-import React from 'react'
+import { Link } from "react-router-dom";
 
+
+// Hero.tsx (Componente actualizado)
 export default function Hero() {
   return (
-    <div className=" bg-hero-pattern bg-cover "> {}
-      <h1 className=" mt-20 p-8 text-3xl font-semibold text-center max-w-2xl mx-auto">
-        OBSERVATORIO TURÍSTICO DEL ESTADO DE COLIMA
-      </h1>
-      <h2 className="p-4 text-lg font-semibold text-center max-w-2xl mx-auto">
-        ¿Qué es el Observatorio del Estado de Colima?
-      </h2>
-      <h3 className="px-4 py-2 max-w-2xl mx-auto font-semibold">
-        Es un espacio de análisis, técnico, intersectorial e interdisciplinario bajo el cual un grupo de personas y/o entidades se agrupan y organizan con el propósito de vigilar, medir y verificar la evolución del sector turismo en el Estado de Colima.
-      </h3>
-      <div className="mt-8 text-center">
-        <button className="py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
-          Explora aquí
-        </button>
+    <div className="relative h-screen bg-hero-pattern bg-cover bg-center">
+      <div className="absolute inset-0 bg-black/40"></div>
+      
+      <div className="relative h-full flex flex-col justify-center items-center text-center text-white px-4">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 max-w-4xl leading-tight">
+          Observatorio Turístico del Estado de Colima
+        </h1>
+        
+        <div className="max-w-3xl space-y-4 mb-8">
+          <p className="text-xl md:text-2xl">
+            Espacio de análisis técnico e interdisciplinario para el desarrollo turístico
+          </p>
+          <Link to="/inventario">
+            <button className="mt-6 px-8 py-3 bg-white text-gray-900 font-semibold rounded-full shadow-lg hover:bg-gray-100 transition">
+              Explorar indicadores
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,7 +5,7 @@ import TourismChart from '../components/TourismChart';
 import Footer from '../components/piedepagina';
 import Top from '../components/top';
 
-export default function Indicadores() {
+export default function Prueba() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('Visitantes');
   const [municipio, setMunicipio] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');

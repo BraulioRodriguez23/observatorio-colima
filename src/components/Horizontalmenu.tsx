@@ -1,30 +1,37 @@
-import React, { useState } from 'react';
+// HorizontalMenu.tsx (Versión mejorada con enrutamiento)
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const HorizontalMenu: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('Inicio'); // Estado para la pestaña activa
-
+  const location = useLocation();
   const tabs = [
-    'Inicio',
-    'Indicadores',
-    'Inventario Turístico',
-    'Barómetro Turístico',
-    'Publicaciones',
+    { name: 'Inicio', path: '/' },
+    { name: 'Inventario Turístico', path: '/inventario' },
+    { name: 'Barómetro', path: '/barometro' },
+    { name: 'Indicadores', path: '/indicadores' },
+    { name: 'Publicaciones', path: '/publicaciones' },
+    { name: 'Prueba', path: '/prueba' },
+
   ];
 
   return (
-    <div className="flex space-x-4 p-1 rounded-full justify-center">
-      {tabs.map((tab, index) => (
-        <button
-          key={index}
-          onClick={() => setActiveTab(tab)}
-          className={`py-1 px-5 rounded-full text-sm ${
-            activeTab === tab ? 'bg-grey-950 text-white font-semibold shadow-sm' : 'bg-gray-500 text-gray-800'
-          } hover:bg-white-400 transition-all`}
+    <nav className="flex space-x-2 md:space-x-4">
+      {tabs.map((tab) => (
+        <NavLink
+          key={tab.path}
+          to={tab.path}
+          className={({ isActive }) => 
+            `py-2 px-4 md:px-6 rounded-full text-sm transition-all ${
+              isActive || location.pathname === tab.path
+                ? 'bg-gray-800 text-white font-semibold shadow-md'
+                : 'text-gray-700 hover:bg-gray-200'
+            }`
+          }
         >
-          {tab}
-        </button>
+          {tab.name}
+        </NavLink>
       ))}
-    </div>
+    </nav>
   );
 };
 
