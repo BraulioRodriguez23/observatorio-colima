@@ -1,6 +1,4 @@
 // src/components/Login.jsx
-import React from "react";
-
 const Login = () => {
   return (
     <div className="bg-gray-100 flex items-center justify-center h-screen">
