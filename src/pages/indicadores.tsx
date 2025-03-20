@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
-import '../index.css';
+// pages/indicadores.tsx
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/header';
 import TourismChart from '../components/TourismChart';
 import Footer from '../components/piedepagina';
-import Top from '../components/top';
 
-export default function Indicadores() {
-  const [categoriaSeleccionada, setCategoriaSeleccionada] =
-    useState('Visitantes');
-  const [municipio, setMunicipio] = useState('');
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
-  const [errorFecha, setErrorFecha] = useState('');
+const Indicadores: React.FC = () => {
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('Visitantes');
+  const [municipio, setMunicipio] = useState<string>('');
+  const [fechaInicio, setFechaInicio] = useState<string>('');
+  const [fechaFin, setFechaFin] = useState<string>('');
+  const [errorFecha, setErrorFecha] = useState<string>('');
 
-  const municipiosColima = [
+  const municipiosColima: string[] = [
     'Colima',
     'Tecomán',
     'Manzanillo',
@@ -26,29 +24,27 @@ export default function Indicadores() {
     'Minatitlán',
   ];
 
-  const handleCategoriaClick = (categoria) => {
+  const handleCategoriaClick = (categoria: string): void => {
     setCategoriaSeleccionada(categoria);
   };
 
-  const handleFechaInicioChange = (e) => {
+  const handleFechaInicioChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const nuevaFechaInicio = e.target.value;
-    const fechaActual = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+    const fechaActual = new Date().toISOString().split('T')[0];
 
     if (nuevaFechaInicio < fechaActual) {
-      setErrorFecha(
-        'La fecha de inicio no puede ser anterior a la fecha actual.'
-      );
+      setErrorFecha('La fecha de inicio no puede ser anterior a la fecha actual.');
     } else {
       setErrorFecha('');
       setFechaInicio(nuevaFechaInicio);
     }
   };
 
-  const handleFechaFinChange = (e) => {
+  const handleFechaFinChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFechaFin(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
 
     if (!municipio || !fechaInicio || !fechaFin) {
@@ -62,15 +58,15 @@ export default function Indicadores() {
     }
 
     setErrorFecha('');
+    // Aquí iría la llamada a tu API
     console.log('Filtrar datos:', { municipio, fechaInicio, fechaFin });
   };
 
   return (
     <div className="relative">
       <Header />
-      <Top />
-
-      {/* Botones de navegación */}
+      
+      {/* Botones de categorías */}
       <section className="bg-blue-50 py-4">
         <div className="max-w-6xl mx-auto flex justify-center space-x-4">
           {[
@@ -95,7 +91,7 @@ export default function Indicadores() {
         </div>
       </section>
 
-      {/* Sección de Gráfico y Formulario */}
+      {/* Sección principal */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
           {/* Gráfico */}
@@ -111,24 +107,21 @@ export default function Indicadores() {
             />
           </div>
 
-          {/* Formulario de Municipio y Fechas */}
+          {/* Formulario */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-bold text-gray-800 mb-4">
               Filtrar datos
             </h3>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label
-                  htmlFor="municipio"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="municipio" className="block text-sm font-medium text-gray-700">
                   Municipio
                 </label>
                 <select
                   id="municipio"
                   className="mt-1 w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   value={municipio}
-                  onChange={(e) => setMunicipio(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setMunicipio(e.target.value)}
                 >
                   <option value="">Seleccione un municipio</option>
                   {municipiosColima.map((mun) => (
@@ -140,10 +133,7 @@ export default function Indicadores() {
               </div>
 
               <div>
-                <label
-                  htmlFor="fecha-inicio"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="fecha-inicio" className="block text-sm font-medium text-gray-700">
                   Fecha de inicio
                 </label>
                 <input
@@ -152,13 +142,24 @@ export default function Indicadores() {
                   className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
                   value={fechaInicio}
                   onChange={handleFechaInicioChange}
-                  min={new Date().toISOString().split('T')[0]} // Bloquea fechas pasadas
+                  min={new Date().toISOString().split('T')[0]}
                 />
               </div>
 
-              {errorFecha && (
-                <p className="text-red-500 text-sm">{errorFecha}</p>
-              )}
+              <div>
+                <label htmlFor="fecha-fin" className="block text-sm font-medium text-gray-700">
+                  Fecha de fin
+                </label>
+                <input
+                  type="date"
+                  id="fecha-fin"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                  value={fechaFin}
+                  onChange={handleFechaFinChange}
+                />
+              </div>
+
+              {errorFecha && <p className="text-red-500 text-sm">{errorFecha}</p>}
 
               <button
                 type="submit"
@@ -174,4 +175,6 @@ export default function Indicadores() {
       <Footer />
     </div>
   );
-}
+};
+
+export default Indicadores;

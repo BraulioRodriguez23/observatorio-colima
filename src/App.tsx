@@ -1,5 +1,4 @@
-import './App.css';
-import Header from './components/Horizontalmenu'; // Importa el componente correctamente
+import './App.css'; // Importa el componente correctamente
 import { Route, Routes } from 'react-router-dom';
 import Barometer from './pages/barometer';
 import Home from './pages/home';
