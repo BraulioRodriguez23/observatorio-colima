@@ -1,4 +1,3 @@
-import Circlegraph from "../components/Circlegraph";
 
 // Hero.tsx (Componente actualizado)
 export default function Top() {

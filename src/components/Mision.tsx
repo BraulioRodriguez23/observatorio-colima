@@ -1,4 +1,3 @@
-import React from 'react';
 import imagencol from '../images/volcan.jpg'; // Nombre más descriptivo
 
 export default function MisionVision() {
