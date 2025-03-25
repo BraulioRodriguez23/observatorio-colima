@@ -6,9 +6,9 @@ const HorizontalMenu: React.FC = () => {
   const location = useLocation();
   const tabs = [
     { name: 'Inicio', path: '/' },
-    { name: 'Inventario Turístico', path: '/inventario' },
-    { name: 'Barómetro', path: '/barometro' },
-    { name: 'Publicaciones', path: '/publicaciones' },
+    { name: 'Indicadores', path: '/inventario' },
+    { name: 'Publicaciones', path: '/Publications' },
+    { name: 'Noticias', path: '/News' },
 
 
   ];

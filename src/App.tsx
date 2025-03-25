@@ -1,8 +1,7 @@
 import "./App.css"; // Importa el componente correctamente
 import { Route, Routes } from "react-router-dom";
-import Barometer from "./pages/barometer";
-import Home from "./pages/home";
 import Publications from "./pages/publications";
+import Home from "./pages/home";
 import Inventory from "./pages/inventory";
 import Indicadores from "./pages/indicadores";
 import Login from "./components/login";
@@ -10,6 +9,7 @@ import Admin from "../src/pages/admin";
 import ProtectedRoute from "./hooks/protectedRoute";
 import { AuthProvider } from "../src/context/user";
 import NoticiaDetalle from "./pages/noticia";
+import News from "./pages/News";
 
 function App() {
   return (
@@ -22,9 +22,9 @@ function App() {
             <Route path="/admin" element={<Admin />} />
           </Route>
           <Route path="/indicador" element={<Indicadores />} />
-          <Route path="/barometro" element={<Barometer />} />
+          <Route path="/Publications" element={<Publications />} />
           <Route path="/inventario" element={<Inventory />} />
-          <Route path="/publicaciones" element={<Publications />} />
+          <Route path="/News" element={<News />} />
           <Route path="/noticia/:id" element={<NoticiaDetalle />} />
 
         </Routes>

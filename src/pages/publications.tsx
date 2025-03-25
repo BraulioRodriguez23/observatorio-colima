@@ -1,23 +1,10 @@
-import  { useEffect, useState } from 'react';
 import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
+import { useEffect, useState } from 'react';
 
-// Define the type for a news article
-interface NewsArticle {
-  id: number;
-  title: string;
-  content: string;
-  metadata: string;
-  imageUrl: string;
-  userId: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export default function Publications() {
-  // State to store the news data
-  const [news, setNews] = useState<NewsArticle[]>([]);
+const PDFSection = () => {
+  const [pdfs, setPdfs] = useState<any[]>([]);
   // State to handle loading and error states
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,12 +13,13 @@ export default function Publications() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/news`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory/pdfs`);
         if (!response.ok) {
           throw new Error('Failed to fetch news');
         }
         const data = await response.json();
-        setNews(data); // Set the news data
+        console.log(data)
+        setPdfs(data); // Set the news data
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred'); // Handle errors
       } finally {
@@ -55,47 +43,31 @@ export default function Publications() {
   return (
     <div className="relative">
       <Header />
-      <section className="bg-blue-50 py-4">
-        <div className="md:col-span-2">
-          <h2 className="text-3xl font-bold text-pink-600 mb-8 text-center">
-            Últimas Publicaciones
-          </h2>
-          <h3 className="text-3xl font-bold text-pink-600 mb-8 text-left">
-            Ve las últimas noticias turísticas
-          </h3>
-        </div>
-      </section>
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <h1 className="text-3xl font-bold text-center text-pink-600 mb-8">Documentos Turísticos</h1>
 
-      <section className="py-8 px-4">
-        <div className="grid md:grid-cols-3 gap-6">
-          {news.map((article) => (
-            <div
-              key={article.id}
-              className="bg-white shadow-md rounded-lg overflow-hidden"
-            >
-              <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${article.imageUrl}`} // Use the full image URL
-                alt="Noticia turística"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h4 className="text-lg font-semibold text-gray-800">
-                  {article.title}
-                </h4>
-                <p className="text-gray-600 mt-2">{article.content}</p>
+        {/* Sección de PDFs */}
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Informes Mensuales</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pdfs.map((pdf) => (
+              <div key={pdf.id} className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{pdf.title}</h3>
                 <a
-                  href={`/noticia/${article.id}`}
-                  className="text-blue-500 hover:underline mt-2 block"
+                  href= {`${import.meta.env.VITE_API_BASE_URL}${pdf.fileUrl}`}
+                  download
+                  className="inline-block mt-4 px-6 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition-colors"
                 >
-                  Leer más...
+                  Descargar PDF 
                 </a>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </section>
-
+      </div>
       <Footer />
     </div>
   );
-}
+};
+
+export default PDFSection;

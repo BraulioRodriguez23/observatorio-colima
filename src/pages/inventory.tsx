@@ -163,6 +163,12 @@ export default function Indicadores() {
               >
                 Aplicar filtro
               </button>
+              <button
+                type="submit"
+                className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                Descargar excel
+              </button>
             </form>
           </div>
         </div>
