@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom"; // For navigation after login
+import {  useNavigate } from "react-router-dom"; // For navigation after login
 import { useAuth } from "../context/user"; // Import the useAuth hook
 
 const Login = () => {
