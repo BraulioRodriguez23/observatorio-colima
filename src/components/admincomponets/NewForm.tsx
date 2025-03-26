@@ -6,11 +6,18 @@ interface NewsFormProps {
   onCancel: () => void;
 }
 
+
+interface NewsFormProps {
+  initialData?: { title: string; content: string; image?: string };
+  onSubmit: (data: { title: string; content: string; image?: File }) => void;
+  onCancel: () => void;
+}
+
 const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     content: initialData?.content || '',
-    image: null as File | null, // Cambiar a File en lugar de string
+    image: undefined as File | undefined, // Tipo corregido
   });
 
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -20,9 +27,9 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSubmit, onCancel }) 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, image: file })); // Guardar el archivo
+      setFormData((prev) => ({ ...prev, image: file }));
 
-      // Mostrar una vista previa de la imagen
+      // Mostrar vista previa
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
@@ -33,10 +40,10 @@ const NewsForm: React.FC<NewsFormProps> = ({ initialData, onSubmit, onCancel }) 
 
   const handleSubmit = () => {
     const { title, content, image } = formData;
-    onSubmit({ title, content, image });
+    onSubmit({ title, content, image }); // Ahora image es File | undefined
 
-    // Limpiar el estado después de enviar el formulario
-    setFormData({ title: '', content: '', image: null });
+    // Reset con tipo correcto
+    setFormData({ title: '', content: '', image: undefined });
     setImagePreview(null);
   };
 

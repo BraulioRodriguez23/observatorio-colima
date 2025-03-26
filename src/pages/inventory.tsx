@@ -5,14 +5,13 @@ import TourismChart from '../components/TourismChart';
 import Footer from '../components/piedepagina';
 
 export default function Indicadores() {
-  const [categoriaSeleccionada, setCategoriaSeleccionada] =
-    useState('Visitantes');
-  const [municipio, setMunicipio] = useState('');
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
-  const [errorFecha, setErrorFecha] = useState('');
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('Visitantes');
+  const [municipio, setMunicipio] = useState<string>('');
+  const [fechaInicio, setFechaInicio] = useState<string>('');
+  const [fechaFin, setFechaFin] = useState<string>('');
+  const [errorFecha, setErrorFecha] = useState<string>('');
 
-  const municipiosColima = [
+  const municipiosColima: string[] = [
     'Colima',
     'Tecomán',
     'Manzanillo',
@@ -25,29 +24,32 @@ export default function Indicadores() {
     'Minatitlán',
   ];
 
-  const handleCategoriaClick = (categoria) => {
+  // Maneja el clic en las categorías
+  const handleCategoriaClick = (categoria: string): void => {
     setCategoriaSeleccionada(categoria);
   };
 
-  const handleFechaInicioChange = (e) => {
+  // Maneja el cambio en el input de fecha de inicio
+  const handleFechaInicioChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const nuevaFechaInicio = e.target.value;
     const fechaActual = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
 
     if (nuevaFechaInicio < fechaActual) {
-      setErrorFecha(
-        'La fecha de inicio no puede ser anterior a la fecha actual.'
-      );
+      setErrorFecha('La fecha de inicio no puede ser anterior a la fecha actual.');
     } else {
       setErrorFecha('');
       setFechaInicio(nuevaFechaInicio);
     }
   };
 
-  const handleFechaFinChange = (e) => {
-    setFechaFin(e.target.value);
+  // Maneja el cambio en el input de fecha de fin
+  const handleFechaFinChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const nuevaFechaFin = e.target.value;
+    setFechaFin(nuevaFechaFin);
   };
 
-  const handleSubmit = (e) => {
+  // Maneja el envío del formulario
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
 
     if (!municipio || !fechaInicio || !fechaFin) {
@@ -67,6 +69,7 @@ export default function Indicadores() {
   return (
     <div className="relative">
       <Header />
+
       {/* Botones de navegación */}
       <section className="bg-blue-50 py-4">
         <div className="max-w-6xl mx-auto flex justify-center space-x-4">
@@ -110,15 +113,10 @@ export default function Indicadores() {
 
           {/* Formulario de Municipio y Fechas */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">
-              Filtrar datos
-            </h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Filtrar datos</h3>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label
-                  htmlFor="municipio"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="municipio" className="block text-sm font-medium text-gray-700">
                   Municipio
                 </label>
                 <select
@@ -137,10 +135,7 @@ export default function Indicadores() {
               </div>
 
               <div>
-                <label
-                  htmlFor="fecha-inicio"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="fecha-inicio" className="block text-sm font-medium text-gray-700">
                   Fecha de inicio
                 </label>
                 <input
@@ -153,9 +148,21 @@ export default function Indicadores() {
                 />
               </div>
 
-              {errorFecha && (
-                <p className="text-red-500 text-sm">{errorFecha}</p>
-              )}
+              <div>
+                <label htmlFor="fecha-fin" className="block text-sm font-medium text-gray-700">
+                  Fecha de fin
+                </label>
+                <input
+                  type="date"
+                  id="fecha-fin"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                  value={fechaFin}
+                  onChange={handleFechaFinChange}
+                  min={fechaInicio || new Date().toISOString().split('T')[0]} // Bloquea fechas pasadas
+                />
+              </div>
+
+              {errorFecha && <p className="text-red-500 text-sm">{errorFecha}</p>}
 
               <button
                 type="submit"
@@ -164,7 +171,8 @@ export default function Indicadores() {
                 Aplicar filtro
               </button>
               <button
-                type="submit"
+                type="button"
+                onClick={() => console.log('Descargar Excel')}
                 className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
               >
                 Descargar excel
