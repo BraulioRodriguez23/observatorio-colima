@@ -369,7 +369,8 @@ const AdminPage: React.FC = () => {
 
                   {currentSection === "pdfs" && (
                     <>
-                      <h3 className="font-semibold text-lg mb-2 text-blue-600">
+                      <h3 className="font-semibold te
+                      xt-lg mb-2 text-blue-600">
                         {(item as DocumentItem).title}
                       </h3>
                       <div className="flex justify-between">
