@@ -64,7 +64,7 @@ const NoticiaDetalle = () => {
           {article.imageUrl && (
             <div className="relative h-96 bg-gray-100">
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${article.imageUrl}`}
+                src={article.imageUrl}
                 alt={article.title}
                 className="w-full h-full object-cover transition-opacity duration-300 hover:opacity-95"
               />

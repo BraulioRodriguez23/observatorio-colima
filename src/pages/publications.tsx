@@ -13,7 +13,7 @@ const PDFSection = () => {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory/pdfs`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory/`);
         if (!response.ok) {
           throw new Error('Failed to fetch news');
         }
@@ -54,7 +54,7 @@ const PDFSection = () => {
               <div key={pdf.id} className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{pdf.title}</h3>
                 <a
-                  href= {`${import.meta.env.VITE_API_BASE_URL}${pdf.fileUrl}`}
+                  href= {pdf.fileUrl}
                   download
                   className="inline-block mt-4 px-6 py-2 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition-colors"
                 >

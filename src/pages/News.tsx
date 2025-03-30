@@ -91,7 +91,7 @@ export default function News() {
                 {/* Imagen con Efecto */}
                 <div className="relative h-72 overflow-hidden rounded-t-2xl">
                   <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}${article.imageUrl}`}
+                    src={article.imageUrl}
                     alt={article.title}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                   />
