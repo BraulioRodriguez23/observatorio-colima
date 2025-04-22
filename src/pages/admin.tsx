@@ -253,14 +253,29 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleDeletePdf = async (id: string, name: string) => {
+  const handleDeletePdf = async (id: string, fileName: string) => {
     try {
-      await supabase.storage.from("pdfs").remove([name]);
-
-      setPdfs(pdfs.filter((pdf) => pdf.id !== id));
-    } catch (error) {
-      console.error("Error deleting PDF:", error);
-      alert("Error al eliminar el PDF");
+      // 1) Borrar fichero de Supabase
+      await supabase.storage.from("pdfs").remove([fileName]);
+  
+      // 2) Informar al backend para que borre el registro en la BD
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/inventory/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Error borrando en API: ${response.status}`);
+      }
+  
+      // 3) Actualizar estado local
+      setPdfs((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Error deleting PDF:", err);
+      alert(err instanceof Error ? err.message : "Error al eliminar el PDF");
     }
   };
 
@@ -273,7 +288,7 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 text-gra">
       <AdminSidebar
         currentSection={currentSection}
         onSectionChange={setCurrentSection}
@@ -299,7 +314,7 @@ const AdminPage: React.FC = () => {
                   placeholder="Título del PDF"
                   value={pdfTitle}
                   onChange={(e) => setPdfTitle(e.target.value)}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 text-gray-800"
                 />
                 <input
                   type="file"
@@ -317,7 +332,7 @@ const AdminPage: React.FC = () => {
                       alert("Por favor, completa todos los campos");
                     }
                   }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-500 text-gray-800 rounded hover:bg-blue-600 "
                 >
                   Subir PDF
                 </button>

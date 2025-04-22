@@ -1,45 +1,79 @@
-import { useState } from "react";
+// src/components/admincomponets/ExcelSection.tsx
+import React, { useState } from 'react';
 
-const ExcelSection = () => {
-  const [excels, setExcels] = useState<File[]>([]);
+export interface DocumentItem {
+  id: string;
+  title: string;
+  url: string;
+}
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    
-    const newExcels = Array.from(files).filter(file => 
-      file.type.includes('excel') || file.type.includes('spreadsheet')
-    );
-    
-    setExcels([...excels, ...newExcels]);
+interface ExcelSectionProps {
+  data: DocumentItem[];
+  onUpload: (file: File, title: string) => Promise<void>;
+  onDelete: (id: string, name: string) => Promise<void>;
+}
+
+const ExcelSection: React.FC<ExcelSectionProps> = ({ data, onUpload, onDelete }) => {
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [excelTitle, setExcelTitle] = useState('');
+
+  const handleUpload = async () => {
+    if (!excelFile || !excelTitle) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+    try {
+      await onUpload(excelFile, excelTitle);
+      setExcelFile(null);
+      setExcelTitle('');
+    } catch (err) {
+      console.error(err);
+      alert('Error al subir el Excel');
+    }
   };
 
   return (
-    <div>
-      <div className="mb-4">
-        <input 
-          type="file" 
-          accept=".xls,.xlsx" 
-          multiple
-          onChange={handleUpload}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-        />
-        <p className="text-sm text-gray-500 mt-1">Formatos permitidos: .xls, .xlsx</p>
-      </div>
-
-      <div className="space-y-2">
-        {excels.map((excel, index) => (
-          <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded">
-            <span className="text-gray-700">{excel.name}</span>
-            <button 
-              onClick={() => setExcels(excels.filter((_, i) => i !== index))}
-              className="text-red-500"
+    <div className="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 className="text-2xl font-bold mb-4">Subir Excel</h2>
+      <input
+        type="text"
+        placeholder="Título del Excel"
+        value={excelTitle}
+        onChange={e => setExcelTitle(e.target.value)}
+        className="w-full p-2 border rounded mb-2"
+      />
+      <input
+        type="file"
+        accept=".xlsx,.xls"
+        onChange={e => setExcelFile(e.target.files?.[0] || null)}
+        className="w-full p-2 border rounded mb-4"
+      />
+      <button
+        onClick={handleUpload}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Subir Excel
+      </button>
+      <ul className="mt-4 space-y-2">
+        {data.map(item => (
+          <li key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:underline"
+            >
+              {item.title}
+            </a>
+            <button
+              onClick={() => onDelete(item.id, item.title)}
+              className="text-red-600 hover:underline"
             >
               Eliminar
             </button>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

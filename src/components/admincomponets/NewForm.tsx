@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 
+
 interface NewsFormProps {
   initialData?: { 
     title: string; 
@@ -71,28 +72,28 @@ const NewsForm: React.FC<NewsFormProps> = ({
         {initialData ? 'Editar Noticia' : 'Nueva Noticia'}
       </h2>
 
-      <div className="space-y-4">
+      <div className="space-y-4 text-gray-800">
         <input
           type="text"
           placeholder="Título"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
         />
 
         <textarea
           placeholder="Contenido"
           value={formData.content}
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          className="w-full p-2 border rounded h-32 focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border rounded bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
         />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-gray-800">
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="flex-1 p-2 border rounded bg-white"
+            className="flex-1 p-2 border rounded bg-white text-gray-800"            
             disabled={isUploading}
           />
           {imagePreview && (

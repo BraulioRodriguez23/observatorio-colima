@@ -20,15 +20,11 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8 text-gray-700">
             <div className="space-y-6">
               <p className="text-lg leading-relaxed">
-                Colima es un tesoro gastronómico, en sus “cenadurías” se conserva la autenticidad 
-                de la cocina Colimota, en ellas podrás saborear los sopitos colimotes, las enchiladas 
-                y también el pozole seco, que se ha convertido en uno de los platillos más icónicos 
-                de la región.
+              La suma de características naturales y económicas, aunadas a la riqueza cultural de diversas localidades del Estado, han significado un atractivo que motiva la llegada de visitantes y turistas, tanto nacionales como internacionales. De esta manera, el turismo se ha posicionado, desde principios del siglo XX, como una de las actividades económicas y sociales más importantes del estado de Colima. Destinos como Manzanillo, Cuyutlán, Tecomán, Colima, Villa de Álvarez y Comala, albergan una amplia variedad de experiencias que abarcan desde sol y playa, gastronomía, negocios hasta turismo cultural, natural, rural y de aventura. 
+
               </p>
               <p className="text-lg leading-relaxed">
-                A través de las actividades de la comunidad, nosotros somos diferentes tipos de 
-                recursos que se encuentran en el mundo. El centro de los recursos humanos es un 
-                sistema de trabajo y la vida de nuestros objetivos.
+              Sin embargo, uno de los principales retos que enfrenta el sector turismo es la falta de datos confiables en el Estado, situación que obstaculiza la toma de decisiones informadas para impulsar una gestión turística más competitiva y sostenible. Esta problemática ha sido reconocida en el Plan Estatal de Desarrollo 2021-2027, que plantea la cultura del dato como un eje fundamental para el mejoramiento del desempeño del destino.
               </p>
             </div>
             

@@ -14,13 +14,13 @@ const HorizontalMenu: React.FC = () => {
   ];
 
   return (
-    <nav className="flex space-x-2 md:space-x-4">
+    <nav className="flex space-x-3 md:space-x-4">
       {tabs.map((tab) => (
         <NavLink
           key={tab.path}
           to={tab.path}
           className={({ isActive }) => 
-            `py-2 px-4 md:px-6 rounded-full text-sm transition-all ${
+            `py-3 px-4 md:px-6 rounded-full text-sm transition-all ${
               isActive || location.pathname === tab.path
                 ? 'bg-gray-800 text-white font-semibold shadow-md'
                 : 'text-gray-700 hover:bg-gray-200'
