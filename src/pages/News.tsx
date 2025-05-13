@@ -2,6 +2,8 @@ import  { useEffect, useState } from 'react';
 import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
+//import ComalaFondo from  '../images/comala-fondo.jpg';
+
 
 // Define the type for a news article
 interface NewsArticle {

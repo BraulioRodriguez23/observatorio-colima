@@ -6,9 +6,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
           {/* Información */}
           <div>
-            <h3 className="text-lg font-semibold text-pink-400">Sobre Nosotros</h3>
+            <h3 className="text-lg font-semibold text-pink-400">Aviso de Privacidad</h3>
             <p className="mt-4 text-sm">
-              El Observatorio turístico del estado de Colima surge como una respuesta estratégica a la necesidad de contar con información confiable, sistematizada y útil sobre el comportamiento del turismo en la entidad. Esta iniciativa, impulsada por la Subsecretaría de Turismo del Gobierno del Estado en coordinación con la Universidad de Colima a través de la Facultad de Turismo, tiene como principal propósito apoyar la mejora continua del sector mediante un sistema de gestión de la información que permita el seguimiento regular de indicadores clave de desempeño turístico.
+            
             </p>
           </div>
 

@@ -10,6 +10,7 @@ import ProtectedRoute from "./hooks/protectedRoute";
 import { AuthProvider } from "../src/context/user";
 import NoticiaDetalle from "./pages/noticia";
 import News from "./pages/News";
+import Sobre_nosotros from "./pages/Sobre_nosotros"; 
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
           <Route path="/inventario" element={<Inventory />} />
           <Route path="/News" element={<News />} />
           <Route path="/noticia/:id" element={<NoticiaDetalle />} />
+          <Route path="/Sobre_nosotros" element={<Sobre_nosotros />} />
+          
 
         </Routes>
       </AuthProvider>

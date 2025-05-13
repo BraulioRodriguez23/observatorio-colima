@@ -15,7 +15,7 @@
     "axios": "^1.8.4",
     "chart.js": "^4.4.7",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.5.0",
+    "framer-motion": "^12.11.0",
     "lucide-react": "^0.483.0",
     "observartorio-colima": "file:",
     "react": "^18.3.1",

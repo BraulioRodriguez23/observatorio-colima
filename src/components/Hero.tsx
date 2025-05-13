@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+
 
 
 // Hero.tsx (Componente actualizado)
@@ -16,11 +16,7 @@ export default function Hero() {
           <p className="text-xl md:text-2xl">
             Espacio de análisis técnico e interdisciplinario para el desarrollo turístico
           </p>
-          <Link to="/inventario">
-            <button className="mt-6 px-8 py-3 bg-white text-gray-900 font-semibold rounded-full shadow-lg hover:bg-gray-100 transition">
-              Explorar indicadores
-            </button>
-          </Link>
+          
         </div>
       </div>
     </div>

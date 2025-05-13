@@ -1,4 +1,5 @@
 // HorizontalMenu.tsx (Versión mejorada con enrutamiento)
+import path from 'path';
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ const HorizontalMenu: React.FC = () => {
     { name: 'Indicadores', path: '/inventario' },
     { name: 'Publicaciones', path: '/Publications' },
     { name: 'Noticias', path: '/News' },
+    { name: 'Sobre Nosotros', path: '/Sobre_nosotros'},
 
 
   ];
