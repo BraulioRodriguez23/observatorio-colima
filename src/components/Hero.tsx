@@ -1,10 +1,11 @@
-
-
-
-// Hero.tsx (Componente actualizado)
+// Hero.tsx (Componente actualizado)import ballenaImg from '../assets/ballena.jpg';
+import ballenaImg from '../images/ballena-nueva.jpg'
 export default function Hero() {
   return (
-    <div className="relative h-screen bg-top-pattern bg-cover bg-center">
+    <div
+      className="relative h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${ballenaImg})` }}
+    >
       <div className="absolute inset-0 bg-black/40"></div>
       
       <div className="relative h-full flex flex-col justify-center items-center text-center text-white px-4">
