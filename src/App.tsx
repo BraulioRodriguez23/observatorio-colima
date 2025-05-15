@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import Publications from "./pages/publications";
 import Home from "./pages/home";
 import Inventory from "./pages/inventory";
-import Indicadores from "./pages/indicadores";
+
 import Login from "./components/login";
 import Admin from "./pages/admin";
 import ExcelManager from "./components/admincomponets/ExcelManager"; // <-- Nueva importación
@@ -12,7 +12,7 @@ import ProtectedRoute from "./hooks/protectedRoute";
 import { AuthProvider } from "./context/user";
 import NoticiaDetalle from "./pages/noticia";
 import News from "./pages/News";
-import Sobre_nosotros from "./pages/Sobre_Nosotros"
+import Sobre_nosotros from "./pages/Sobre_nosotros"
 
 function App() {
   return (
@@ -28,12 +28,11 @@ function App() {
             <Route path="/admin/excel" element={<ExcelManager />} /> {/* Nueva ruta para ExcelManager */}
           </Route>
 
-          <Route path="/indicador" element={<Indicadores />} />
           <Route path="/Publications" element={<Publications />} />
           <Route path="/inventario" element={<Inventory />} />
           <Route path="/News" element={<News />} />
           <Route path="/noticia/:id" element={<NoticiaDetalle />} />
-          <Route path="/Sobre_nosotros" element={<Sobre_nosotros />} />
+          <Route path="/Sobre_Nosotros" element={<Sobre_nosotros />} />
         </Routes>
       </AuthProvider>
     </div>
