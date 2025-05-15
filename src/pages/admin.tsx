@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
-import AdminSidebar from "../components/admincomponets/AdminSidebar";
-import AdminLayout from "../components/admincomponets/AdminLayout";
-import AdminHeader from "../components/admincomponets/AdminHeader";
-import NewsForm from "../components/admincomponets/NewForm";
-import { createClient } from "@supabase/supabase-js";
-import { ExcelUpload } from '../components/admincomponets/ExcelUpload';
-import { Notification } from '../components/admincomponets/Notification';
-import { ExcelList } from '../components/admincomponets/ExcelList';
+import React, { useState, useEffect } from 'react';
+import AdminSidebar from '../components/admincomponets/AdminSidebar';
+import AdminLayout from '../components/admincomponets/AdminLayout';
+import AdminHeader from '../components/admincomponets/AdminHeader';
+import NewsForm from '../components/admincomponets/NewForm';
+import { createClient } from '@supabase/supabase-js';
 
-type Section = "news" | "pdfs" | "excel";
+type Section = 'news' | 'pdfs' | 'excel';
 
 interface NewsItem {
   id: string;
@@ -24,98 +21,92 @@ interface DocumentItem {
   url: string;
 }
 
-interface ExcelItem extends DocumentItem {
-  section: string;
-  fileName: string;
-  uploadedAt: string;  
-}
-
+// Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const AdminPage: React.FC = () => {
-  const [currentSection, setCurrentSection] = useState<Section>("news");
+  const [currentSection, setCurrentSection] = useState<Section>('news');
   const [news, setNews] = useState<NewsItem[]>([]);
   const [pdfs, setPdfs] = useState<DocumentItem[]>([]);
-  const [excels, setExcels] = useState<ExcelItem[]>([]);
+  const [excels, setExcels] = useState<DocumentItem[]>([]);
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pdfTitle, setPdfTitle] = useState("");
-  const [notification, setNotification] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
-  const [excelView, setExcelView] = useState<'upload' | 'list'>('upload');
-  const [refreshExcel, setRefreshExcel] = useState(false);
+  const [pdfTitle, setPdfTitle] = useState('');
+  const [excelFile, setExcelFile] = useState<File | null>(null);
 
-  // Funciones de fetching de datos
   const fetchNews = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/news`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/news`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Error al cargar las noticias');
+      }
       const data = await response.json();
       setNews(data);
     } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al cargar noticias' });
+      console.error('Error:', error);
+      alert('Error al cargar las noticias');
     }
   };
 
   const fetchPdfs = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/inventory/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Error al cargar los PDFs');
+      }
       const data = await response.json();
+      // Se asume que la data es un arreglo de DocumentItem.
       setPdfs(data);
     } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al cargar PDFs' });
-    }
-  };
-
-  const fetchExcels = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/info-injection`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      setExcels(data);
-    } catch (error) {
       console.error('Error:', error);
-      setNotification({ type: 'error', message: 'Error al cargar excels' });
+      alert('Error al cargar los PDFs');
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      await Promise.all([fetchNews(), fetchPdfs(), fetchExcels()]);
+      await Promise.all([fetchNews(), fetchPdfs()]);
       setLoading(false);
     };
+    setExcels([]);
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (refreshExcel) {
-      fetchExcels().then(() => setRefreshExcel(false));
-    }
-  }, [refreshExcel]);
-
   const uploadImageToSupabase = async (file: File): Promise<string> => {
     const fileName = `news-images/${Date.now()}-${file.name}`;
+    console.log(fileName);
     const { error } = await supabase.storage
-      .from("news-articles")
-      .upload(fileName, file, { contentType: "image/jpeg" });
+      .from('news-articles')
+      .upload(fileName, file, {
+        contentType: 'image/jpeg',
+      });
 
-    if (error) throw error;
-    
-    const { data: { publicUrl } } = supabase.storage.from("news-articles").getPublicUrl(fileName);
+    if (error) {
+      throw error;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('news-articles').getPublicUrl(fileName);
     return publicUrl;
   };
 
@@ -127,128 +118,191 @@ const AdminPage: React.FC = () => {
   }) => {
     try {
       let imageUrl = data.imageUrl;
-      if (data.image) imageUrl = await uploadImageToSupabase(data.image);
 
-      const token = localStorage.getItem("token");
-      const method = editingNews ? "PUT" : "POST";
-      const url = editingNews 
+      // Upload new image if provided
+      if (data.image) {
+        imageUrl = await uploadImageToSupabase(data.image);
+      }
+      // Save news data to your API
+      const token = localStorage.getItem('token');
+      const method = editingNews ? 'PUT' : 'POST';
+      const url = editingNews
         ? `${import.meta.env.VITE_API_BASE_URL}/news/${editingNews.id}`
         : `${import.meta.env.VITE_API_BASE_URL}/news`;
 
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: data.title,
           content: data.content,
           imageUrl,
-          metadata: { author: "Autor", date: new Date().toISOString() },
+          metadata: { author: 'Autor', date: new Date().toISOString() },
+          userId: '1',
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(
+          editingNews
+            ? 'Error al actualizar la noticia'
+            : 'Error al crear la noticia'
+        );
+      }
+
       const newsItem = await response.json();
-      setNews(prev => editingNews 
-        ? prev.map(item => item.id === editingNews.id ? newsItem : item) 
-        : [...prev, newsItem]
-      );
+
+      if (editingNews) {
+        setNews(
+          news.map((item) => (item.id === editingNews.id ? newsItem : item))
+        );
+      } else {
+        setNews([...news, newsItem]);
+      }
+
       setEditingNews(null);
-      setNotification({ type: 'success', message: 'Noticia guardada exitosamente' });
     } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al guardar noticia' });
+      console.error('Error:', error);
+      alert(
+        editingNews
+          ? 'Error al actualizar la noticia'
+          : 'Error al crear la noticia'
+      );
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      const newsItem = news.find(item => item.id === id);
+      // First get the news item to check for image
+      const newsItem = news.find((item) => item.id === id);
+
       if (newsItem?.imageUrl) {
-        const imagePath = newsItem.imageUrl.split("/").pop();
-        if (imagePath) await supabase.storage.from("news-images").remove([imagePath]);
+        // Extract the image path from the URL
+        const imagePath = newsItem.imageUrl.split('/').pop();
+        if (imagePath) {
+          await supabase.storage.from('news-images').remove([imagePath]);
+        }
       }
 
-      const token = localStorage.getItem("token");
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/news/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // Then delete from the API
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/news/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      setNews(prev => prev.filter(item => item.id !== id));
-      setNotification({ type: 'success', message: 'Noticia eliminada exitosamente' });
+      if (!response.ok) {
+        throw new Error('Error al eliminar la noticia');
+      }
+
+      setNews(news.filter((item) => item.id !== id));
     } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al eliminar noticia' });
+      console.error('Error:', error);
+      alert('Error al eliminar la noticia');
     }
   };
 
   const handlePdfUpload = async (file: File, title: string) => {
     try {
+      const token = localStorage.getItem('token');
       const fileName = `pdfs/${Date.now()}-${file.name}`;
-      const { error } = await supabase.storage.from("pdfs").upload(fileName, file);
-      if (error) throw error;
+      const { error } = await supabase.storage
+        .from('pdfs')
+        .upload(fileName, file);
 
-      const { data: { publicUrl } } = supabase.storage.from("pdfs").getPublicUrl(fileName);
+      if (error) {
+        throw error;
+      }
 
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, fileUrl: publicUrl }),
-      });
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('pdfs').getPublicUrl(fileName);
 
+      console.log(title);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/inventory`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: title,
+            fileUrl: publicUrl,
+          }),
+        }
+      );
+      console.log(response);
+      if (!response.ok) {
+        throw new Error('Error al subir el archivo PDF');
+      }
       const newPdf = await response.json();
-      setPdfs(prev => [...prev, newPdf]);
-      setNotification({ type: 'success', message: 'PDF subido exitosamente' });
+      setPdfs((prevPdfs) => [...prevPdfs, newPdf]);
     } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al subir PDF' });
+      console.error('Error:', error);
+      alert('Error al subir el archivo PDF');
+    }
+  };
+
+  const handleExcelUpload = async (file: File) => {
+    if (!file) {
+      throw new Error('Por favor selecciona un archivo.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(
+        'https://observatorio-api-dhp4.vercel.app/info-injection/upload-excel',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      alert(data.message);
+      setExcelFile(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new Error('Error al conectar con el servidor.');
     }
   };
 
   const handleDeletePdf = async (id: string, fileName: string) => {
     try {
-      await supabase.storage.from("pdfs").remove([fileName]);
-      const token = localStorage.getItem("token");
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/inventory/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPdfs(prev => prev.filter(p => p.id !== id));
-      setNotification({ type: 'success', message: 'PDF eliminado exitosamente' });
-    } catch (error) {
-      console.error("Error:", error);
-      setNotification({ type: 'error', message: 'Error al eliminar PDF' });
-    }
-  };
+      // 1) Borrar fichero de Supabase
+      await supabase.storage.from('pdfs').remove([fileName]);
 
-  const handleDeleteExcel = async (id: string, fileName: string) => {
-    try {
+      // 2) Informar al backend para que borre el registro en la BD
       const token = localStorage.getItem('token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/info-injection/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/inventory/${id}`,
+        {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (!response.ok) {
-        throw new Error('Error al eliminar el archivo');
+        throw new Error(`Error borrando en API: ${response.status}`);
       }
 
-      await supabase.storage.from("excels").remove([fileName]);
-      setRefreshExcel(true);
-      setNotification({ type: 'success', message: 'Archivo eliminado exitosamente' });
-    } catch (error) {
-      setNotification({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Error desconocido',
-      });
+      // 3) Actualizar estado local
+      setPdfs((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error('Error deleting PDF:', err);
+      alert(err instanceof Error ? err.message : 'Error al eliminar el PDF');
     }
   };
 
@@ -261,22 +315,18 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar currentSection={currentSection} onSectionChange={setCurrentSection} />
-      
+    <div className="flex min-h-screen bg-gray-50 text-gra">
+      <AdminSidebar
+        currentSection={currentSection}
+        onSectionChange={setCurrentSection}
+      />
+
       <div className="ml-64 flex-1 p-8">
         <AdminHeader />
-        
-        <Notification 
-          open={!!notification}
-          message={notification?.message || ''}
-          type={notification?.type}
-          onClose={() => setNotification(null)}
-        />
 
         <AdminLayout>
           <div className="space-y-6">
-            {currentSection === "news" && (
+            {currentSection === 'news' && (
               <NewsForm
                 initialData={editingNews || undefined}
                 onSubmit={handleNewsSubmit}
@@ -284,19 +334,21 @@ const AdminPage: React.FC = () => {
               />
             )}
 
-            {currentSection === "pdfs" && (
+            {currentSection === 'pdfs' && (
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Título del PDF"
                   value={pdfTitle}
                   onChange={(e) => setPdfTitle(e.target.value)}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 text-gray-800"
                 />
                 <input
                   type="file"
                   accept=".pdf"
-                  onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+                  onChange={(e) =>
+                    setPdfFile(e.target.files ? e.target.files[0] : null)
+                  }
                   className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
                 />
                 <button
@@ -304,58 +356,54 @@ const AdminPage: React.FC = () => {
                     if (pdfFile && pdfTitle) {
                       handlePdfUpload(pdfFile, pdfTitle);
                     } else {
-                      setNotification({ type: 'error', message: 'Complete todos los campos' });
+                      alert('Por favor, completa todos los campos');
                     }
                   }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-500 text-gray-800 rounded hover:bg-blue-600 "
                 >
                   Subir PDF
                 </button>
               </div>
             )}
 
-            {currentSection === "excel" && (
-              <div className="space-y-6">
-                <div className="flex gap-2 border-b pb-2">
-                  <button 
-                    onClick={() => setExcelView('upload')} 
-                    className={`px-4 py-2 ${excelView === 'upload' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                  >
-                    Subir Excel
-                  </button>
-                  <button 
-                    onClick={() => setExcelView('list')} 
-                    className={`px-4 py-2 ${excelView === 'list' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                  >
-                    Ver Archivos
-                  </button>
-                </div>
-
-                {excelView === 'upload' ? (
-                  <ExcelUpload
-                    onSuccess={(msg) => {
-                      setNotification({ type: 'success', message: msg });
-                      setRefreshExcel(true);
-                      setExcelView('list');
-                    }}
-                    onError={(msg) => setNotification({ type: 'error', message: msg })}
-                    onUploadComplete={() => setRefreshExcel(true)}
-                  />
-                ) : (
-                  <ExcelList
-                    data={excels}
-                    onDelete={handleDeleteExcel}
-                  />
-                )}
+            {currentSection === 'excel' && (
+              <div className="text-black">
+                <h2 className="color-black">Sube aqui tu excel</h2>
+                <input
+                  type="file"
+                  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  onChange={(e) =>
+                    setExcelFile(e.target.files ? e.target.files[0] : null)
+                  }
+                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={() => {
+                    if (excelFile) {
+                      handleExcelUpload(excelFile);
+                    } else {
+                      alert('Por favor, completa todos los campos');
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-gray-800 rounded hover:bg-blue-600 "
+                >
+                  Subir Excel
+                </button>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(currentSection === "news" ? news : 
-               currentSection === "pdfs" ? pdfs : 
-               []).map((item) => (
-                <div key={item.id} className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                  {currentSection === "news" && (
+              {(currentSection === 'news'
+                ? news
+                : currentSection === 'pdfs'
+                ? pdfs
+                : excels
+              ).map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {currentSection === 'news' && (
                     <>
                       {(item as NewsItem).imageUrl && (
                         <img
@@ -364,8 +412,12 @@ const AdminPage: React.FC = () => {
                           className="w-full h-48 object-cover rounded mb-3"
                         />
                       )}
-                      <h3 className="font-semibold text-lg mb-2">{(item as NewsItem).title}</h3>
-                      <p className="text-gray-800 line-clamp-3 mb-4">{(item as NewsItem).content}</p>
+                      <h3 className="font-semibold text-lg mb-2">
+                        {(item as NewsItem).title}
+                      </h3>
+                      <p className="text-gray-800 line-clamp-3 mb-4">
+                        {(item as NewsItem).content}
+                      </p>
                       <div className="flex justify-between items-center">
                         <button
                           onClick={() => setEditingNews(item as NewsItem)}
@@ -383,9 +435,14 @@ const AdminPage: React.FC = () => {
                     </>
                   )}
 
-                  {currentSection === "pdfs" && (
+                  {currentSection === 'pdfs' && (
                     <>
-                      <h3 className="font-semibold text-lg mb-2 text-blue-600">{(item as DocumentItem).title}</h3>
+                      <h3
+                        className="font-semibold te
+                      xt-lg mb-2 text-blue-600"
+                      >
+                        {(item as DocumentItem).title}
+                      </h3>
                       <div className="flex justify-between">
                         <a
                           href={(item as DocumentItem).url}
