@@ -274,10 +274,11 @@ const AdminPage: React.FC = () => {
       const data = await response.json();
       alert(data.message);
       setExcelFile(null);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      throw new Error('Error al conectar con el servidor.');
-    }
+    
+   } catch {
+  throw new Error('Error al conectar con el servidor.');
+}
+
   };
 
   const handleDeletePdf = async (id: string, fileName: string) => {
