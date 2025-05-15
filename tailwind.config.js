@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        'hero-pattern': "url('./src/images/fondo.jpg')",
-        'top-pattern': "url('./src/images/fondo.jpg')",
+        'hero-pattern': "url('./src/images/ballena-nueva.jpg')",
+        'top-pattern': "url('./src/images/ballena-nueva.jpg')",
       },
       keyframes: {
         hide: {

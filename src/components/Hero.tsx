@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
+
 
 
 // Hero.tsx (Componente actualizado)
 export default function Hero() {
   return (
-    <div className="relative h-screen bg-hero-pattern bg-cover bg-center">
+    <div className="relative h-screen bg-top-pattern bg-cover bg-center">
       <div className="absolute inset-0 bg-black/40"></div>
       
       <div className="relative h-full flex flex-col justify-center items-center text-center text-white px-4">
@@ -16,11 +16,7 @@ export default function Hero() {
           <p className="text-xl md:text-2xl">
             Espacio de análisis técnico e interdisciplinario para el desarrollo turístico
           </p>
-          <Link to="/inventario">
-            <button className="mt-6 px-8 py-3 bg-white text-gray-900 font-semibold rounded-full shadow-lg hover:bg-gray-100 transition">
-              Explorar indicadores
-            </button>
-          </Link>
+         
         </div>
       </div>
     </div>

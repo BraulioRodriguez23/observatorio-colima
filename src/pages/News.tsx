@@ -2,6 +2,7 @@ import  { useEffect, useState } from 'react';
 import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
+import imagenfondo  from '../images/comala-pueblo-mgico-foto-hernando-rivera.jpg'
 
 // Define the type for a news article
 interface NewsArticle {
@@ -58,24 +59,23 @@ export default function News() {
       
       {/* Hero Section Noticias */}
       <section className="relative h-96 flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1604999565976-8913ad2ddb7c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
-            alt="Turismo Colima"
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-800/80 to-blue-800/80" />
-        </div>
-        
-        <div className="relative z-10 text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 animate-slide-up">
-            Explorando Colima
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 font-light max-w-2xl mx-auto">
-            Descubre las últimas novedades, eventos y experiencias turísticas de nuestro estado
-          </p>
-        </div>
-      </section>
+  <div className="absolute inset-0 z-0">
+    <img 
+      src={imagenfondo}
+      alt="Turismo Colima"
+      className="w-full h-full object-cover"
+    />
+  </div>
+
+  <div className="relative z-10 text-center px-4 bg-black/40 rounded-xl p-6">
+    <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 animate-slide-up">
+      Explorando Colima
+    </h1>
+    <p className="text-xl md:text-2xl text-white font-light max-w-2xl mx-auto">
+      Descubre las últimas novedades, eventos y experiencias turísticas de nuestro Estado
+    </p>
+  </div>
+</section>
   
       {/* Grid de Noticias */}
       <main className="flex-1 py-16 px-4 sm:px-6 lg:px-8">
