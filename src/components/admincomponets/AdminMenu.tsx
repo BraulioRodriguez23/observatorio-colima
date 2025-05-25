@@ -1,10 +1,9 @@
-// HorizontalMenu.tsx
-import React from 'react';
-import { NavLink,  useNavigate } from 'react-router-dom';
-import { Home, User, Settings, LogOut } from "lucide-react";
+// src/components/HorizontalMenu.tsx
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Home, User, LogOut } from "lucide-react";
 
 const HorizontalMenu: React.FC = () => {
-;
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,35 +12,33 @@ const HorizontalMenu: React.FC = () => {
   };
 
   const tabs = [
-    { name: "Inicio", path: "/admin", icon: <Home size={20} /> },
-    { name: "Perfil", path: "/admin/profile", icon: <User size={20} /> },
-    { name: "Configuración", path: "/admin/settings", icon: <Settings size={20} /> },
-    { name: "Salir", icon: <LogOut size={20} />, action: handleLogout }
+    { name: "Inicio",   path: "/admin",           icon: <Home size={20} /> },
+    { name: "Perfil",   path: "/admin/Profile",    icon: <User size={20} /> },
+  
+    { name: "Salir",    action: handleLogout,      icon: <LogOut size={20} /> }
   ];
 
   return (
     <nav className="flex space-x-2 md:space-x-4">
-      {tabs.map((tab) => (
+      {tabs.map(tab =>
         tab.action ? (
           <button
             key={tab.name}
             onClick={tab.action}
-            className="py-2 px-4 md:px-6 rounded-full text-sm transition-all text-gray-700 hover:bg-gray-200"
+            className="py-2 px-4 rounded-full text-sm flex items-center gap-1 text-gray-700 hover:bg-gray-200"
           >
-            <div className="flex items-center gap-1">
-              {tab.icon}
-              {tab.name}
-            </div>
+            {tab.icon}
+            {tab.name}
           </button>
         ) : (
           <NavLink
             key={tab.path}
             to={tab.path}
-            className={({ isActive }) => 
-              `py-2 px-4 md:px-6 rounded-full text-sm transition-all flex items-center gap-1 ${
+            className={({ isActive }) =>
+              `py-2 px-4 rounded-full text-sm flex items-center gap-1 transition-all ${
                 isActive
-                  ? 'bg-gray-800 text-white font-semibold shadow-md'
-                  : 'text-gray-700 hover:bg-gray-200'
+                  ? "bg-blue-600 text-white font-semibold"
+                  : "text-gray-700 hover:bg-gray-200"
               }`
             }
           >
@@ -49,7 +46,7 @@ const HorizontalMenu: React.FC = () => {
             {tab.name}
           </NavLink>
         )
-      ))}
+      )}
     </nav>
   );
 };

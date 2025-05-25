@@ -21,7 +21,7 @@ export default function CircleGraph() {
     },
     { 
       title: "Derrama económica", 
-      value: "5,375,337 mdp",
+      value: "5,375 mdp",
       progress: 78,
       icon: MoneyIcon
     },
@@ -84,7 +84,7 @@ export default function CircleGraph() {
     },
     { 
       title: "Derrama económica ", 
-      value: "4,752,935 mdp",
+      value: "4,752mdp",
       progress: 72.3,
       icon: MoneyIcon
     },
@@ -101,7 +101,7 @@ export default function CircleGraph() {
       icon: StayIcon
     },
     { 
-      title: "Oferta hotelera de cuatos", 
+      title: "Oferta hotelera de cuartos", 
       value: "4,621",
       progress: 97,
       icon: OccupiedIcon
@@ -170,7 +170,7 @@ export default function CircleGraph() {
       <div className="max-w-6xl mx-auto">
         {/* Sección de Indicadores Generales */}
         <h2 className="text-3xl font-bold text-pink-800 mb-12 text-center">
-          INDICADORES TURÍSTICOS
+          INDICADORES TURÍSTICOS DEL ESTADO  DE COLIMA, CIERRE 2024
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">

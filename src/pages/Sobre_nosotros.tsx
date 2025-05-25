@@ -26,8 +26,8 @@ export default function HeroSection() {
               Observatorio Turístico de Colima
             </h1>
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
-              <p className="text-xl md:text-2xl font-medium leading-relaxed">
-                "El monitoreo constante al sector turístico estatal, así como la generación de datos actuales para la toma de decisiones, pues esta información ayudará para la planeación y creación de estrategias que impulsen de diferentes formas el turismo en Colima."
+              <p className="text-xl md:text-2xl font-medium leading-relaxed text-justify">
+            El Observatorio turístico del estado de Colima surge como una respuesta estratégica a la necesidad de contar con información confiable, sistematizada y útil sobre el comportamiento del turismo en la entidad. Esta iniciativa, impulsada por la Subsecretaría de Turismo del Gobierno del Estado en coordinación con la Universidad de Colima a través de la Facultad de Turismo, tiene como principal propósito apoyar la mejora continua del sector mediante un sistema de gestión de la información que permita el seguimiento regular de indicadores clave de desempeño turístico.
               </p>
             </div>
           </motion.div>
@@ -39,8 +39,11 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 mb-12"
           >
-            <p className="text-lg md:text-xl leading-relaxed">
-               El Observatorio turístico del estado de Colima surge como una respuesta estratégica a la necesidad de contar con información confiable, sistematizada y útil sobre el comportamiento del turismo en la entidad. Esta iniciativa, impulsada por la Subsecretaría de Turismo del Gobierno del Estado en coordinación con la Universidad de Colima a través de la Facultad de Turismo, tiene como principal propósito apoyar la mejora continua del sector mediante un sistema de gestión de la información que permita el seguimiento regular de indicadores clave de desempeño turístico.
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">
+              Objetivo principal
+            </h2>
+            <p className="text-xl md:text-2xl font-medium leading-relaxed text-justify">
+                  El monitoreo constante al sector turístico estatal, así como la generación de datos actuales para la toma de decisiones, pues esta información ayudará para la planeación y creación de estrategias que impulsen de diferentes formas el turismo en Colima.
             </p>
           </motion.div>
 

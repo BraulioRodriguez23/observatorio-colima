@@ -3,6 +3,7 @@ import React, { useState, useCallback } from 'react';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
 import { useExcelFiles, DataRecord } from '../hooks/ExcelFiles';
+import { useExcelExport } from '../hooks/useExcelExport';
 import { 
   BarChart, 
   Bar, 
@@ -14,23 +15,22 @@ import {
 } from 'recharts';
 
 const municipiosColima = [
-  'Colima', 'Tecomán', 'Manzanillo', 'Villa de Álvarez',
-  'Coquimatlán', 'Comala', 'Cuauhtémoc', 'Armería',
-  'Ixtlahuacán', 'Minatitlán',
+  'Colima', 'Tecomán', 'Manzanillo',
+   'Comala', 'Armería',
+   
 ];
 
 const metricOptions = [
   { key: 'occupancyRate',    label: '% Ocupación'        },
-  { key: 'roomOffer',        label: 'Oferta Cuartos'     },
-  { key: 'occupiedRooms',    label: 'Cuartos Ocupados'   },
-  { key: 'availableBeds',    label: 'Ctos. Disp.'        },
+  { key: 'roomOffer',        label: 'Oferta cuartos'     },
+  { key: 'occupiedRooms',    label: 'Cuartos ocupados'   },
+  { key: 'availableBeds',    label: 'Ctos. disp.'        },
   { key: 'stay',             label: 'Estadía'            },
   { key: 'density',          label: 'Densidad'           },
-  { key: 'nights',           label: 'Noches'             },
-  { key: 'touristsPerNight', label: 'Turistas Noche'     },
-  { key: 'gpd',              label: 'GPD'                },
-  { key: 'economicImpact',   label: 'Derrama Económica'  },
-  { key: 'touristFlow',      label: 'Afluencia Turística'},
+  { key: 'touristsPerNight', label: 'Turistas noche'     },
+  { key: 'gpd',              label: 'Gasto promedio diario'},
+  { key: 'economicImpact',   label: 'Derrama económica'  },
+  { key: 'touristFlow',      label: 'Afluencia turística'},
 ];
 
 const monthMap: Record<string, number> = {
@@ -53,6 +53,19 @@ const getDefaultDates = (): { start: string; end: string } => {
   return { start: formatMonth(lastMonth), end: formatMonth(today) };
 };
 
+const generateMonthRange = (start: string, end: string): string[] => {
+  const startDate = new Date(`${start}-01`);
+  const endDate = new Date(`${end}-01`);
+  const months: string[] = [];
+
+  while (startDate <= endDate) {
+    months.push(formatMonth(startDate));
+    startDate.setMonth(startDate.getMonth() + 1);
+  }
+
+  return months;
+};
+
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -67,7 +80,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function Indicadores(): JSX.Element {
+export default function IndicadoresPaginated(): JSX.Element {
   const token = localStorage.getItem('token') ?? '';
   const [municipio, setMunicipio] = useState('');
   const [fechaInicio, setFechaInicio] = useState(getDefaultDates().start);
@@ -109,7 +122,21 @@ export default function Indicadores(): JSX.Element {
     reload();
   };
 
-  const selectedMonths = [fechaInicio, fechaFin];
+  // Exportación mejorada con nombre de indicador
+  const { exportToExcel } = useExcelExport();
+  const handleExport = () => {
+    const filtered = records.map(r => ({
+      Año:r.year,
+      Mes: r.bridgeName,
+      Municipio: r.municipality,
+      Indicador: metricOptions.find(m => m.key === metric)?.label,
+      Valor: (r[metric as keyof DataRecord] as number),
+    }));
+    exportToExcel(filtered, 'indicadores.xlsx');
+  };
+
+  // Generación de datos para el gráfico
+  const selectedMonths = generateMonthRange(fechaInicio, fechaFin);
   const chartData = selectedMonths.map(monthKey => {
     const [yy, mm] = monthKey.split('-').map(Number);
     const rec = records.find(r => 
@@ -133,28 +160,37 @@ export default function Indicadores(): JSX.Element {
       
       <main className="flex-grow p-4 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          {/* Botones métricas */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {metricOptions.map(o => (
-              <button
-                key={o.key}
-                onClick={() => setMetric(o.key)}
-                className={`px-3 py-1 rounded-full text-sm ${
-                  metric === o.key
-                    ? 'bg-pink-600 text-white'
-                    : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                }`}
-              >
-                {o.label}
-              </button>
-            ))}
+          {/* Encabezado con métricas y botón de exportación */}
+          <div className="flex flex-wrap gap-2 mb-4 items-center justify-between">
+            <div className="flex flex-wrap gap-2">
+              {metricOptions.map(o => (
+                <button
+                  key={o.key}
+                  onClick={() => setMetric(o.key)}
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    metric === o.key
+                      ? 'bg-pink-600 text-white'
+                      : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                  }`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleExport}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              Exportar a Excel
+            </button>
           </div>
 
+          {/* Contenedor principal */}
           <div className="grid lg:grid-cols-4 gap-6">
-            {/* FILTROS */}
+            {/* Sección de filtros */}
             <form 
               onSubmit={handleSubmit} 
-              className=" text-gray-800 lg:col-span-1 bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+              className="text-gray-800 lg:col-span-1 bg-white p-4 rounded-lg shadow-sm border border-gray-200"
             >
               <div className="space-y-4">
                 <div>
@@ -195,16 +231,16 @@ export default function Indicadores(): JSX.Element {
 
                 <button
                   type="submit"
-                  className="w-full bg-pink-600 text-white py-5 rounded-md hover:bg-pink-700 transition-colors"
+                  className="w-full bg-pink-600 text-white py-2 rounded-md hover:bg-pink-700 transition-colors"
                 >
-                  {loading ? 'Cargando...' : 'Actualizar gráfico'}
+                  {loading ? 'Cargando...' : 'Actualizar'}
                 </button>
               </div>
             </form>
 
-            {/* GRÁFICO DE BARRAS */}
-            <div className="lg:col-span-3 bg-white p-12 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-16">
+            {/* Gráfico */}
+            <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 {metricOptions.find(o => o.key === metric)?.label}
               </h3>
               
@@ -237,7 +273,6 @@ export default function Indicadores(): JSX.Element {
                         fill="#db2777"
                         barSize={35}
                         radius={[4, 4, 0, 0]}
-                        className="hover:fill-pink-700 transition-colors"
                       />
                     </BarChart>
                   </ResponsiveContainer>

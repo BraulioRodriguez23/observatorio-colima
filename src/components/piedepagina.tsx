@@ -1,20 +1,17 @@
-import udcLogo from '../images/logoudc.png'
-import gColimaLogo from '../images/escudo1.jpg';
+import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png'
+import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
 
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-gray-200 py-8">
       <div className="max-w-6xl mx-auto px-4">
-
-       
-
         {/* Sección Superior */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left mb-8">
           {/* Sobre Nosotros */}
           <div>
-            <h3 className="text-lg font-semibold text-pink-400">Sobre Nosotros</h3>
+            <h3 className="text-lg font-semibold text-pink-400">Aviso de privacidad</h3>
             <p className="mt-4 text-sm">
-              El Observatorio turístico del estado de Colima surge como una respuesta estratégica a la necesidad de contar con información confiable, sistematizada y útil sobre el comportamiento del turismo en la entidad. Esta iniciativa, impulsada por la Subsecretaría de Turismo del Gobierno del Estado en coordinación con la Universidad de Colima a través de la Facultad de Turismo, tiene como principal propósito apoyar la mejora continua del sector mediante un sistema de gestión de la información que permita el seguimiento regular de indicadores clave de desempeño turístico.
+              falta contenido
             </p>
           </div>
 
@@ -24,15 +21,18 @@ export default function Footer() {
             <ul className="mt-4 space-y-2">
               <li><a href="https://visitacolima.mx/" className="hover:underline">Visita Colima</a></li>
               <li><a href="https://visitmanzanillo.mx/" className="hover:underline">Visita Manzanillo</a></li>
-              <li><a href="https://www.gob.mx/sectur" className="hover:underline">Sectur</a></li>
-              <li><a href="https://cedocvirtual.sectur.gob.mx/janium-bin/janium_login.pl" className="hover:underline">Cedoc</a></li>
-              <li><a href="https://atlasturistico.sectur.gob.mx" className="hover:underline">Atlas Turístico</a></li>
+              <li><a href="https://www.gob.mx/sectur" className="hover:underline">Sectur Federal</a></li>
+              <li><a href="https://cedocvirtual.sectur.gob.mx/janium-bin/janium_login.pl" className="hover:underline">Cedoc virtual</a></li>
+              <li><a href="https://atlasturistico.sectur.gob.mx" className="hover:underline">Atlas turístico</a></li>
+              <li><a href="https://www.gob.mx/sectur/acciones-y-programas/instituto-de-competitividad-turistica" className="hover:underline">Instituto de competitividad turística</a></li>
+              <li><a href="https://www.gob.mx/tramites/ficha/inscripcion-a-la-red-de-investigadores-y-centros-de-investigacion-en-turismo-ricit/ICTUR6101"
+                className="hover:underline">RICIT</a></li>
             </ul>
           </div>
 
           {/* Redes Sociales */}
           <div>
-            <h3 className="text-lg font-semibold text-pink-400">Síguenos</h3>
+            <h3 className="text-lg font-semibold text-pink-400">Síguenos Visita Colima</h3>
             <div className="flex flex-col items-center md:items-start mt-2 space-y-2">
               <a href="https://www.facebook.com/SecturColimaOficial?locale=es_LA" className="hover:text-pink-400">
                 <i className="fab fa-facebook"></i> Facebook
@@ -48,9 +48,6 @@ export default function Footer() {
               </a>
             </div>
           </div>
-           {/* Logos */}
-        <div className="flex justify-center md:justify-start space-x-6 mb-7">
-         
 
           {/* Contacto */}
           <div>
@@ -65,24 +62,26 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Logos alineados */}
+        <div className="flex justify-center items-center space-x-4 mb-4 ml-20">
+          <img
+            src={udcLogo}
+            alt="Universidad de Colima"
+            className="h-20 object-contain"
+          />
+          <img
+            src={gColimaLogo}
+            alt="Gobierno del Estado de Colima"
+            className="h-20 object-contain"
+          />
+        </div>
+
         {/* Sección Inferior */}
-        <div className="border-t border-gray-700 mt-4 pt-2 text-center">
+        <div className="border-t border-gray-700 pt-4 text-center">
           <p className="text-sm">
             &copy; {new Date().getFullYear()} Observatorio Turístico de Colima. Todos los derechos reservados.<br />
             Subsecretaría de Turismo de Gobierno del Estado de Colima.
           </p>
-        </div>
-         <img 
-            src={udcLogo}
-            alt="Universidad de Colima"
-            className="h-15 object-contain "
-          />
-          
-          <img
-            src={gColimaLogo}
-            alt="Gobierno del Estado de Colima"
-            className="h-15 object-contain"
-          />
         </div>
       </div>
     </footer>

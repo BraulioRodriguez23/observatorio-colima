@@ -18,6 +18,28 @@ const NoticiaDetalle = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Expresión regular para detectar URLs
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  // Función que convierte texto con URLs en fragmentos React con <a>
+  const linkify = (text: string) =>
+    text.split(urlRegex).map((part, i) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return <span key={i}>{part}</span>;
+    });
+
   // Fetch news data from the API
   useEffect(() => {
     const fetchNews = async () => {
@@ -29,16 +51,16 @@ const NoticiaDetalle = () => {
           throw new Error("Failed to fetch news");
         }
         const data = await response.json();
-        setArticle(data); // Set the news data
+        setArticle(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
-        setLoading(false); // Set loading to false after the request completes
+        setLoading(false);
       }
     };
 
     fetchNews();
-  }, [id]); // Dependencia en `id` para que se vuelva a ejecutar si cambia
+  }, [id]);
 
   // Mostrar estado de carga
   if (loading) {
@@ -58,7 +80,7 @@ const NoticiaDetalle = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
-      
+
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {article.imageUrl && (
@@ -71,21 +93,21 @@ const NoticiaDetalle = () => {
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-32" />
             </div>
           )}
-          
+
           <div className="px-6 py-8 md:px-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               {article.title}
             </h1>
-            
+
             <div className="prose prose-lg max-w-none text-gray-700">
-              {article.content.split('\n').map((paragraph, index) => (
+              {article.content.split("\n").map((paragraph, index) => (
                 <p key={index} className="mb-6 last:mb-0">
-                  {paragraph}
+                  {linkify(paragraph)}
                 </p>
               ))}
             </div>
           </div>
-          
+
           <div className="px-6 md:px-12 pb-8">
             <div className="border-t border-gray-200 pt-6">
               <a
@@ -113,4 +135,5 @@ const NoticiaDetalle = () => {
     </div>
   );
 };
+
 export default NoticiaDetalle;
