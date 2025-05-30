@@ -18,7 +18,7 @@ const HorizontalMenu: React.FC = () => {
   return (
     <div className="relative">
       {/* Botón hamburguesa en móvil */}
-      <div className="md:hidden flex justify-end px-4 py-2">
+      <div className="md:hidden flex justify-end px-4 py-4">
         <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -28,7 +28,7 @@ const HorizontalMenu: React.FC = () => {
       <nav
         className={`${
           isOpen ? 'flex' : 'hidden'
-        } flex-col space-y-2 px-4 pb-4 md:flex md:flex-row md:space-x-4 md:space-y-0 md:pb-0`}
+        } flex-col space-y-6 px-4 pb-4 md:flex md:flex-row md:space-x-4 md:space-y-0 md:pb-0`}
       >
         {tabs.map((tab) => (
           <NavLink

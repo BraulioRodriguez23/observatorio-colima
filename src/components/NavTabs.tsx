@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 export default function NavTabs() {
   return (
     <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-8xl mx-auto px-4">
         <div className="flex space-x-8">
           <NavLink 
             to="/"

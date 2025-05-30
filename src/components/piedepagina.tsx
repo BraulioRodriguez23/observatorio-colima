@@ -1,19 +1,13 @@
-import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png'
+import React from 'react';
+import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png';
 import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
 
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-gray-200 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Sección Superior */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left mb-8">
-          {/* Sobre Nosotros */}
-          <div>
-            <h3 className="text-lg font-semibold text-pink-400">Aviso de privacidad</h3>
-            <p className="mt-4 text-sm">
-              falta contenido
-            </p>
-          </div>
+        {/* Sección Superior: 3 columnas centradas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-8">
 
           {/* Enlaces útiles */}
           <div>
@@ -25,15 +19,14 @@ export default function Footer() {
               <li><a href="https://cedocvirtual.sectur.gob.mx/janium-bin/janium_login.pl" className="hover:underline">Cedoc virtual</a></li>
               <li><a href="https://atlasturistico.sectur.gob.mx" className="hover:underline">Atlas turístico</a></li>
               <li><a href="https://www.gob.mx/sectur/acciones-y-programas/instituto-de-competitividad-turistica" className="hover:underline">Instituto de competitividad turística</a></li>
-              <li><a href="https://www.gob.mx/tramites/ficha/inscripcion-a-la-red-de-investigadores-y-centros-de-investigacion-en-turismo-ricit/ICTUR6101"
-                className="hover:underline">RICIT</a></li>
+              <li><a href="https://www.gob.mx/tramites/ficha/inscripcion-a-la-red-de-investigadores-y-centros-de-investigacion-en-turismo-ricit/ICTUR6101" className="hover:underline">RICIT</a></li>
             </ul>
           </div>
 
           {/* Redes Sociales */}
           <div>
             <h3 className="text-lg font-semibold text-pink-400">Síguenos Visita Colima</h3>
-            <div className="flex flex-col items-center md:items-start mt-2 space-y-2">
+            <div className="flex flex-col items-center mt-2 space-y-2">
               <a href="https://www.facebook.com/SecturColimaOficial?locale=es_LA" className="hover:text-pink-400">
                 <i className="fab fa-facebook"></i> Facebook
               </a>
@@ -63,7 +56,7 @@ export default function Footer() {
         </div>
 
         {/* Logos alineados */}
-        <div className="flex justify-center items-center space-x-4 mb-4 ml-20">
+        <div className="flex justify-center items-center space-x-4 mb-4">
           <img
             src={udcLogo}
             alt="Universidad de Colima"

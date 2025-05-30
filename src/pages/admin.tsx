@@ -27,20 +27,35 @@ interface DocumentItem {
   category: string;
 }
 
+interface ExcelItem {
+  id: number;
+  name: string; // O el campo relevante, ajusta según tu modelo
+  // ...otros campos si tienes
+}
+
+const excelTypes = [
+  { value: "mensual",   route: "monthly-stats",   label: "Mensual"      },
+  { value: "temporada", route: "season-stats",    label: "Temporada"    },
+  { value: "puentes",   route: "info-injection",  label: "Puentes"      },
+];
+
 // -------- Supabase --------
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const AdminPage: React.FC = () => {
+  const [excelType, setExcelType] = useState<string>(excelTypes[0].value);
   const [currentSection, setCurrentSection] = useState<Section>("news");
   const [news, setNews] = useState<NewsItem[]>([]);
   const [pdfs, setPdfs] = useState<DocumentItem[]>([]);
+  const [excels, setExcels] = useState<ExcelItem[]>([]);
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfTitle, setPdfTitle] = useState("");
-  const [pdfCategory, setPdfCategory] = useState(""); // Nuevo estado para categoría PDF
+  const [pdfCategory, setPdfCategory] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   // -------- Fetch data --------
   const fetchNews = async () => {
@@ -57,7 +72,7 @@ const AdminPage: React.FC = () => {
       setNews(data);
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al cargar las noticias");
+      setError("Error al cargar las noticias");
     }
   };
 
@@ -72,25 +87,50 @@ const AdminPage: React.FC = () => {
       );
       if (!response.ok) throw new Error("Error al cargar los PDFs");
       const data = await response.json();
-      // Forzamos a id:number por seguridad si viniera como string
-      setPdfs(data.map((d: DocumentItem) => ({
-        ...d,
-        id: Number(d.id), // Por si llega como string, lo convierte a number
-      })));
+      setPdfs(
+        data.map((d: DocumentItem & { fileUrl?: string }) => ({
+          ...d,
+          id: Number(d.id),
+          url: d.url ?? d.fileUrl,
+          category: d.category ?? "Sin Categoría",
+        }))
+      );
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al cargar los PDFs");
+      setError("Error al cargar los PDFs");
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([fetchNews(), fetchPdfs()]);
-      setLoading(false);
-    };
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
+// 1) Dentro de AdminPage (o donde definas tu fetch de listado)
+const fetchExcels = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const config = excelTypes.find(e => e.value === excelType)!;
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/${config.route}`,   // ← GET a /<route>
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    if (!response.ok) throw new Error("Error al cargar los Excels");
+    const data = await response.json();
+    setExcels(data);
+  } catch {
+    setError("Error al cargar los Excels");
+  }
+};
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    await Promise.all([fetchNews(), fetchPdfs()]);
+    if (currentSection === "excel") {
+      await fetchExcels();
+    }
+    setLoading(false);
+  };
+  fetchData();
+}, [currentSection, excelType]);
 
   // -------- Supabase uploads --------
   const uploadImageToSupabase = async (file: File): Promise<string> => {
@@ -217,7 +257,15 @@ const AdminPage: React.FC = () => {
       );
       if (!response.ok) throw new Error("Error al subir el archivo PDF");
       const newPdf = await response.json();
-      setPdfs((prevPdfs) => [...prevPdfs, { ...newPdf, id: Number(newPdf.id) }]);
+      setPdfs((prevPdfs) => [
+        ...prevPdfs,
+        {
+          ...newPdf,
+          id: Number(newPdf.id),
+          url: newPdf.url ?? newPdf.fileUrl,
+          category: newPdf.category ?? "Sin Categoría",
+        },
+      ]);
       setPdfFile(null);
       setPdfTitle("");
       setPdfCategory("");
@@ -246,23 +294,62 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  // --------- Eliminar Excel ---------
+  const handleDeleteExcel = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/info-injection/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      if (!response.ok) throw new Error("Error al eliminar el Excel");
+      setExcels((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      alert("Error al eliminar el archivo Excel");
+    }
+  };
+
+  // AGRUPACIÓN por categoría
+  const groupedByCategory = pdfs.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
+    const category = pdf.category || "Sin Categoría";
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(pdf);
+    return acc;
+  }, {});
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-xl">Cargando...</div>
+      <div className="flex min-h-screen bg-gray-50 text-gray-900">
+        <AdminSidebar
+          currentSection={currentSection}
+          onSectionChange={setCurrentSection}
+        />
+        <div className="ml-64 flex-1 p-8">
+          <AdminHeader />
+          <AdminLayout>
+            <div className="space-y-6">
+              <div>Cargando...</div>
+            </div>
+          </AdminLayout>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gra">
-      <AdminSidebar currentSection={currentSection} onSectionChange={setCurrentSection} />
-
+    <div className="flex min-h-screen bg-gray-50 text-gray-900">
+      <AdminSidebar
+        currentSection={currentSection}
+        onSectionChange={setCurrentSection}
+      />
       <div className="ml-64 flex-1 p-8">
         <AdminHeader />
-
         <AdminLayout>
           <div className="space-y-6">
+
             {currentSection === "news" && (
               <>
                 <NewsForm
@@ -270,7 +357,11 @@ const AdminPage: React.FC = () => {
                   onSubmit={handleNewsSubmit}
                   onCancel={() => setEditingNews(null)}
                 />
-                <NewsList news={news} onEdit={setEditingNews} onDelete={handleDelete} />
+                <NewsList
+                  news={news}
+                  onEdit={setEditingNews}
+                  onDelete={handleDelete}
+                />
               </>
             )}
 
@@ -285,17 +376,70 @@ const AdminPage: React.FC = () => {
                   setPdfCategory={setPdfCategory}
                   handlePdfUpload={handlePdfUpload}
                 />
-                <PdfList pdfs={pdfs} onDelete={handleDeletePdf} />
+                <div className="space-y-6">
+                  {Object.entries(groupedByCategory).map(([category, docs]) => (
+                    <div key={category} className="mb-8">
+                      <h3 className="font-bold text-lg mb-2">{category}</h3>
+                      <PdfList pdfs={docs} onDelete={handleDeletePdf} />
+                    </div>
+                  ))}
+                </div>
               </>
             )}
 
             {currentSection === "excel" && (
-              <ExcelUpload
-                onSuccess={(msg) => alert(msg)}
-                onError={(msg) => alert(msg)}
-                onUploadComplete={() => {/* Puedes refrescar datos aquí si quieres */}}
-              />
+              <>
+                {/* Selector de tipo de Excel */}
+                <div className="w-1/3 mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de Excel
+                  </label>
+                  <select
+                    value={excelType}
+                    onChange={e => {
+                      setExcelType(e.target.value);
+                      setLoading(true);
+                    }}
+                    className="w-full p-2 border rounded"
+                  >
+                    {excelTypes.map(opt => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Componente de subida */}
+                <ExcelUpload
+                  excelType={excelType}
+                  excelTypes={excelTypes}
+                  onSuccess={() => fetchExcels()}
+                  onError={msg => alert(msg)}
+                  onUploadComplete={() => fetchExcels()}
+                />
+
+                {/* Listado de Excels */}
+                <div className="space-y-4 mt-4">
+                  {excels.map(item => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between bg-white p-3 rounded shadow"
+                    >
+                      <span>{item.name}</span>
+                      <button
+                        onClick={() => handleDeleteExcel(item.id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
+
+            {error && <div className="text-red-600 mt-4">{error}</div>}
           </div>
         </AdminLayout>
       </div>

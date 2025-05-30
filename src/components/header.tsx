@@ -1,6 +1,6 @@
 import React from 'react';
 import logo from '../images/colima-logo.png';
-import logomnz from '../images/Manzanillo marca turística.png';
+import logomnz from '../images/Manzanillo -logo.png';
 import logocomala from '../images/Comala Pueblo Mágico.png';
 import HorizontalMenu from './Horizontalmenu';
 
@@ -15,26 +15,25 @@ const Header: React.FC = () => {
     alt="Logo Colima"
     className="h-8 sm:h-10 object-contain sm:hidden"
   />
-
-  {/* Manzanillo – aparece en ≥sm */}
-  <img
+<img
   src={logomnz}
   alt="Logo Manzanillo"
-  className="hidden sm:block h-24 max-w-[150px] object-contain p-0 bg-transparent border-2  rounded "
+  className="h-2 sm:h-24 object-contain -ml-2 -mr-2"
 />
+
 
   {/* Colima – vuelve a aparecer en ≥sm */}
   <img
     src={logo}
     alt="Logo Colima"
-    className="hidden sm:block h-8 sm:h-10 object-contain"
+    className="hidden sm:block h-9 sm:h-12 object-contain"
   />
 
   {/* Comala – solo en ≥md */}
   <img
     src={logocomala}
     alt="Logo Comala"
-    className="hidden md:block h-10 md:h-10 object-contain"
+    className="hidden md:block h-12 md:h-20 object-contain"
   />
 </div>
 

@@ -2,62 +2,71 @@ import { useState } from 'react';
 import axios from 'axios';
 
 interface ExcelData {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  touristFlow: any;       // ajusta el tipo si sabes más
-  año: number;
-  municipio: string;
-  porcentaje_ocupacion: number;
-  oferta_cuartos: number;
-  cuartos_ocupados: number;
-  derrama_economica: number;
+  id: number;
+  year: number;
+  municipality: string;
+  occupancyRate?: number;
+  touristFlow?: number;
+  economicImpact?: number;
+  roomOffer?: number;
+  occupiedRooms?: number;
+  availableRooms?: number;
+  stay?: number;
+  density?: number;
+  touristsPerNight?: number;
+  avgSpending?: number;
+  bridgeName?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Filters {
-  year: string;
-  municipio: string;
+  year?: string;
+  municipality?: string;
 }
 
-export const useExcelData = () => {
+export const useExcelData = (
+  route: 'monthly-stats' | 'season-stats' | 'info-injection'
+) => {
   const [data, setData] = useState<ExcelData[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [filters, setFilters] = useState<Filters>({ year: '', municipio: '' });
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filters, setFilters] = useState<Filters>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadData = async (currentPage = page, rowsPerPage = 10) => {
+  const loadData = async (currentPage = page, perPage = rowsPerPage) => {
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) throw new Error('Usuario no autenticado');
 
-      // 1. Construcción dinámica de params
+      // Construcción dinámica de params
       const params: Record<string, unknown> = {
         page: currentPage,
-        limit: rowsPerPage
+        limit: perPage,
       };
-      if (filters.year) {
-        params.year = filters.year;              // aquí 'year' coincide con tu backend
-      }
-      if (filters.municipio) {
-        params.municipality = filters.municipio; // backend espera 'municipality'
-      }
+      if (filters.year) params.fromYear = filters.year;
+      if (filters.year) params.toYear = filters.year;
+      if (filters.municipality) params.municipality = filters.municipality;
 
-      // 2. Llamada con Axios
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/upload-excel`,
+        `${import.meta.env.VITE_API_BASE_URL}/${route}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          params
+          params,
         }
       );
 
-      setData(response.data.rows);
-      setTotal(response.data.total);
+      // Paginación
+      setData(response.data.rows || response.data);
+      setTotal(response.data.total ?? response.data.length);
     } catch (err) {
-      console.error('Error fetching Excel files:', err);
-      setError('No se pudieron cargar los archivos. Intente de nuevo.');
+      console.error('Error fetching Excel data:', err);
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -66,18 +75,19 @@ export const useExcelData = () => {
   return {
     data,
     total,
-    loadData,
     page,
     setPage,
+    rowsPerPage,
+    setRowsPerPage,
     filters: {
-      year: filters.year,
-      municipio: filters.municipio,
-      setYear: (value: string) =>
-        setFilters(prev => ({ ...prev, year: value })),
-      setMunicipio: (value: string) =>
-        setFilters(prev => ({ ...prev, municipio: value }))
+      year: filters.year || '',
+      municipality: filters.municipality || '',
+      setYear: (year: string) => setFilters(prev => ({ ...prev, year })),
+      setMunicipality: (municipality: string) =>
+        setFilters(prev => ({ ...prev, municipality })),
     },
     loading,
-    error
+    error,
+    loadData,
   };
 };
