@@ -6,26 +6,13 @@ const TABS = [
   { label: "Corte Mensual", value: "mensual" },
   { label: "Temporadas vacacionales", value: "temporada" },
   { label: "Fines de semana largos", value: "puentes" },
-  
 ];
 
+// Define aquí si quieres que aparezca el segundo nivel de filtros. Si no lo necesitas, bórralo del render también.
 const DESCARGABLES: Record<string, { label: string; value: string }[]> = {
-  mensual: [
-    { label: "Establecimientos de hospedaje", value: "hospedaje" },
-    { label: "Personal ocupado", value: "personal" },
-    { label: "PIBE", value: "pibe" },
-    { label: "Histórico principales indicadores", value: "historico" },
-    { label: "Cruceros", value: "cruceros" },
-  ],
-  temporada: [
-    { label: "Temporada: Reporte general", value: "temp_general" },
-  ],
-  puentes: [
-    { label: "Puentes: Estadísticas completas", value: "puentes_completo" },
-  ],
-  cruceros: [
-    { label: "Cruceros: Reporte anual", value: "cruceros_anual" },
-  ],
+  mensual: [{ label: "General", value: "general" }],
+  temporada: [{ label: "General", value: "general" }],
+  puentes: [{ label: "General", value: "general" }],
 };
 
 interface ExcelIndicator {
@@ -36,6 +23,54 @@ interface ExcelIndicator {
   temporada?: string;
   puente?: string;
   ocupacion?: number;
+}
+
+// Mapping del backend (en inglés) a los nombres que espera tu frontend:
+type RawExcelRecord = {
+  id: number;
+  year: number;
+  municipality?: string;
+  month?: string;
+  season?: string;
+  bridgeName?: string;
+  occupancyRate?: number;
+};
+
+function mapExcelRecord(raw: RawExcelRecord, type: string): ExcelIndicator {
+  switch (type) {
+    case "mensual":
+      return {
+        id: raw.id,
+        year: raw.year,
+        municipio: raw.municipality,
+        mes: raw.month,
+        ocupacion: raw.occupancyRate,
+      };
+    case "temporada":
+      return {
+        id: raw.id,
+        year: raw.year,
+        municipio: raw.municipality,
+        temporada: raw.season,
+        ocupacion: raw.occupancyRate,
+      };
+    case "puentes":
+      return {
+        id: raw.id,
+        year: raw.year,
+        municipio: raw.municipality,
+        puente: raw.bridgeName,
+        ocupacion: raw.occupancyRate,
+      };
+    default:
+      // fallback for unexpected types
+      return {
+        id: raw.id,
+        year: raw.year,
+        municipio: raw.municipality,
+        ocupacion: raw.occupancyRate,
+      };
+  }
 }
 
 const endpointByType: Record<string, string> = {
@@ -62,7 +97,9 @@ const IndicadoresPage: React.FC = () => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then(setData)
+      .then(rawData => {
+        setData(rawData.map((item: RawExcelRecord) => mapExcelRecord(item, activeTab)));
+      })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [activeTab]);

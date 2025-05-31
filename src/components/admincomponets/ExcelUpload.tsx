@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 // ------------ CONFIGURACIÓN DE TIPOS Y ENDPOINTS --------------
 const excelTypes = [
-  { value: "Corte mensual",   route: "monthly-stats",   label: "Mensual"      },
-  { value: "Temporada vacacion", route: "season-stats",    label: "Temporada"    },
-  { value: "Fines de semana largos",   route: "info-injection",  label: "Puentes"      },
+  { value: "mensual",   route: "monthly-stats",   label: "Corte mensual" },
+  { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales" },
+  { value: "puentes",   route: "info-injection",  label: "Fines de semana largos" },
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
