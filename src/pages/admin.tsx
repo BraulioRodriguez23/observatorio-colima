@@ -413,7 +413,6 @@ useEffect(() => {
                 {/* Componente de subida */}
                 <ExcelUpload
                   excelType={excelType}
-                  excelTypes={excelTypes}
                   onSuccess={() => fetchExcels()}
                   onError={msg => alert(msg)}
                   onUploadComplete={() => fetchExcels()}
