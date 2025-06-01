@@ -1,4 +1,3 @@
-
 import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png';
 import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
 

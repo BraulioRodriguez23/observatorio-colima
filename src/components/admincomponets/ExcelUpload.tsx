@@ -8,7 +8,6 @@ const excelTypes = [
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
-
 type ExcelRecord = Record<string, string | number | null | undefined>;
 
 interface ExcelUploadProps {
@@ -50,6 +49,8 @@ export const ExcelUpload: React.FC<ExcelUploadProps> = ({
 
       const config = excelTypes.find(e => e.value === excelType);
       if (!config) throw new Error('Tipo de Excel no válido');
+
+      // Ajusta aquí tu base URL según tu .env o tu configuración real:
       const url = `${import.meta.env.VITE_API_BASE_URL}/${config.route}/upload-excel`;
 
       const formData = new FormData();
@@ -142,6 +143,7 @@ const ExcelUploadManager: React.FC = () => {
     try {
       const config = excelTypes.find(e => e.value === excelType);
       if (!config) throw new Error('Tipo de Excel no válido');
+
       const url = `${import.meta.env.VITE_API_BASE_URL}/${config.route}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('No se pudieron obtener los registros');
@@ -157,7 +159,7 @@ const ExcelUploadManager: React.FC = () => {
   // Refresca registros cada vez que cambia el tipo
   useEffect(() => {
     fetchRecords();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [excelType]);
 
   // Mensajes de éxito/error
