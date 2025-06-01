@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-// ------------ CONFIGURACIÓN DE TIPOS Y ENDPOINTS --------------
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Corte mensual" },
   { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales" },
@@ -8,7 +7,6 @@ const excelTypes = [
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
-type ExcelRecord = Record<string, string | number | null | undefined>;
 
 interface ExcelUploadProps {
   excelType: ExcelType;
@@ -17,7 +15,6 @@ interface ExcelUploadProps {
   onUploadComplete: () => void;
 }
 
-// ------------ COMPONENTE DE SUBIDA ---------------
 export const ExcelUpload: React.FC<ExcelUploadProps> = ({
   excelType,
   onSuccess,
@@ -50,9 +47,7 @@ export const ExcelUpload: React.FC<ExcelUploadProps> = ({
       const config = excelTypes.find(e => e.value === excelType);
       if (!config) throw new Error('Tipo de Excel no válido');
 
-      // Ajusta aquí tu base URL según tu .env o tu configuración real:
       const url = `${import.meta.env.VITE_API_BASE_URL}/${config.route}/upload-excel`;
-
       const formData = new FormData();
       formData.append('file', file);
 
@@ -79,10 +74,11 @@ export const ExcelUpload: React.FC<ExcelUploadProps> = ({
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label htmlFor="file-input" className="block text-sm font-medium text-gray-700 mb-2">
         Seleccionar archivo Excel
       </label>
       <input
+        id="file-input"
         type="file"
         accept=".xlsx,.xls"
         onChange={handleFileChange}
@@ -98,111 +94,3 @@ export const ExcelUpload: React.FC<ExcelUploadProps> = ({
     </div>
   );
 };
-
-// ----------- COMPONENTE DE TABLA DINÁMICA (RESULTADOS) -----------
-const ExcelTable: React.FC<{ records: ExcelRecord[] }> = ({ records }) => {
-  if (!records.length) return null;
-  return (
-    <div className="mt-6 overflow-x-auto">
-      <h3 className="font-bold mb-2">Registros subidos:</h3>
-      <table className="min-w-full border bg-white">
-        <thead>
-          <tr>
-            {Object.keys(records[0]).map((key) => (
-              <th key={key} className="border px-2 py-1">{key}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {records.map((row, idx) => (
-            <tr key={idx}>
-              {Object.values(row).map((val, i) => (
-                <td key={i} className="border px-2 py-1">{val != null ? String(val) : ''}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-// ------------- PADRE: MANEJA EL TIPO, FEEDBACK Y DATOS ----------
-const ExcelUploadManager: React.FC = () => {
-  const [excelType, setExcelType] = useState<ExcelType>("mensual");
-  const [msg, setMsg] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [records, setRecords] = useState<ExcelRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // Cargar registros de la tabla según tipo seleccionado
-  const fetchRecords = async () => {
-    setLoading(true);
-    setRecords([]);
-    setErr(null);
-    try {
-      const config = excelTypes.find(e => e.value === excelType);
-      if (!config) throw new Error('Tipo de Excel no válido');
-
-      const url = `${import.meta.env.VITE_API_BASE_URL}/${config.route}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('No se pudieron obtener los registros');
-      const data = await response.json();
-      setRecords(data);
-    } catch (err) {
-      setErr(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Refresca registros cada vez que cambia el tipo
-  useEffect(() => {
-    fetchRecords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [excelType]);
-
-  // Mensajes de éxito/error
-  const handleSuccess = (txt: string) => {
-    setMsg(txt);
-    setErr(null);
-    fetchRecords();
-  };
-  const handleError = (txt: string) => {
-    setErr(txt);
-    setMsg(null);
-  };
-
-  return (
-    <div className="max-w-xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Subir y consultar archivos Excel</h1>
-
-      <label className="block mb-2">Tipo de Excel</label>
-      <select
-        value={excelType}
-        onChange={e => setExcelType(e.target.value as ExcelType)}
-        className="mb-4 block p-2 border rounded w-full"
-      >
-        {excelTypes.map(opt => (
-          <option value={opt.value} key={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-
-      <ExcelUpload
-        excelType={excelType}
-        onSuccess={handleSuccess}
-        onError={handleError}
-        onUploadComplete={fetchRecords}
-      />
-
-      {msg && <div className="mt-4 text-green-600">{msg}</div>}
-      {err && <div className="mt-4 text-red-600">{err}</div>}
-
-      {loading && <div className="mt-4">Cargando registros...</div>}
-
-      <ExcelTable records={records} />
-    </div>
-  );
-};
-
-export default ExcelUploadManager;

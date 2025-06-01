@@ -7,7 +7,7 @@ import NewsList from "../components/admincomponets/NewsList";
 import PdfList from "../components/admincomponets/PdfList";
 import PdfUpload from "../components/admincomponets/PdfUpload";
 import { ExcelUpload } from "../components/admincomponets/ExcelUpload";
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js";
 
 // -------- Types --------
 type Section = "news" | "pdfs" | "excel";
@@ -28,25 +28,13 @@ interface DocumentItem {
 }
 
 interface ExcelItem {
-  /** Identificador único en la base de datos */
   id: number;
-
-  /** Nombre del archivo Excel (sin ruta) */
   name: string;
-
-  /** URL pública del archivo almacenado (para descargarlo o visualizarlo) */
   fileUrl: string;
-
-  /** Tipo o categoría del Excel (“mensual” | “temporada” | “puentes”, según tu lógica) */
   tipo: "mensual" | "temporada" | "puentes";
-
-  /** Fecha y hora en que se subió el archivo (ISO 8601) */
   createdAt: string;
-
-  /** (Opcional) Usuario que subió el archivo */
   uploadedBy?: string;
 }
-
 
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Mensual"   },
@@ -213,7 +201,6 @@ const AdminPage: React.FC = () => {
     try {
       const newsItem = news.find((item) => item.id === id);
       if (newsItem?.imageUrl) {
-        // Extrae el path relativo para removerlo de Supabase
         const parts = newsItem.imageUrl.split("/");
         const idx = parts.findIndex((p) => p === "news-images");
         if (idx >= 0) {
@@ -302,7 +289,9 @@ const AdminPage: React.FC = () => {
   const handleDeleteExcel = async (id: number) => {
     try {
       const token = localStorage.getItem("token") || "";
-      const endpoint = `${API_BASE}/info-injection/${id}`;
+      const config = excelTypes.find(e => e.value === excelType)!;
+      const route = config.route;
+      const endpoint = `${API_BASE}/${route}/${id}`;
       const response = await fetch(endpoint, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -314,7 +303,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Agrupa PDFs por categoría para mostrarlos
   const groupedByCategory = pdfs.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
     const category = pdf.category || "Sin Categoría";
     if (!acc[category]) acc[category] = [];
@@ -391,17 +379,15 @@ const AdminPage: React.FC = () => {
 
             {currentSection === "excel" && (
               <>
-                {/* Selector de tipo de Excel */}
+                {/* Selector de tipo de Excel con accesibilidad */}
                 <div className="w-1/3 mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
                     Tipo de Excel
                   </label>
                   <select
+                    id="tipo-excel"
                     value={excelType}
-                    onChange={(e) => {
-                      setExcelType(e.target.value);
-                      setLoading(true);
-                    }}
+                    onChange={(e) => setExcelType(e.target.value)}
                     className="w-full p-2 border rounded"
                   >
                     {excelTypes.map((opt) => (
@@ -414,7 +400,7 @@ const AdminPage: React.FC = () => {
 
                 {/* Componente de subida de Excel */}
                 <ExcelUpload
-                  excelType={excelType}
+                  excelType={excelType as "mensual" | "temporada" | "puentes"}
                   onSuccess={() => fetchExcels()}
                   onError={(msg) => alert(msg)}
                   onUploadComplete={() => fetchExcels()}
