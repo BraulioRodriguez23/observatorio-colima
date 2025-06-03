@@ -34,10 +34,6 @@ const PdfUpload: React.FC<Props> = ({
       className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 text-gray-800"
     >
       <option value="">Selecciona la sección</option>
-      <option value="Investigación">Investigación</option>
-      <option value="Perfil y grado de satisfacción de los turistas que visitan el estado en temporadas vacacionales">
-        Perfil y grado de satisfacción de los turistas que visitan el estado en temporadas vacacionales
-      </option>
       <option value="Por temporada vacacional">Por temporada vacacional</option>
       <option value="Por destino">Por destino</option>
       <option value="Informe anual 2024">Informe anual 2024</option>

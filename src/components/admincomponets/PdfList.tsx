@@ -14,7 +14,7 @@ interface PdfListProps {
 
 function groupPdfsByCategory(pdfs: DocumentItem[]) {
   return pdfs.reduce<{ [key: string]: DocumentItem[] }>((acc, pdf) => {
-    const cat = pdf.category || "ok";
+    const cat = pdf.category || "Sin categoría";
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(pdf);
     return acc;
