@@ -26,7 +26,7 @@ interface Filters {
 }
 
 export const useExcelData = (
-  route: 'monthly-stats' | 'season-stats' | 'info-injection'
+  route: 'monthly-stats' | 'season-stats' | 'puentes-stats'
 ) => {
   const [data, setData] = useState<ExcelData[]>([]);
   const [total, setTotal] = useState(0);

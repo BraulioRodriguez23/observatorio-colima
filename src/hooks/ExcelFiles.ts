@@ -50,7 +50,7 @@ interface UseExcelFilesParams {
 export const useExcelFiles = (
   params: UseExcelFilesParams,
   token: string,
-  route: 'monthly-stats' | 'season-stats' | 'info-injection'
+  route: 'monthly-stats' | 'season-stats' | 'puentes-stats'
 ) => {
   const [records, setRecords] = useState<DataRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(false);

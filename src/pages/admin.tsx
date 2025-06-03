@@ -39,7 +39,7 @@ interface ExcelItem {
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Mensual"   },
   { value: "temporada", route: "season-stats",    label: "Temporada" },
-  { value: "puentes",   route: "info-injection",  label: "Puentes"   },
+  { value: "puentes",   route: "monthly-stats",  label: "Puentes"   },
 ];
 
 // -------- Supabase --------

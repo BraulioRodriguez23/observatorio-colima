@@ -3,7 +3,7 @@ import BarChartIndicadores from "./BarChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-// Campos de la tabla de fines de semana largos
+// --- INTERFAZ --- //
 export interface FinesSemanaRecord {
   id: number;
   year: number;
@@ -23,6 +23,7 @@ export interface FinesSemanaRecord {
   [key: string]: string | number;
 }
 
+// --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
   { label: "Tasa de ocupación", value: "ocupacion" },
   { label: "Oferta cuartos", value: "oferta_cuartos" },
@@ -51,30 +52,32 @@ const FinesSemanaIndicador: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/info-injection`)
+
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/monthly-stats`)
       .then(res => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
       .then((rawData) => {
+        // --- Mapea los campos tal cual tu backend los entrega ---
         const mapped: FinesSemanaRecord[] = rawData.map((d: unknown) => {
           const record = d as Record<string, unknown>;
           return {
             id: record.id as number,
             year: record.year as number,
-            fin: (record.bridgeName ?? record.fin ?? "") as string,
-            municipio: record.municipality as string,
-            ocupacion: record.occupancyRate as number,
-            oferta_cuartos: record.roomOffer as number,
-            cuartos_ocupados: record.occupiedRooms as number,
-            cuartos_disponibles: (record.availableBeds ?? record.availableRooms ?? 0) as number,
-            estadia: record.stay as number,
-            densidad: record.density as number,
-            noches: (record.nights ?? 3) as number,
-            turistas_noche: record.touristsPerNight as number,
-            gasto_promedio: (record.gpd ?? record.avgSpending ?? 0) as number,
-            derrama: record.economicImpact as number,
-            afluencia: record.touristFlow as number,
+            fin: (record.bridgeName as string) || (record["Fin de semana largo"] as string) || (record.fin as string) || "",
+            municipio: (record.municipality as string) || (record["Municipio"] as string) || "",
+            ocupacion: record.occupancyRate ?? record["Tasa de ocupación"] ?? 0,
+            oferta_cuartos: record.roomOffer ?? record["Oferta cuartos"] ?? 0,
+            cuartos_ocupados: record.occupiedRooms ?? record["Cuartos ocupados"] ?? 0,
+            cuartos_disponibles: record.availableBeds ?? record["Cuartos disponibles"] ?? 0,
+            estadia: record.stay ?? record["Estadía promedio"] ?? 0,
+            densidad: record.density ?? record["Densidad de ocupación"] ?? 0,
+            noches: record.nights ?? record["Noches"] ?? 3,
+            turistas_noche: record.touristsPerNight ?? record["Turistas noche"] ?? 0,
+            gasto_promedio: record.gpd ?? record["Gasto promedio diario"] ?? 0,
+            derrama: record.economicImpact ?? record["Derrama económica"] ?? 0,
+            afluencia: record.touristFlow ?? record["Afluencia turística"] ?? 0,
           };
         });
         setData(mapped);
@@ -83,16 +86,18 @@ const FinesSemanaIndicador: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // --- Valores únicos para los filtros --- //
   const anios = [...new Set(data.map(d => d.year))].sort();
   const fines = anio ? [...new Set(data.filter(d => d.year === Number(anio)).map(d => d.fin))] : [];
   const municipios = [...new Set(data.map(d => d.municipio))];
 
-  // Filtrado
+  // --- FILTRADO --- //
   let dataFiltrada = data;
   if (anio) dataFiltrada = dataFiltrada.filter(d => d.year === Number(anio));
   if (fin) dataFiltrada = dataFiltrada.filter(d => d.fin === fin);
   if (municipio) dataFiltrada = dataFiltrada.filter(d => d.municipio === municipio);
 
+  // --- EXPORTACIÓN --- //
   function exportToExcel() {
     const ws = XLSX.utils.json_to_sheet(dataFiltrada);
     const wb = XLSX.utils.book_new();
