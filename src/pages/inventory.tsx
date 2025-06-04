@@ -35,15 +35,7 @@ const IndicadoresPage: React.FC = () => {
       <main className="flex-grow max-w-7xl mx-auto w-full py-10">
         {activeTab === "mensual" && <MensualIndicador />}
         {activeTab === "puentes" && <FinesSemanaIndicador />}
-        {activeTab === "temporada" && (
-          <TemporadaIndicador
-            data={[]} // Replace with your actual data array
-            dataKey="" // Replace with the correct dataKey string
-            xKey="" // Replace with the correct xKey string
-            labelX="" // Replace with the correct labelX string
-            labelY="" // Replace with the correct labelY string
-          />
-        )}
+        {activeTab === "temporada" && <TemporadaIndicador />}
       </main>
       <Footer />
     </div>
