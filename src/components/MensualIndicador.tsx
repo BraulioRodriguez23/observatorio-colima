@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
-import BarChartIndicadores from "./BarChartIndicadores";
+import LineChartIndicadores from "./LineChartIndicadores"; // 👈 Cambiado
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
-  { label: "Oferta Cuartos", value: "roomOffer" },
-  { label: "Cuartos Ocupados", value: "occupiedRooms" },
-  { label: "Ctos. Disp.", value: "availableRooms" },
-  { label: "Estadía", value: "stay" },
-  { label: "Densidad", value: "density" },
-  { label: "Turistas Noche", value: "touristsPerNight" },
-  { label: "Gasto promedio por persona", value: "avgSpending" },
-  { label: "Derrama Económica", value: "economicImpact" },
+ { label: "Derrama Económica", value: "economicImpact" },
   { label: "Afluencia Turística", value: "touristFlow" },
 ];
 
@@ -33,22 +26,15 @@ const MensualIndicador: React.FC = () => {
     year: number;
     occupancyRate?: number;
     roomOffer?: number;
-    occupiedRooms?: number;
-    availableRooms?: number;
-    stay?: number;
-    density?: number;
-    touristsPerNight?: number;
-    avgSpending?: number;
-    economicImpact?: number;
     touristFlow?: number;
     [key: string]: string | number | undefined;
   }
   
-    const [data, setData] = useState<MensualData[]>([]);
+  const [data, setData] = useState<MensualData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filtros
+  // Filtros controlados
   const [indicador, setIndicador] = useState(INDICADORES[0].value);
   const [municipio, setMunicipio] = useState<string>("");
   const [mesInicio, setMesInicio] = useState<string>("Enero");
@@ -84,12 +70,19 @@ const MensualIndicador: React.FC = () => {
   const fechaIni = toDate(filtros.mesInicio, filtros.anioInicio);
   const fechaFin = toDate(filtros.mesFin, filtros.anioFin);
 
-  const dataFiltrada = data.filter(d => {
-    if (!d.month || !d.year) return false;
-    const f = toDate(d.month, d.year);
-    const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
-    return f >= fechaIni && f <= fechaFin && municipioOK;
-  });
+  // Filtro de datos
+  const dataFiltrada = data
+    .filter(d => {
+      if (!d.month || !d.year) return false;
+      const f = toDate(d.month, d.year);
+      const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
+      return f >= fechaIni && f <= fechaFin && municipioOK;
+    })
+    // Ordena por año y mes (importante para las líneas)
+    .sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return MESES.indexOf(a.month) - MESES.indexOf(b.month);
+    });
 
   function exportToExcel() {
     const ws = XLSX.utils.json_to_sheet(dataFiltrada);
@@ -126,29 +119,35 @@ const MensualIndicador: React.FC = () => {
     });
   }
 
+  // Crea un eje X amigable (Mes/Año)
+  const dataParaGrafica = dataFiltrada.map(d => ({
+    ...d,
+    mesAnio: `${d.month} ${d.year}`
+  }));
+
   return (
-    <div className="flex flex-col md:flex-row gap-8">
-      <div className="flex-1 bg-white rounded-xl p-10 shadow h-[680px] flex flex-col justify-center">
-        <h2 className="text-4xl font-bold text-center text-pink-600 mb-8">Gráfica de Turismo</h2>
+    <div className="flex flex-col md:flex-row gap-8 w-full">
+      {/* GRÁFICA */}
+      <div className="flex-1 bg-white rounded-xl p-6 shadow h-fit min-h-[500px] flex flex-col justify-center">
+        <h2 className="text-3xl font-bold text-center text-pink-600 mb-8">Indicador Turístico</h2>
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
-        ) : dataFiltrada.length === 0 ? (
+        ) : dataParaGrafica.length === 0 ? (
           <div className="text-center text-gray-500 py-10">No hay datos para este filtro.</div>
         ) : (
-          <BarChartIndicadores
-            data={dataFiltrada}
+          <LineChartIndicadores
+            data={dataParaGrafica}
             dataKey={filtros.indicador}
-            xKey="month"
-            labelX="Mes"
+            xKey="mesAnio"
+            labelX="Mes/Año"
             labelY={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
-            barLabel={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
           />
         )}
       </div>
       {/* FILTROS */}
-      <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0">
+      <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0 text-gray-800">
         <h3 className="text-2xl font-bold mb-5 text-gray-700">Filtrar datos</h3>
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Municipio</label>

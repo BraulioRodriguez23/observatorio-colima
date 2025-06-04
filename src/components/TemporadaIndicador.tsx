@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import BarChartIndicadores from "./BarChartIndicadores";
+import LineChartIndicadores from "./LineChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -32,8 +32,8 @@ const TemporadaIndicador: React.FC = () => {
     touristFlow?: number;
     [key: string]: string | number | undefined;
   }
-  
-    const [data, setData] = useState<TemporadaData[]>([]);
+
+  const [data, setData] = useState<TemporadaData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,11 +64,17 @@ const TemporadaIndicador: React.FC = () => {
   const municipios = [...new Set(data.map(d => d.municipality).filter(Boolean))];
   const temporadas = [...new Set(data.map(d => d.season).filter(Boolean))];
 
+  // Filtra los datos según el filtro seleccionado
   const dataFiltrada = data.filter(d => {
     const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
     const temporadaOK = !filtros.temporada || d.season === filtros.temporada;
     return municipioOK && temporadaOK;
   });
+
+  // Verifica que haya valores numéricos válidos para el indicador seleccionado
+  const hayValores = dataFiltrada.some(
+    d => typeof d[filtros.indicador] === "number" && !isNaN(Number(d[filtros.indicador]))
+  );
 
   function exportToExcel() {
     const ws = XLSX.utils.json_to_sheet(dataFiltrada);
@@ -106,14 +112,20 @@ const TemporadaIndicador: React.FC = () => {
           <div className="text-center text-red-600">{error}</div>
         ) : dataFiltrada.length === 0 ? (
           <div className="text-center text-gray-500 py-10">No hay datos para este filtro.</div>
+        ) : !hayValores ? (
+          <div className="text-center text-gray-500 py-10">
+            No hay valores válidos para este indicador en las temporadas seleccionadas.
+          </div>
         ) : (
-          <BarChartIndicadores
+          <LineChartIndicadores
             data={dataFiltrada}
             dataKey={filtros.indicador}
             xKey="season"
             labelX="Temporada"
             labelY={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
-            barLabel={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
+            titulo={
+              `Evolución del indicador "${INDICADORES.find(i => i.value === filtros.indicador)?.label}"${filtros.municipio ? " en " + filtros.municipio : ""}`
+            }
           />
         )}
       </div>

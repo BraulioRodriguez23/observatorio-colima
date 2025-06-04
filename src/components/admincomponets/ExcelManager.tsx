@@ -8,20 +8,20 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 const ADMIN_TABS = [
   { label: "Corte mensual", value: "mensual" },
   { label: "Temporadas vacacionales", value: "temporada" },
-  { label: "Fines de semana largos", value: "puentes" }
+  { label: "Fines de semana largos", value: "fines de semana largos" },
 ];
 
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Corte mensual"      },
   { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales"    },
-  { value: "puentes",   route: "info-injection",  label: "Fines de semana largos"      },
+  { value: "puentes",   route: "puentes-stats",  label: "Fines de semana largos"      },
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
 
 const getEndpoint = (type: ExcelType) => {
   const config = excelTypes.find(e => e.value === type);
-  return config ? config.route : "info-injection";
+  return config ? config.route : "puentes-stats ";
 };
 
 const ExcelManager: React.FC = () => {

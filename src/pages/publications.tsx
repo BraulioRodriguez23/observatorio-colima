@@ -103,9 +103,12 @@ const PDFSection = () => {
       <main className="flex-grow bg-gray-50 py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold text-center text-pink-600 mb-8">
-            Documentos Turísticos
-          </h1>
+            Investigación  <h2>
+            Perfil y grado de satisfacción de turistas que visitan el Estado
+          </h2>
 
+          </h1>
+         
           {Object.entries(groupedPdfs).map(([cat, docs]) => (
             <section key={cat} className="mb-12">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">{cat}</h2>

@@ -286,6 +286,13 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleEditPdf = (pdf: DocumentItem) => {
+    setPdfFile(null);
+    setPdfTitle(pdf.title);
+    setPdfCategory(pdf.category);
+    setCurrentSection("pdfs");
+  };
+
   const handleDeleteExcel = async (id: number) => {
     try {
       const token = localStorage.getItem("token") || "";
@@ -371,6 +378,12 @@ const AdminPage: React.FC = () => {
                     <div key={category} className="mb-8">
                       <h3 className="font-bold text-lg mb-2">{category}</h3>
                       <PdfList pdfs={docs} onDelete={handleDeletePdf} />
+                      <button
+                        onClick={() => handleEditPdf(docs[0])}
+                        className="text-blue-600 hover:underline mt-2"
+                      >
+                        Editar
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -400,7 +413,7 @@ const AdminPage: React.FC = () => {
 
                 {/* Componente de subida de Excel */}
                 <ExcelUpload
-                  excelType={excelType as "mensual" | "temporada" | "puentes"}
+                  excelType={excelType as "mensual" | "temporada" | "fines de semana largos"}
                   onSuccess={() => fetchExcels()}
                   onError={(msg) => alert(msg)}
                   onUploadComplete={() => fetchExcels()}

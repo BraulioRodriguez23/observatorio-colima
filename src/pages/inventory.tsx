@@ -6,7 +6,7 @@ import TemporadaIndicador from "../components/TemporadaIndicador";
 import FinesSemanaIndicador from "../components/FinesSemanaIndicador";
 
 const TABS = [
-  { label: "Corte Mensual", value: "mensual" },
+  { label: "Corte mensual", value: "mensual" },
   { label: "Temporadas vacacionales", value: "temporada" },
   { label: "Fines de semana largos", value: "puentes" },
 ];
@@ -35,7 +35,15 @@ const IndicadoresPage: React.FC = () => {
       <main className="flex-grow max-w-7xl mx-auto w-full py-10">
         {activeTab === "mensual" && <MensualIndicador />}
         {activeTab === "puentes" && <FinesSemanaIndicador />}
-        {activeTab === "temporada" && <TemporadaIndicador />}
+        {activeTab === "temporada" && (
+          <TemporadaIndicador
+            data={[]} // Replace with your actual data array
+            dataKey="" // Replace with the correct dataKey string
+            xKey="" // Replace with the correct xKey string
+            labelX="" // Replace with the correct labelX string
+            labelY="" // Replace with the correct labelY string
+          />
+        )}
       </main>
       <Footer />
     </div>

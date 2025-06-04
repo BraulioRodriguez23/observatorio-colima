@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Corte mensual" },
   { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales" },
-  { value: "puentes",   route: "monthly-stats",  label: "Fines de semana largos" },
+  { value: "fines de semana largos", route: "puentes-stats",  label: "Fines de semana largos" },
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
@@ -50,6 +50,7 @@ export const ExcelUpload: React.FC<ExcelUploadProps> = ({
       const url = `${import.meta.env.VITE_API_BASE_URL}/${config.route}/upload-excel`;
       const formData = new FormData();
       formData.append('file', file);
+    
 
       const response = await fetch(url, {
         method: 'POST',
