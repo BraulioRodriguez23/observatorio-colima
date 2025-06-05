@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import LineChartIndicadores from "./LineChartIndicadores"; // 👈 Cambiado
+import LineChartIndicadores from "./LineChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
- { label: "Derrama Económica", value: "economicImpact" },
+  { label: "Derrama Económica", value: "economicImpact" },
   { label: "Afluencia Turística", value: "touristFlow" },
 ];
 
@@ -14,28 +14,31 @@ const MESES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+// --- 1. Define la INTERFACE correctamente ---
+interface MensualData {
+  municipality: string;
+  month: string;
+  year: number;
+  occupancyRate?: number;
+  economicImpact?: number;
+  touristFlow?: number;
+  [key: string]: string | number | undefined;
+}
+
+// --- 2. Tipa la función toDate ---
 function toDate(mes: string, anio: number) {
   const idx = MESES.findIndex(m => m.toLowerCase() === mes.toLowerCase());
   return new Date(anio, idx, 1);
 }
 
 const MensualIndicador: React.FC = () => {
-  interface MensualData {
-    municipality: string;
-    month: string;
-    year: number;
-    occupancyRate?: number;
-    roomOffer?: number;
-    touristFlow?: number;
-    [key: string]: string | number | undefined;
-  }
-  
+  // --- 3. Tipa el estado correctamente ---
   const [data, setData] = useState<MensualData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filtros controlados
-  const [indicador, setIndicador] = useState(INDICADORES[0].value);
+  // No hay valores por default
+  const [indicador, setIndicador] = useState<string>("");
   const [municipio, setMunicipio] = useState<string>("");
   const [mesInicio, setMesInicio] = useState<string>("Enero");
   const [anioInicio, setAnioInicio] = useState<number>(2021);
@@ -43,7 +46,7 @@ const MensualIndicador: React.FC = () => {
   const [anioFin, setAnioFin] = useState<number>(2024);
 
   const [filtros, setFiltros] = useState({
-    indicador: INDICADORES[0].value,
+    indicador: "",
     municipio: "",
     mesInicio: "Enero",
     anioInicio: 2021,
@@ -59,7 +62,7 @@ const MensualIndicador: React.FC = () => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then(rawData => setData(rawData))
+      .then((rawData: MensualData[]) => setData(rawData))
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -70,18 +73,29 @@ const MensualIndicador: React.FC = () => {
   const fechaIni = toDate(filtros.mesInicio, filtros.anioInicio);
   const fechaFin = toDate(filtros.mesFin, filtros.anioFin);
 
-  // Filtro de datos
+  // --- 4. Filtrado tipado y sin warnings ---
   const dataFiltrada = data
-    .filter(d => {
+    .filter((d) => {
       if (!d.month || !d.year) return false;
       const f = toDate(d.month, d.year);
       const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
       return f >= fechaIni && f <= fechaFin && municipioOK;
     })
-    // Ordena por año y mes (importante para las líneas)
     .sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       return MESES.indexOf(a.month) - MESES.indexOf(b.month);
+    })
+    .map((d) => {
+      const newData = { ...d, mesAnio: `${d.month} ${d.year}` };
+      // SOLO corrige occupancyRate si es atípico
+      if (filtros.indicador === "occupancyRate" && typeof d.occupancyRate === "number" && d.occupancyRate > 100) {
+        if (d.occupancyRate < 1000) {
+          newData.occupancyRate = Number((d.occupancyRate / 10).toFixed(2));
+        } else {
+          newData.occupancyRate = Number((d.occupancyRate / 100).toFixed(2));
+        }
+      }
+      return newData;
     });
 
   function exportToExcel() {
@@ -103,14 +117,14 @@ const MensualIndicador: React.FC = () => {
     });
   }
   function handleResetFiltro() {
-    setIndicador(INDICADORES[0].value);
+    setIndicador("");
     setMunicipio("");
     setMesInicio("Enero");
     setAnioInicio(2021);
     setMesFin("Diciembre");
     setAnioFin(2024);
     setFiltros({
-      indicador: INDICADORES[0].value,
+      indicador: "",
       municipio: "",
       mesInicio: "Enero",
       anioInicio: 2021,
@@ -119,26 +133,19 @@ const MensualIndicador: React.FC = () => {
     });
   }
 
-  // Crea un eje X amigable (Mes/Año)
-  const dataParaGrafica = dataFiltrada.map(d => ({
-    ...d,
-    mesAnio: `${d.month} ${d.year}`
-  }));
-
   return (
     <div className="flex flex-col md:flex-row gap-8 w-full">
-      {/* GRÁFICA */}
       <div className="flex-1 bg-white rounded-xl p-6 shadow h-fit min-h-[500px] flex flex-col justify-center">
         <h2 className="text-3xl font-bold text-center text-pink-600 mb-8">Indicador Turístico</h2>
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
-        ) : dataParaGrafica.length === 0 ? (
+        ) : dataFiltrada.length === 0 || !filtros.indicador ? (
           <div className="text-center text-gray-500 py-10">No hay datos para este filtro.</div>
         ) : (
           <LineChartIndicadores
-            data={dataParaGrafica}
+            data={dataFiltrada}
             dataKey={filtros.indicador}
             xKey="mesAnio"
             labelX="Mes/Año"
@@ -146,7 +153,6 @@ const MensualIndicador: React.FC = () => {
           />
         )}
       </div>
-      {/* FILTROS */}
       <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0 text-gray-800">
         <h3 className="text-2xl font-bold mb-5 text-gray-700">Filtrar datos</h3>
         <div className="mb-4">
@@ -159,6 +165,7 @@ const MensualIndicador: React.FC = () => {
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Indicador</label>
           <select className="w-full border px-3 py-2 rounded" value={indicador} onChange={e => setIndicador(e.target.value)}>
+            <option value="">Seleccione</option>
             {INDICADORES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
           </select>
         </div>

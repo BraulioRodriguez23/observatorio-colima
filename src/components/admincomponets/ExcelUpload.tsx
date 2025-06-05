@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 const excelTypes = [
-  { value: "mensual",   route: "monthly-stats",   label: "Corte mensual" },
-  { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales" },
-  { value: "fines de semana largos", route: "puentes-stats",  label: "Fines de semana largos" },
+  { value: "mensual", route: "monthly-stats", label: "Corte mensual" },
+  { value: "temporada", route: "season-stats", label: "Temporadas vacacionales" },
+  { value: "puentes", route: "info-injection", label: "Fines de semana largos" },
 ];
+
 
 type ExcelType = typeof excelTypes[number]["value"];
 

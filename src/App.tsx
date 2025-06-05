@@ -13,7 +13,7 @@ import { AuthProvider } from "./context/user";
 import NoticiaDetalle from "./pages/noticia";
 import News from "./pages/News";
 import Sobre_nosotros from "./pages/Sobre_nosotros"
-
+import AdminUsers from "./pages/AdminUsers"; // Asegúrate de que esta ruta sea correcta
 function App() {
   return (
     <div className="bg-transparent">
@@ -26,6 +26,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/excel" element={<ExcelManager />} /> {/* Nueva ruta para ExcelManager */}
+            <Route path="/admin/users" element={<AdminUsers />} /> {/* Ruta para AdminUsers */}
           </Route>
 
           <Route path="/Publications" element={<Publications />} />

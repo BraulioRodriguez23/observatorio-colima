@@ -39,7 +39,7 @@ interface ExcelItem {
 const excelTypes = [
   { value: "mensual",   route: "monthly-stats",   label: "Mensual"   },
   { value: "temporada", route: "season-stats",    label: "Temporada" },
-  { value: "puentes",   route: "monthly-stats",  label: "Puentes"   },
+  { value: "puentes",   route: "info-injection",  label: "Puentes"   },
 ];
 
 // -------- Supabase --------
@@ -99,6 +99,27 @@ const AdminPage: React.FC = () => {
       setError("Error al cargar los PDFs");
     }
   };
+  const handleEditPdfSave = async (id: number, newTitle: string, newCategory: string) => {
+  try {
+    const token = localStorage.getItem("token") || "";
+    const response = await fetch(`${API_BASE}/inventory/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: newTitle, category: newCategory }),
+    });
+    if (!response.ok) throw new Error("No se pudo actualizar el PDF");
+    setPdfs((prev) =>
+      prev.map((pdf) =>
+        pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
+      )
+    );
+  } catch {
+    alert("Error al actualizar el PDF");
+  }
+};
 
   const fetchExcels = async () => {
     try {
@@ -286,12 +307,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleEditPdf = (pdf: DocumentItem) => {
-    setPdfFile(null);
-    setPdfTitle(pdf.title);
-    setPdfCategory(pdf.category);
-    setCurrentSection("pdfs");
-  };
 
   const handleDeleteExcel = async (id: number) => {
     try {
@@ -337,114 +352,113 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gray-900">
-      <AdminSidebar
-        currentSection={currentSection}
-        onSectionChange={setCurrentSection}
-      />
-      <div className="ml-64 flex-1 p-8">
-        <AdminHeader />
-        <AdminLayout>
-          <div className="space-y-6">
-            {currentSection === "news" && (
-              <>
-                <NewsForm
-                  initialData={editingNews || undefined}
-                  onSubmit={handleNewsSubmit}
-                  onCancel={() => setEditingNews(null)}
-                />
-                <NewsList
-                  news={news}
-                  onEdit={setEditingNews}
-                  onDelete={handleDelete}
-                />
-              </>
-            )}
+  <div className="flex min-h-screen bg-gray-50 text-gray-900">
+    <AdminSidebar
+      currentSection={currentSection}
+      onSectionChange={setCurrentSection}
+    />
+    <div className="ml-64 flex-1 p-8">
+      <AdminHeader />
+      <AdminLayout>
+        <div className="space-y-6">
+          {currentSection === "news" && (
+            <>
+              <NewsForm
+                initialData={editingNews || undefined}
+                onSubmit={handleNewsSubmit}
+                onCancel={() => setEditingNews(null)}
+              />
+              <NewsList
+                news={news}
+                onEdit={setEditingNews}
+                onDelete={handleDelete}
+              />
+            </>
+          )}
 
-            {currentSection === "pdfs" && (
-              <>
-                <PdfUpload
-                  pdfFile={pdfFile}
-                  setPdfFile={setPdfFile}
-                  pdfTitle={pdfTitle}
-                  setPdfTitle={setPdfTitle}
-                  pdfCategory={pdfCategory}
-                  setPdfCategory={setPdfCategory}
-                  handlePdfUpload={handlePdfUpload}
-                />
+        {currentSection === "pdfs" && (
+  <>
+    <PdfUpload
+      pdfFile={pdfFile}
+      setPdfFile={setPdfFile}
+      pdfTitle={pdfTitle}
+      setPdfTitle={setPdfTitle}
+      pdfCategory={pdfCategory}
+      setPdfCategory={setPdfCategory}
+      handlePdfUpload={handlePdfUpload}
+    />
 
-                <div className="space-y-6 pt-4">
-                  {Object.entries(groupedByCategory).map(([category, docs]) => (
-                    <div key={category} className="mb-8">
-                      <h3 className="font-bold text-lg mb-2">{category}</h3>
-                      <PdfList pdfs={docs} onDelete={handleDeletePdf} />
-                      <button
-                        onClick={() => handleEditPdf(docs[0])}
-                        className="text-blue-600 hover:underline mt-2"
-                      >
-                        Editar
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {currentSection === "excel" && (
-              <>
-                {/* Selector de tipo de Excel con accesibilidad */}
-                <div className="w-1/3 mb-4">
-                  <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
-                    Tipo de Excel
-                  </label>
-                  <select
-                    id="tipo-excel"
-                    value={excelType}
-                    onChange={(e) => setExcelType(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  >
-                    {excelTypes.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Componente de subida de Excel */}
-                <ExcelUpload
-                  excelType={excelType as "mensual" | "temporada" | "fines de semana largos"}
-                  onSuccess={() => fetchExcels()}
-                  onError={(msg) => alert(msg)}
-                  onUploadComplete={() => fetchExcels()}
-                />
-
-                {/* Listado de archivos Excel */}
-                <div className="space-y-4 mt-4">
-                  {excels.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between bg-white p-3 rounded shadow"
-                    >
-                      <span>{item.name}</span>
-                      <button
-                        onClick={() => handleDeleteExcel(item.id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {error && <div className="text-red-600 mt-4">{error}</div>}
-          </div>
-        </AdminLayout>
-      </div>
+    <div className="space-y-6 pt-4">
+      {Object.entries(groupedByCategory).map(([category, docs]) => (
+        <div key={category} className="mb-8">
+          <h3 className="font-bold text-lg mb-2">{category}</h3>
+          <PdfList
+            pdfs={docs}
+            onDelete={handleDeletePdf}
+            onEditSave={handleEditPdfSave}
+          />
+        </div>
+      ))}
     </div>
-  );
-};
+  </>
+)}
+
+          {currentSection === "excel" && (
+            <>
+              {/* Selector de tipo de Excel con accesibilidad */}
+              <div className="w-1/3 mb-4">
+                <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo de Excel
+                </label>
+                <select
+                  id="tipo-excel"
+                  value={excelType}
+                  onChange={(e) => setExcelType(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  {excelTypes.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Componente de subida de Excel */}
+              <ExcelUpload
+                excelType={excelType as "mensual" | "temporada" | "puentes"}
+                onSuccess={() => fetchExcels()}
+                onError={(msg) => alert(msg)}
+                onUploadComplete={() => fetchExcels()}
+              />
+
+              {/* Listado de archivos Excel */}
+              <div className="space-y-4 mt-4">
+                {excels.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between bg-white p-3 rounded shadow"
+                  >
+                    <span>{item.name}</span>
+                    <button
+                      onClick={() => handleDeleteExcel(item.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {error && <div className="text-red-600 mt-4">{error}</div>}
+        </div>
+      </AdminLayout>
+    </div>
+  </div>
+);
+
+}
 
 export default AdminPage;
