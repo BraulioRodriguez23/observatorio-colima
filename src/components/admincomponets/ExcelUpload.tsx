@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const excelTypes = [
   { value: "mensual", route: "monthly-stats", label: "Corte mensual" },
   { value: "temporada", route: "season-stats", label: "Temporadas vacacionales" },
-  { value: "puentes", route: "info-injection", label: "Fines de semana largos" },
+  { value: "puentes", route: "long-weekend-stats", label: "Fines de semana largos" },
 ];
 
 

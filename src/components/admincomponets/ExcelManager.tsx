@@ -6,22 +6,22 @@ import { ExcelList, ExcelItem } from '../../components/admincomponets/ExcelList'
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ADMIN_TABS = [
-  { label: "Corte mensual", value: "mensual" },
-  { label: "Temporadas vacacionales", value: "temporada" },
-  { label: "Fines de semana largos", value: "fines de semana largos" },
+   { value: "mensual", route: "monthly-stats", label: "Corte mensual" },
+  { value: "temporada", route: "season-stats", label: "Temporadas vacacionales" },
+  { value: "puentes", route: "long-weekend-stats", label: "Fines de semana largos" },
 ];
 
 const excelTypes = [
-  { value: "mensual",   route: "monthly-stats",   label: "Corte mensual"      },
-  { value: "temporada", route: "season-stats",    label: "Temporadas vacacionales"    },
-  { value: "puentes",   route: "puentes-stats",  label: "Fines de semana largos"      },
+   { value: "mensual", route: "monthly-stats", label: "Corte mensual" },
+  { value: "temporada", route: "season-stats", label: "Temporadas vacacionales" },
+  { value: "puentes", route: "long-weekend-stats", label: "Fines de semana largos" },
 ];
 
 type ExcelType = typeof excelTypes[number]["value"];
 
 const getEndpoint = (type: ExcelType) => {
   const config = excelTypes.find(e => e.value === type);
-  return config ? config.route : "puentes-stats ";
+  return config ? config.route : "long-weekend-stats";
 };
 
 const ExcelManager: React.FC = () => {
