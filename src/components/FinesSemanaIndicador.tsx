@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import BarChartIndicadores from "./BarChartIndicadores";
+import LineChartIndicadores from "./LineChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -38,8 +38,7 @@ interface FinesSemanaRecord {
   [key: string]: string | number;
 }
 
-// --- COMPONENTE PRINCIPAL --- //
-const FinesSemanaIndicador: React.FC = () => {
+const FinesSemanaIndicadorLineal: React.FC = () => {
   const [data, setData] = useState<FinesSemanaRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,16 +47,17 @@ const FinesSemanaIndicador: React.FC = () => {
   const [indicador, setIndicador] = useState<string>("");
   const [municipio, setMunicipio] = useState<string>("");
   const [fin, setFin] = useState<string>("");
-  const [anio, setAnio] = useState<string>("");
+  const [anioInicio, setAnioInicio] = useState<string>("");
+  const [anioFin, setAnioFin] = useState<string>("");
 
   const [filtros, setFiltros] = useState({
     indicador: "",
     municipio: "",
     fin: "",
-    anio: "",
+    anioInicio: "",
+    anioFin: "",
   });
 
-  // --- CARGA DE DATOS --- //
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -73,12 +73,14 @@ const FinesSemanaIndicador: React.FC = () => {
   }, []);
 
   // --- LISTAS ÚNICAS PARA FILTROS --- //
-  const anios = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
-  const fines = filtros.anio
+  const anios = [
+    ...new Set(data.map(d => d.year).filter(x => !!x))
+  ].sort((a, b) => a - b);
+  const fines = filtros.anioInicio
     ? [
         ...new Set(
           data
-            .filter(d => d.year === Number(filtros.anio))
+            .filter(d => d.year === Number(filtros.anioInicio))
             .map(d => d.bridge_name)
         ),
       ]
@@ -87,63 +89,93 @@ const FinesSemanaIndicador: React.FC = () => {
 
   // --- FILTRADO DE DATOS --- //
   const dataFiltrada = data.filter(d => {
-    const filtroAnio = !filtros.anio || d.year === Number(filtros.anio);
+    const añoOK =
+      (!filtros.anioInicio || d.year >= Number(filtros.anioInicio)) &&
+      (!filtros.anioFin || d.year <= Number(filtros.anioFin));
     const filtroFin = !filtros.fin || d.bridge_name === filtros.fin;
     const filtroMunicipio = !filtros.municipio || d.municipality === filtros.municipio;
-    return filtroAnio && filtroFin && filtroMunicipio;
+    return añoOK && filtroFin && filtroMunicipio;
   });
+
+  // --- Prepara los datos para la gráfica: eje X = fin de semana largo + año --- //
+  const dataParaGrafica = dataFiltrada
+    .map(d => ({
+      ...d,
+      finAnio: `${d.bridge_name} ${d.year}`,
+    }))
+    .sort((a, b) => {
+      // Ordenar por año y después por nombre
+      if (a.year !== b.year) return a.year - b.year;
+      return a.bridge_name.localeCompare(b.bridge_name);
+    });
 
   // --- EXPORTAR A EXCEL --- //
   function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(dataFiltrada);
+    const ws = XLSX.utils.json_to_sheet(dataParaGrafica);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "FinesSemana");
+    XLSX.utils.book_append_sheet(wb, ws, "FinesSemanaLineal");
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     saveAs(
       new Blob([excelBuffer], { type: "application/octet-stream" }),
-      "fines_semana_indicadores.xlsx"
+      "fines_semana_lineal.xlsx"
     );
   }
 
   // --- ACCIONES DE FILTROS --- //
   function handleAplicarFiltro() {
-    setFiltros({ indicador, municipio, fin, anio });
+    setFiltros({
+      indicador,
+      municipio,
+      fin,
+      anioInicio,
+      anioFin,
+    });
   }
   function handleResetFiltro() {
     setIndicador("");
     setMunicipio("");
     setFin("");
-    setAnio("");
-    setFiltros({ indicador: "", municipio: "", fin: "", anio: "" });
+    setAnioInicio("");
+    setAnioFin("");
+    setFiltros({ indicador: "", municipio: "", fin: "", anioInicio: "", anioFin: "" });
+  }
+
+  function getTituloGrafica() {
+    const indLabel = INDICADORES.find(i => i.value === filtros.indicador)?.label || "";
+    let añoTxt = "";
+    const añosUnicos = [
+      ...new Set(dataParaGrafica.map(d => d.year).filter(Boolean))
+    ].sort((a, b) => a - b);
+    if (añosUnicos.length) {
+      if (añosUnicos.length === 1) añoTxt = `(${añosUnicos[0]})`;
+      else añoTxt = `(${añosUnicos[0]} - ${añosUnicos[añosUnicos.length - 1]})`;
+    }
+    return `Evolución "${indLabel}" en Fines de Semana Largos ${añoTxt}`;
   }
 
   return (
     <div className="flex flex-col md:flex-row gap-8 w-full">
       <div className="flex-1 bg-white rounded-xl p-8 shadow h-[600px] flex flex-col justify-center">
         <h2 className="text-3xl font-bold text-center text-pink-600 mb-6">
-          Fines de Semana Largos
+          Fines de Semana Largos (Evolución)
         </h2>
 
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
-        ) : dataFiltrada.length === 0 || !filtros.indicador ? (
+        ) : dataParaGrafica.length === 0 || !filtros.indicador ? (
           <div className="text-center text-gray-500 py-10">
             No hay datos para este filtro.
           </div>
         ) : (
-          <BarChartIndicadores
-            data={dataFiltrada}
+          <LineChartIndicadores
+            data={dataParaGrafica}
             dataKey={filtros.indicador}
-            xKey="municipality"
-            labelX="Municipio"
-            labelY={
-              INDICADORES.find(i => i.value === filtros.indicador)?.label || ""
-            }
-            barLabel={
-              INDICADORES.find(i => i.value === filtros.indicador)?.label || ""
-            }
+            xKey="finAnio"
+            labelX="Fin de Semana Largo"
+            labelY={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
+            titulo={getTituloGrafica()}
           />
         )}
       </div>
@@ -151,66 +183,73 @@ const FinesSemanaIndicador: React.FC = () => {
       <aside className="w-full md:w-80 bg-white rounded-xl shadow p-6 h-fit">
         <h3 className="text-xl font-semibold mb-4">Filtros Fines de Semana</h3>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-semibold text-gray-700">Año</label>
-          <select
-            className="w-full border px-3 py-2 rounded"
-            value={anio}
-            onChange={e => setAnio(e.target.value)}
-          >
-            <option value="">Todos los años</option>
-            {anios.map(a => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
+        <div className="mb-4 flex gap-2">
+          <div className="w-1/2">
+            <label className="block mb-1 font-semibold text-black">Año inicio</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={anioInicio}
+              onChange={e => setAnioInicio(e.target.value)}
+            >
+              <option value="">--</option>
+              {anios.map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
+          <div className="w-1/2">
+            <label className="block mb-1 font-semibold text-black">Año fin</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={anioFin}
+              onChange={e => setAnioFin(e.target.value)}
+            >
+              <option value="">--</option>
+              {anios.map(a => (
+                <option key={a} value={a}>{a}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold text-gray-700">Fin de semana</label>
+          <label className="block mb-1 font-semibold text-black">Fin de semana</label>
           <select
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded text-black"
             value={fin}
             onChange={e => setFin(e.target.value)}
           >
             <option value="">Todos</option>
             {fines.map(fv => (
-              <option key={fv} value={fv}>
-                {fv}
-              </option>
+              <option key={fv} value={fv}>{fv}</option>
             ))}
           </select>
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold text-gray-700">Municipio</label>
+          <label className="block mb-1 font-semibold text-black">Municipio</label>
           <select
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded text-black"
             value={municipio}
             onChange={e => setMunicipio(e.target.value)}
           >
             <option value="">Todos</option>
             {municipios.map(m => (
-              <option key={m} value={m}>
-                {m}
-              </option>
+              <option key={m} value={m}>{m}</option>
             ))}
           </select>
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold text-gray-700">Indicador</label>
+          <label className="block mb-1 font-semibold text-black">Indicador</label>
           <select
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded text-black"
             value={indicador}
             onChange={e => setIndicador(e.target.value)}
           >
-            <option value="">Selecciona un indicador</option>
+            <option value="">Seleccione un indicador</option>
             {INDICADORES.map(i => (
-              <option key={i.value} value={i.value}>
-                {i.label}
-              </option>
+              <option key={i.value} value={i.value}>{i.label}</option>
             ))}
           </select>
         </div>
@@ -241,4 +280,4 @@ const FinesSemanaIndicador: React.FC = () => {
   );
 };
 
-export default FinesSemanaIndicador;
+export default FinesSemanaIndicadorLineal;
