@@ -53,7 +53,7 @@ const FinesSemanaIndicador: React.FC = () => {
     setLoading(true);
     setError(null);
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/info-injection`,)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/long-weekend-stats`,)
       .then(res => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
