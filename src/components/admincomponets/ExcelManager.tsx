@@ -57,19 +57,27 @@ const ExcelManager: React.FC = () => {
 
   // Eliminar todos los excels de una fecha
   const handleDeleteByDate = async (date: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/${getEndpoint(excelType)}/by-date?date=${date}`, {
+  try {
+    const token = localStorage.getItem('token');
+    // Aquí usamos `start` en lugar de `date`
+    const res = await fetch(
+      `${API_URL}/${getEndpoint(excelType)}/by-date?start=${date}`,
+      {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Error al eliminar por fecha');
-      fetchExcels();
-      setSuccess(`Se eliminaron los archivos del ${date}.`);
-    } catch {
-      setError('Error al eliminar archivos por fecha');
-    }
-  };
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    if (!res.ok) throw new Error('Error al eliminar por fecha');
+    await fetchExcels();
+    setSuccess(`Se eliminaron los registros del ${date}.`);
+  } catch (err) {
+    console.error(err);
+    setError('Error al eliminar registros por fecha');
+  }
+};
 
   useEffect(() => {
     fetchExcels(excelType);
