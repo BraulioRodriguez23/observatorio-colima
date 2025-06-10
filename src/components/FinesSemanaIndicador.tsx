@@ -157,7 +157,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
     <div className="flex flex-col md:flex-row gap-8 w-full">
       <div className="flex-1 bg-white rounded-xl p-8 shadow h-[600px] flex flex-col justify-center">
         <h2 className="text-3xl font-bold text-center text-pink-600 mb-6">
-          Fines de Semana Largos (Evolución)
+          Fines de Semana Largos 
         </h2>
 
         {loading ? (
@@ -210,6 +210,19 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
               ))}
             </select>
           </div>
+        </div>
+         <div className="mb-4">
+          <label className="block mb-1 font-semibold text-black">Indicador</label>
+          <select
+            className="w-full border px-3 py-2 rounded text-black"
+            value={indicador}
+            onChange={e => setIndicador(e.target.value)}
+          >
+            <option value="">Seleccione un indicador</option>
+            {INDICADORES.map(i => (
+              <option key={i.value} value={i.value}>{i.label}</option>
+            ))}
+          </select>
         </div>
 
         <div className="mb-4">

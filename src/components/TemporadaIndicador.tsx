@@ -190,18 +190,18 @@ const TemporadaIndicador: React.FC = () => {
             </select>
           </div>
         </div>
+          <div className="mb-4">
+          <label className="block mb-1 font-semibold text-black">Temporada</label>
+          <select className="w-full border px-3 py-2 rounded text-black" value={temporada} onChange={e => setTemporada(e.target.value)}>
+            <option value="">Todas</option>
+            {temporadas.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-black">Municipio</label>
           <select className="w-full border px-3 py-2 rounded text-black" value={municipio} onChange={e => setMunicipio(e.target.value)}>
             <option value="">Todos</option>
             {municipios.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Temporada</label>
-          <select className="w-full border px-3 py-2 rounded text-black" value={temporada} onChange={e => setTemporada(e.target.value)}>
-            <option value="">Todas</option>
-            {temporadas.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
         <div className="mb-4">

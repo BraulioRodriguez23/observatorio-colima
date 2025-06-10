@@ -37,6 +37,9 @@ const IndicadoresPage: React.FC = () => {
         {activeTab === "puentes" && <FinesSemanaIndicador />}
         {activeTab === "temporada" && <TemporadaIndicador />}
       </main>
+      <div>
+
+      </div>
       <Footer />
     </div>
   );

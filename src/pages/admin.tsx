@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/admincomponets/AdminSidebar";
 import AdminLayout from "../components/admincomponets/AdminLayout";
 import AdminHeader from "../components/admincomponets/AdminHeader";
@@ -59,8 +59,6 @@ const AdminPage: React.FC = () => {
   const [pdfTitle, setPdfTitle] = useState("");
   const [pdfCategory, setPdfCategory] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);	
-  const [deleteDate, setDeleteDate] = useState<string | null>(null);
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL!;
 
@@ -123,7 +121,7 @@ const AdminPage: React.FC = () => {
   }
 };
 
-  const fetchExcels = useCallback(async () => {
+  const fetchExcels = async () => {
     try {
       const token = localStorage.getItem("token") || "";
       const config = excelTypes.find((e) => e.value === excelType)!;
@@ -137,7 +135,7 @@ const AdminPage: React.FC = () => {
     } catch {
       setError("Error al cargar los Excels");
     }
-  }, [API_BASE, excelType]);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,29 +151,6 @@ const AdminPage: React.FC = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSection, excelType]);
-
- const handleDeleteByDate = useCallback(async () => {
-    try {
-      if (!deleteDate) throw new Error('Selecciona una fecha');
-      const token = localStorage.getItem('token') || '';
-      const config = excelTypes.find(e => e.value === excelType)!;
-      const res = await fetch(
-        `${API_BASE}/${config.route}/by-date?start=${deleteDate}`,
-        { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (!res.ok) throw new Error('Error al eliminar por fecha');
-      await fetchExcels();
-      setSuccess(`Se eliminaron registros a partir de ${deleteDate}.`);
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err: unknown) {
-      let msg = 'Error al eliminar registros por fecha';
-      if (err instanceof Error) {
-        msg = err.message === 'Selecciona una fecha' ? 'Por favor, selecciona una fecha válida.' : err.message || msg;
-      }
-      setError(msg);
-      setTimeout(() => setError(null), 3000);
-    }
-  }, [API_BASE, deleteDate, excelType, fetchExcels]);
 
   // -------- Supabase uploads --------
   const uploadImageToSupabase = async (file: File): Promise<string> => {
@@ -428,69 +403,54 @@ const AdminPage: React.FC = () => {
   </>
 )}
 
-         {currentSection === "excel" && (
-  <>
-    <p className="mb-2 text-sm text-gray-700">
-      Puedes eliminar registros por fecha de subida. Selecciona la fecha para borrar todos los archivos subidos ese día.
-    </p>
-    <div className="mb-4 flex items-center gap-4">
-      <div>
-        <label className="block mb-1">Tipo de Excel</label>
-        <select
-          value={excelType}
-          onChange={e => setExcelType(e.target.value)}
-          className="border p-2 rounded"
-        >
-          {excelTypes.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-      </div>
+          {currentSection === "excel" && (
+            <>
+              {/* Selector de tipo de Excel con accesibilidad */}
+              <div className="w-1/3 mb-4">
+                <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo de Excel
+                </label>
+                <select
+                  id="tipo-excel"
+                  value={excelType}
+                  onChange={(e) => setExcelType(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  {excelTypes.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-      <div>
-        <label className="block mb-1">Eliminar desde fecha</label>
-        <input
-          type="date"
-          value={deleteDate || ""}
-          onChange={e => setDeleteDate(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </div>
+              {/* Componente de subida de Excel */}
+              <ExcelUpload
+                excelType={excelType as "mensual" | "temporada" | "puentes"}
+                onSuccess={() => fetchExcels()}
+                onError={(msg) => alert(msg)}
+                onUploadComplete={() => fetchExcels()}
+              />
 
-      <button
-        onClick={handleDeleteByDate}
-        disabled={!deleteDate}
-        className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50"
-      >
-        Borrar por fecha
-      </button>
-    </div>
-
-    {success && <div className="text-green-600 mb-2">{success}</div>}
-    {error && <div className="text-red-600 mb-2">{error}</div>}
-
-    <ExcelUpload
-      excelType={excelType as "mensual" | "temporada" | "puentes"}
-      onSuccess={() => fetchExcels()}
-      onError={(msg) => alert(msg)}
-      onUploadComplete={() => fetchExcels()}
-    />
-
-    <div className="space-y-4 mt-4">
-      {excels.map(item => (
-        <div key={item.id} className="flex justify-between p-3 bg-white rounded shadow">
-          <span>{item.name} <span className="text-xs text-gray-500">({item.createdAt?.slice(0,10)})</span></span>
-          <button
-            onClick={() => handleDeleteExcel(item.id)}
-            className="text-red-600 hover:underline"
-          >
-            Eliminar
-          </button>
-        </div>
-      ))}
-    </div>
-  </>
-)}
+              {/* Listado de archivos Excel */}
+              <div className="space-y-4 mt-4">
+                {excels.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between bg-white p-3 rounded shadow"
+                  >
+                    <span>{item.name}</span>
+                    <button
+                      onClick={() => handleDeleteExcel(item.id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           {error && <div className="text-red-600 mt-4">{error}</div>}
         </div>
