@@ -60,7 +60,7 @@ const IndicadoresPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE}/pdfs-Front`);
+      const response = await fetch(`${API_BASE}/pdf-front`);
       if (!response.ok) throw new Error('Error al cargar los PDFs');
       
       const allPdfs: PdfDocument[] = await response.json();

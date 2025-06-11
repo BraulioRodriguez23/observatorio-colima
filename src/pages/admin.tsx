@@ -128,7 +128,7 @@ const AdminPage: React.FC = () => {
   const fetchPdfsFront = async () => {
     try {
       const token = localStorage.getItem("token") || "";
-      const url = `${API_BASE}/pdfs-Front`;
+      const url = `${API_BASE}/pdf-front`;
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
