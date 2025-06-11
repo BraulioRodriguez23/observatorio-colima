@@ -5,12 +5,12 @@ import { saveAs } from "file-saver";
 
 // --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
-  { label: "Tasa de ocupación", value: "occupancy_rate" },
+  { label: "% ocupación", value: "occupancy_rate" },
   { label: "Oferta cuartos", value: "room_offer" },
   { label: "Cuartos ocupados", value: "occupied_rooms" },
   { label: "Cuartos disponibles", value: "available_rooms" },
   { label: "Estadía promedio", value: "average_stay" },
-  { label: "Densidad ocupación", value: "occupancy_density" },
+  { label: "Densidad de ocupación", value: "occupancy_density" },
   { label: "Noches", value: "nights" },
   { label: "Turistas noche", value: "tourists_per_night" },
   { label: "Gasto promedio diario", value: "daily_avg_spending" },
@@ -110,17 +110,23 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
     });
 
   // --- EXPORTAR A EXCEL --- //
-  function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(dataParaGrafica);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "FinesSemanaLineal");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(
-      new Blob([excelBuffer], { type: "application/octet-stream" }),
-      "fines_semana_lineal.xlsx"
-    );
-  }
+function exportToExcel() {
+  const camposExcluir = ["id", "createdAt", "updatedAt"];
+  const dataLimpia = dataParaGrafica.map(obj =>
+    Object.fromEntries(
+      Object.entries(obj).filter(([key]) => !camposExcluir.includes(key))
+    )
+  );
 
+  const ws = XLSX.utils.json_to_sheet(dataLimpia);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "FinesSemanaLineal");
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  saveAs(
+    new Blob([excelBuffer], { type: "application/octet-stream" }),
+    "fines_semana_lineal.xlsx"
+  );
+}
   // --- ACCIONES DE FILTROS --- //
   function handleAplicarFiltro() {
     setFiltros({
@@ -157,7 +163,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
     <div className="flex flex-col md:flex-row gap-8 w-full">
       <div className="flex-1 bg-white rounded-xl p-8 shadow h-[600px] flex flex-col justify-center">
         <h2 className="text-3xl font-bold text-center text-pink-600 mb-6">
-          Fines de Semana Largos 
+          Fines de semana largos 
         </h2>
 
         {loading ? (
@@ -181,7 +187,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
       </div>
 
       <aside className="w-full md:w-80 bg-white rounded-xl shadow p-6 h-fit">
-        <h3 className="text-xl font-semibold mb-4">Filtros Fines de Semana</h3>
+        <h3 className="text-xl font-semibold mb-4">Filtros fines de semana</h3>
 
         <div className="mb-4 flex gap-2">
           <div className="w-1/2">
@@ -226,7 +232,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Fin de semana</label>
+          <label className="block mb-1 font-semibold text-black">Fines de semana largos</label>
           <select
             className="w-full border px-3 py-2 rounded text-black"
             value={fin}

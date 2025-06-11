@@ -5,8 +5,8 @@ import { saveAs } from "file-saver";
 
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
-  { label: "Derrama Económica", value: "economicImpact" },
-  { label: "Afluencia Turística", value: "touristFlow" },
+  { label: "Derrama económica", value: "economicImpact" },
+  { label: "Afluencia turística", value: "touristFlow" },
 ];
 
 const MESES = [
@@ -136,7 +136,7 @@ const MensualIndicador: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row gap-8 w-full">
       <div className="flex-1 bg-white rounded-xl p-6 shadow h-fit min-h-[500px] flex flex-col justify-center">
-        <h2 className="text-3xl font-bold text-center text-pink-600 mb-8">Indicador Turístico</h2>
+        <h2 className="text-3xl font-bold text-center text-pink-600 mb-8">Indicador turístico</h2>
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (

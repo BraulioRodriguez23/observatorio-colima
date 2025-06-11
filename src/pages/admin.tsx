@@ -8,9 +8,10 @@ import PdfList from "../components/admincomponets/PdfList";
 import PdfUpload from "../components/admincomponets/PdfUpload";
 import { ExcelUpload } from "../components/admincomponets/ExcelUpload";
 import { createClient } from "@supabase/supabase-js";
+import PdfUploadFront from "../components/admincomponets/pdfUploadFront";
 
 // -------- Types --------
-type Section = "news" | "pdfs" | "excel";
+type Section = "news" | "pdfs" | "excel" | "pdfFront";
 
 interface NewsItem {
   id: string;
@@ -59,6 +60,7 @@ const AdminPage: React.FC = () => {
   const [pdfTitle, setPdfTitle] = useState("");
   const [pdfCategory, setPdfCategory] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [pdfsFront, setPdfsFront] = useState<DocumentItem[]>([]);
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL!;
 
@@ -99,27 +101,120 @@ const AdminPage: React.FC = () => {
       setError("Error al cargar los PDFs");
     }
   };
+
   const handleEditPdfSave = async (id: number, newTitle: string, newCategory: string) => {
-  try {
-    const token = localStorage.getItem("token") || "";
-    const response = await fetch(`${API_BASE}/inventory/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title: newTitle, category: newCategory }),
-    });
-    if (!response.ok) throw new Error("No se pudo actualizar el PDF");
-    setPdfs((prev) =>
-      prev.map((pdf) =>
-        pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
-      )
-    );
-  } catch {
-    alert("Error al actualizar el PDF");
-  }
-};
+    try {
+      const token = localStorage.getItem("token") || "";
+      const response = await fetch(`${API_BASE}/inventory/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newTitle, category: newCategory }),
+      });
+      if (!response.ok) throw new Error("No se pudo actualizar el PDF");
+      setPdfs((prev) =>
+        prev.map((pdf) =>
+          pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
+        )
+      );
+    } catch {
+      alert("Error al actualizar el PDF");
+    }
+  };
+
+  // ------ pdfsFront (CORREGIDO)
+  const fetchPdfsFront = async () => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const url = `${API_BASE}/pdfs-Front`;
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al cargar los PDFs Front");
+      const data = await response.json();
+      // CORRECCIÓN: Usar setPdfsFront en lugar de setPdfs
+      setPdfsFront(
+        data.map((d: DocumentItem & { fileUrl?: string }) => ({
+          ...d,
+          id: Number(d.id),
+          url: d.url ?? d.fileUrl!,
+          category: d.category ?? "Sin Categoría",
+        }))
+      );
+    } catch {
+      setError("Error al cargar los PDFs Front");
+    }
+  };
+
+  const handleEditPdfsFrontSave = async (id: number, newTitle: string, newCategory: string) => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      // CORRECCIÓN: Faltaba un slash antes de id
+      const response = await fetch(`${API_BASE}/pdf-front/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: newTitle, category: newCategory }),
+      });
+      if (!response.ok) throw new Error("No se pudo actualizar el PDF Front");
+      // CORRECCIÓN: Usar setPdfsFront en lugar de setPdfs
+      setPdfsFront((prev) =>
+        prev.map((pdf) =>
+          pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
+        )
+      );
+    } catch {
+      alert("Error al actualizar el PDF Front");
+    }
+  };
+
+  const handlePdfUploadFront = async (file: File, title: string, category: string) => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const fileName = `pdf-front/${Date.now()}-${file.name}`;
+      const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
+      if (storageError) throw storageError;
+      const { data: { publicUrl } } = supabase.storage.from("pdf-front").getPublicUrl(fileName);
+
+      const endpoint = `${API_BASE}/pdf-front`;
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title, fileUrl: publicUrl, category }),
+      });
+
+      if (!response.ok) throw new Error("Error al subir el PDF convertido");
+      fetchPdfsFront();
+      setPdfFile(null);
+      setPdfTitle("");
+      setPdfCategory("");
+    } catch {
+      alert("Error al subir el PDF convertido");
+    }
+  };
+
+  const handleDeletePdfFront = async (id: number, fileName: string) => {
+    try {
+      await supabase.storage.from("pdf-front").remove([fileName]);
+      const token = localStorage.getItem("token") || "";
+      const endpoint = `${API_BASE}/pdf-front/${id}`;
+      const response = await fetch(endpoint, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error(`Error borrando en API: ${response.status}`);
+      setPdfsFront((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      alert((err as Error).message || "Error al eliminar el PDF convertido");
+    }
+  };
 
   const fetchExcels = async () => {
     try {
@@ -145,6 +240,9 @@ const AdminPage: React.FC = () => {
       await fetchPdfs();
       if (currentSection === "excel") {
         await fetchExcels();
+      }
+      if (currentSection === "pdfFront") {
+        await fetchPdfsFront();
       }
       setLoading(false);
     };
@@ -307,7 +405,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-
   const handleDeleteExcel = async (id: number) => {
     try {
       const token = localStorage.getItem("token") || "";
@@ -325,7 +422,16 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  // CORRECCIÓN: Crear groupedByCategory para pdfs normales
   const groupedByCategory = pdfs.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
+    const category = pdf.category || "Sin Categoría";
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(pdf);
+    return acc;
+  }, {});
+
+  // CORRECCIÓN: Crear groupedByCategoryFront para pdfsFront
+  const groupedByCategoryFront = pdfsFront.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
     const category = pdf.category || "Sin Categoría";
     if (!acc[category]) acc[category] = [];
     acc[category].push(pdf);
@@ -352,113 +458,138 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-  <div className="flex min-h-screen bg-gray-50 text-gray-900">
-    <AdminSidebar
-      currentSection={currentSection}
-      onSectionChange={setCurrentSection}
-    />
-    <div className="ml-64 flex-1 p-8">
-      <AdminHeader />
-      <AdminLayout>
-        <div className="space-y-6">
-          {currentSection === "news" && (
-            <>
-              <NewsForm
-                initialData={editingNews || undefined}
-                onSubmit={handleNewsSubmit}
-                onCancel={() => setEditingNews(null)}
-              />
-              <NewsList
-                news={news}
-                onEdit={setEditingNews}
-                onDelete={handleDelete}
-              />
-            </>
-          )}
+    <div className="flex min-h-screen bg-gray-50 text-gray-900">
+      <AdminSidebar
+        currentSection={currentSection}
+        onSectionChange={setCurrentSection}
+      />
+      <div className="ml-64 flex-1 p-8">
+        <AdminHeader />
+        <AdminLayout>
+          <div className="space-y-6">
+            {currentSection === "news" && (
+              <>
+                <NewsForm
+                  initialData={editingNews || undefined}
+                  onSubmit={handleNewsSubmit}
+                  onCancel={() => setEditingNews(null)}
+                />
+                <NewsList
+                  news={news}
+                  onEdit={setEditingNews}
+                  onDelete={handleDelete}
+                />
+              </>
+            )}
 
-        {currentSection === "pdfs" && (
-  <>
-    <PdfUpload
-      pdfFile={pdfFile}
-      setPdfFile={setPdfFile}
-      pdfTitle={pdfTitle}
-      setPdfTitle={setPdfTitle}
-      pdfCategory={pdfCategory}
-      setPdfCategory={setPdfCategory}
-      handlePdfUpload={handlePdfUpload}
-    />
+            {currentSection === "pdfs" && (
+              <>
+                <PdfUpload
+                  pdfFile={pdfFile}
+                  setPdfFile={setPdfFile}
+                  pdfTitle={pdfTitle}
+                  setPdfTitle={setPdfTitle}
+                  pdfCategory={pdfCategory}
+                  setPdfCategory={setPdfCategory}
+                  handlePdfUpload={handlePdfUpload}
+                />
 
-    <div className="space-y-6 pt-4">
-      {Object.entries(groupedByCategory).map(([category, docs]) => (
-        <div key={category} className="mb-8">
-          <h3 className="font-bold text-lg mb-2">{category}</h3>
-          <PdfList
-            pdfs={docs}
-            onDelete={handleDeletePdf}
-            onEditSave={handleEditPdfSave}
-          />
-        </div>
-      ))}
-    </div>
-  </>
-)}
-
-          {currentSection === "excel" && (
-            <>
-              {/* Selector de tipo de Excel con accesibilidad */}
-              <div className="w-1/3 mb-4">
-                <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo de Excel
-                </label>
-                <select
-                  id="tipo-excel"
-                  value={excelType}
-                  onChange={(e) => setExcelType(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  {excelTypes.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                <div className="space-y-6 pt-4">
+                  {Object.entries(groupedByCategory).map(([category, docs]) => (
+                    <div key={category} className="mb-8">
+                      <h3 className="font-bold text-lg mb-2">{category}</h3>
+                      <PdfList
+                        pdfs={docs}
+                        onDelete={handleDeletePdf}
+                        onEditSave={handleEditPdfSave}
+                      />
+                    </div>
                   ))}
-                </select>
-              </div>
+                </div>
+              </>
+            )}
 
-              {/* Componente de subida de Excel */}
-              <ExcelUpload
-                excelType={excelType as "mensual" | "temporada" | "puentes"}
-                onSuccess={() => fetchExcels()}
-                onError={(msg) => alert(msg)}
-                onUploadComplete={() => fetchExcels()}
-              />
+            {currentSection === "pdfFront" && (
+              <>
+                <PdfUploadFront
+                  pdfFile={pdfFile}
+                  setPdfFile={setPdfFile}
+                  pdfTitle={pdfTitle}
+                  setPdfTitle={setPdfTitle}
+                  pdfCategory={pdfCategory}
+                  setPdfCategory={setPdfCategory}
+                  handlePdfUpload={handlePdfUploadFront}
+                />
+                <div className="space-y-6 pt-4">
+                  {Object.entries(groupedByCategoryFront).map(([category, docs]) => (
+                    <div key={category} className="mb-8">
+                      <h3 className="font-bold text-lg mb-2">{category}</h3>
+                      <PdfList
+                        pdfs={docs}
+                        onDelete={handleDeletePdfFront}
+                        onEditSave={handleEditPdfsFrontSave}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
-              {/* Listado de archivos Excel */}
-              <div className="space-y-4 mt-4">
-                {excels.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between bg-white p-3 rounded shadow"
+            {currentSection === "excel" && (
+              <>
+                {/* Selector de tipo de Excel con accesibilidad */}
+                <div className="w-1/3 mb-4">
+                  <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
+                    Tipo de Excel
+                  </label>
+                  <select
+                    id="tipo-excel"
+                    value={excelType}
+                    onChange={(e) => setExcelType(e.target.value)}
+                    className="w-full p-2 border rounded"
                   >
-                    <span>{item.name}</span>
-                    <button
-                      onClick={() => handleDeleteExcel(item.id)}
-                      className="text-red-600 hover:underline"
+                    {excelTypes.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Componente de subida de Excel */}
+                <ExcelUpload
+                  excelType={excelType as "mensual" | "temporada" | "puentes"}
+                  onSuccess={() => fetchExcels()}
+                  onError={(msg) => alert(msg)}
+                  onUploadComplete={() => fetchExcels()}
+                />
+
+                {/* Listado de archivos Excel */}
+                <div className="space-y-4 mt-4">
+                  {excels.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between bg-white p-3 rounded shadow"
                     >
-                      Eliminar
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+                      <span>{item.name}</span>
+                      <button
+                        onClick={() => handleDeleteExcel(item.id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
-          {error && <div className="text-red-600 mt-4">{error}</div>}
-        </div>
-      </AdminLayout>
+            {error && <div className="text-red-600 mt-4">{error}</div>}
+          </div>
+        </AdminLayout>
+      </div>
     </div>
-  </div>
-);
-
-}
+  );
+};
 
 export default AdminPage;

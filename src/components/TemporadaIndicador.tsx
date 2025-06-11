@@ -5,15 +5,15 @@ import { saveAs } from "file-saver";
 
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
-  { label: "Oferta Cuartos", value: "roomOffer" },
-  { label: "Cuartos Ocupados", value: "occupiedRooms" },
-  { label: "Ctos. Disp.", value: "availableRooms" },
-  { label: "Estadía", value: "stay" },
-  { label: "Densidad", value: "density" },
-  { label: "Turistas Noche", value: "touristsPerNight" },
+  { label: "Oferta cuartos", value: "roomOffer" },
+  { label: "Cuartos ocupados", value: "occupiedRooms" },
+  { label: "Cuartos disponibles", value: "availableRooms" },
+  { label: "Estadía promedio", value: "stay" },
+  { label: "Densidad de ocupacion", value: "density" },
+  { label: "Turistas noche", value: "touristsPerNight" },
   { label: "Gasto promedio por persona", value: "avgSpending" },
-  { label: "Derrama Económica", value: "economicImpact" },
-  { label: "Afluencia Turística", value: "touristFlow" },
+  { label: "Derrama económica", value: "economicImpact" },
+  { label: "Afluencia turística", value: "touristFlow" },
 ];
 
 const temporadaAbreviada = (nombre: string) => {
@@ -151,7 +151,7 @@ const TemporadaIndicador: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 md:p-10 flex flex-col justify-center mx-auto" style={{ maxWidth: "1100px" }}>
-        <h2 className="text-4xl font-bold text-center text-pink-600 mb-8">Temporadas Vacacionales</h2>
+        <h2 className="text-4xl font-bold text-center text-pink-600 mb-8">Temporadas vacacionales</h2>
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
@@ -176,20 +176,15 @@ const TemporadaIndicador: React.FC = () => {
         <h3 className="text-2xl font-bold mb-5 text-gray-700">Filtrar datos</h3>
         <div className="mb-4 flex gap-2">
           <div className="w-1/2">
-            <label className="block mb-1 font-semibold text-black">Año inicio</label>
-            <select className="w-full border px-3 py-2 rounded text-black" value={añoInicio} onChange={e => setAñoInicio(e.target.value)}>
-              <option value="">--</option>
-              {años.map(a => <option key={a} value={a}>{a}</option>)}
-            </select>
-          </div>
-          <div className="w-1/2">
-            <label className="block mb-1 font-semibold text-black">Año fin</label>
-            <select className="w-full border px-3 py-2 rounded text-black" value={añoFin} onChange={e => setAñoFin(e.target.value)}>
-              <option value="">--</option>
-              {años.map(a => <option key={a} value={a}>{a}</option>)}
-            </select>
-          </div>
+            <div className="mb-4">
+          <label className="block mb-1 font-semibold text-black">Indicador</label>
+          <select className="w-full border px-3 py-2 rounded text-black" value={indicador} onChange={e => setIndicador(e.target.value)}>
+            <option value="">Seleccione</option>
+            {INDICADORES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
+          </select>
         </div>
+            
+         
           <div className="mb-4">
           <label className="block mb-1 font-semibold text-black">Temporada</label>
           <select className="w-full border px-3 py-2 rounded text-black" value={temporada} onChange={e => setTemporada(e.target.value)}>
@@ -204,13 +199,21 @@ const TemporadaIndicador: React.FC = () => {
             {municipios.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
         </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Indicador</label>
-          <select className="w-full border px-3 py-2 rounded text-black" value={indicador} onChange={e => setIndicador(e.target.value)}>
-            <option value="">Seleccione</option>
-            {INDICADORES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
-          </select>
+         <label className="block mb-1 font-semibold text-black">Año inicio</label>
+            <select className="w-full border px-3 py-2 rounded text-black" value={añoInicio} onChange={e => setAñoInicio(e.target.value)}>
+              <option value="">--</option>
+              {años.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+         <div className="w-1/2">
+            <label className="block mb-1 font-semibold text-black">Año fin</label>
+            <select className="w-full border px-3 py-2 rounded text-black" value={añoFin} onChange={e => setAñoFin(e.target.value)}>
+              <option value="">--</option>
+              {años.map(a => <option key={a} value={a}>{a}</option>)}
+            </select>
+          </div>
+          </div>
         </div>
+      
         <button className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition mb-3"
           onClick={handleAplicarFiltro}>
           Aplicar filtro

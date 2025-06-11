@@ -1,6 +1,6 @@
 import React from "react";
 
-type Section = 'news' | 'pdfs' | 'excel';
+type Section = 'news' | 'pdfs' | 'excel'| 'pdfFront';
 
 interface AdminSidebarProps {
   currentSection: Section;
@@ -11,7 +11,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentSection, onSectionCh
   const sections = [
     { id: 'news', label: 'Noticias' },
     { id: 'pdfs', label: 'PDFs' },
-    { id: 'excel', label: 'Excels' }
+    { id: 'excel', label: 'Excels' },
+    { id: 'pdfFront', label: 'PDFs Front' }
   ];
 
   return (
