@@ -175,9 +175,10 @@ const AdminPage: React.FC = () => {
   const handlePdfUploadFront = async (file: File, title: string, category: string) => {
     try {
       const token = localStorage.getItem("token") || "";
-      const fileName = `pdf-front/${Date.now()}-${file.name}`;
-      const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
-      if (storageError) throw storageError;
+      const fileName = `${Date.now()}-${file.name}`;
+// Elimina cualquier prefijo de carpeta a menos que quieras una estructura interna real
+const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
+if (storageError) throw storageError;
       const { data: { publicUrl } } = supabase.storage.from("pdf-front").getPublicUrl(fileName);
 
       const endpoint = `${API_BASE}/pdf-front`;
