@@ -172,34 +172,64 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handlePdfUploadFront = async (file: File, title: string, category: string) => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      const fileName = `${Date.now()}-${file.name}`;
-// Elimina cualquier prefijo de carpeta a menos que quieras una estructura interna real
-const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
-if (storageError) throw storageError;
-      const { data: { publicUrl } } = supabase.storage.from("pdf-front").getPublicUrl(fileName);
+const handlePdfUploadFront = async (file: File, title: string, category: string) => {
+  try {
+    const token = localStorage.getItem("token") || "";
+    const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    const fileName = `${Date.now()}-${cleanedFileName}`;
 
-      const endpoint = `${API_BASE}/pdf-front`;
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, fileUrl: publicUrl, category }),
-      });
+    // Paso 1: Subida a Supabase Storage
+    const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
 
-      if (!response.ok) throw new Error("Error al subir el PDF convertido");
-      fetchPdfsFront();
-      setPdfFile(null);
-      setPdfTitle("");
-      setPdfCategory("");
-    } catch {
-      alert("Error al subir el PDF convertido");
+    if (storageError) {
+      // Aquí estamos manejando el error ESPECÍFICO de Supabase Storage
+      console.error("Error de Supabase Storage al subir el archivo:", storageError);
+      // Puedes ser más específico con el mensaje al usuario
+      if (storageError.message.includes("Path already exists")) {
+        alert("Ya existe un archivo con ese nombre. Por favor, cambia el nombre del archivo.");
+      } else if (storageError.message.includes("size exceeds")) {
+        alert("El archivo es demasiado grande. Por favor, sube un archivo más pequeño.");
+      } else {
+        alert("Ocurrió un error al subir el archivo al almacenamiento: " + storageError.message);
+      }
+      throw storageError; // Re-lanza el error si quieres que el bloque `catch` externo también lo maneje, o simplemente `return;`
     }
-  };
+
+    const { data: { publicUrl } } = supabase.storage.from("pdf-front").getPublicUrl(fileName);
+
+    // Paso 2: Guardar metadatos en tu backend
+    const endpoint = `${API_BASE}/pdf-front`;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, fileUrl: publicUrl, category }),
+    });
+
+    if (!response.ok) {
+      // Aquí estamos manejando errores ESPECÍFICOS de tu backend (API)
+      const errorData = await response.json().catch(() => ({ message: "Error desconocido del servidor." }));
+      console.error("Error del backend al guardar el PDF:", response.status, errorData);
+      alert(`Error al guardar los datos del PDF: ${errorData.message || response.statusText}`);
+      throw new Error("Error en la API al guardar el PDF"); // Lanza un nuevo error para el `catch` externo
+    }
+
+    fetchPdfsFront();
+    setPdfFile(null);
+    setPdfTitle("");
+    setPdfCategory("");
+    alert("PDF subido y guardado exitosamente."); // Mensaje de éxito
+  } catch (err) {
+    // Este `catch` general atrapará cualquier error que no haya sido manejado
+    // específicamente en los bloques `if (error)` anteriores o errores inesperados.
+    console.error("Un error inesperado ocurrió durante la subida del PDF:", err);
+    // Asegúrate de que `err` sea tratado como un objeto `Error`
+    const errorMessage = (err instanceof Error) ? err.message : String(err);
+    alert("Ocurrió un error inesperado: " + errorMessage);
+  }
+};
 
   const handleDeletePdfFront = async (id: number, fileName: string) => {
     try {
