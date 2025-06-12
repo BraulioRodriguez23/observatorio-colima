@@ -175,29 +175,33 @@ const AdminPage: React.FC = () => {
 const handlePdfUploadFront = async (file: File, title: string, category: string) => {
   try {
     const token = localStorage.getItem("token") || "";
-    const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+    // Limpia el nombre del archivo para evitar problemas de rutas
+    const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const fileName = `${Date.now()}-${cleanedFileName}`;
 
-    // Paso 1: Subida a Supabase Storage
-    const { error: storageError } = await supabase.storage.from("pdf-front").upload(fileName, file);
+    // 1. Sube el archivo PDF al bucket pdf-front de Supabase Storage
+    const { error: storageError } = await supabase.storage
+      .from("pdf-front")
+      .upload(fileName, file);
 
     if (storageError) {
-      // Aquí estamos manejando el error ESPECÍFICO de Supabase Storage
-      console.error("Error de Supabase Storage al subir el archivo:", storageError);
-      // Puedes ser más específico con el mensaje al usuario
+      // Manejo específico de errores de Supabase Storage
       if (storageError.message.includes("Path already exists")) {
         alert("Ya existe un archivo con ese nombre. Por favor, cambia el nombre del archivo.");
       } else if (storageError.message.includes("size exceeds")) {
-        alert("El archivo es demasiado grande. Por favor, sube un archivo más pequeño.");
+        alert("El archivo es demasiado grande. Por favor, sube uno más pequeño.");
       } else {
         alert("Ocurrió un error al subir el archivo al almacenamiento: " + storageError.message);
       }
-      throw storageError; // Re-lanza el error si quieres que el bloque `catch` externo también lo maneje, o simplemente `return;`
+      throw storageError;
     }
 
-    const { data: { publicUrl } } = supabase.storage.from("pdf-front").getPublicUrl(fileName);
+    // 2. Obtiene la URL pública del archivo
+    const { data: { publicUrl } } = supabase.storage
+      .from("pdf-front")
+      .getPublicUrl(fileName);
 
-    // Paso 2: Guardar metadatos en tu backend
+    // 3. Guarda los metadatos en el backend (API)
     const endpoint = `${API_BASE}/pdf-front`;
     const response = await fetch(endpoint, {
       method: "POST",
@@ -209,27 +213,26 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
     });
 
     if (!response.ok) {
-      // Aquí estamos manejando errores ESPECÍFICOS de tu backend (API)
+      // Manejo específico de error del backend
       const errorData = await response.json().catch(() => ({ message: "Error desconocido del servidor." }));
-      console.error("Error del backend al guardar el PDF:", response.status, errorData);
       alert(`Error al guardar los datos del PDF: ${errorData.message || response.statusText}`);
-      throw new Error("Error en la API al guardar el PDF"); // Lanza un nuevo error para el `catch` externo
+      throw new Error("Error en la API al guardar el PDF");
     }
 
+    // 4. Refresca la lista y limpia los campos
     fetchPdfsFront();
     setPdfFile(null);
     setPdfTitle("");
     setPdfCategory("");
-    alert("PDF subido y guardado exitosamente."); // Mensaje de éxito
+    alert("PDF subido y guardado exitosamente.");
   } catch (err) {
-    // Este `catch` general atrapará cualquier error que no haya sido manejado
-    // específicamente en los bloques `if (error)` anteriores o errores inesperados.
-    console.error("Un error inesperado ocurrió durante la subida del PDF:", err);
-    // Asegúrate de que `err` sea tratado como un objeto `Error`
+    // Manejo general de errores inesperados
     const errorMessage = (err instanceof Error) ? err.message : String(err);
     alert("Ocurrió un error inesperado: " + errorMessage);
+    console.error("Un error inesperado ocurrió durante la subida del PDF:", err);
   }
 };
+
 
   const handleDeletePdfFront = async (id: number, fileName: string) => {
     try {
