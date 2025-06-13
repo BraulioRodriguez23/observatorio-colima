@@ -62,6 +62,7 @@ const AdminPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [pdfsFront, setPdfsFront] = useState<DocumentItem[]>([]);
 
+
   const API_BASE = import.meta.env.VITE_API_BASE_URL!;
 
   // -------- Fetch data --------
@@ -169,34 +170,33 @@ const handleEditPdfsFrontSave = async (id: number, newTitle: string, newCategory
   }
 };
 
-const handlePdfUploadFront = async (file: File, title: string, category: string) => {
+const handlePdfUploadGeneral = async (
+  file: File,
+  title: string,
+  category: string,
+  section: "pdfs" | "pdfs-front"
+) => {
   try {
     const token = localStorage.getItem("token") || "";
     const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const fileName = `${Date.now()}-${cleanedFileName}`;
+    const bucket = section;
+    const apiEndpoint =
+      section === "pdfs" ? `${API_BASE}/inventory` : `${API_BASE}/pdfs-front`;
 
-    // Cambia aquí también el bucket
+    // Subir a bucket correcto
     const { error: storageError } = await supabase.storage
-      .from("pdfs-front") // <- aquí cambia
+      .from(bucket)
       .upload(fileName, file);
 
-    if (storageError) {
-      if (storageError.message.includes("Path already exists")) {
-        alert("Ya existe un archivo con ese nombre. Por favor, cambia el nombre del archivo.");
-      } else if (storageError.message.includes("size exceeds")) {
-        alert("El archivo es demasiado grande. Por favor, sube uno más pequeño.");
-      } else {
-        alert("Ocurrió un error al subir el archivo al almacenamiento: " + storageError.message);
-      }
-      throw storageError;
-    }
+    if (storageError) throw storageError;
 
-    const { data: { publicUrl } } = supabase.storage
-      .from("pdfs-front") // <- aquí cambia
-      .getPublicUrl(fileName);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
-    const endpoint = `${API_BASE}/pdfs-front`; // <- aquí cambia
-    const response = await fetch(endpoint, {
+    // Subir metadatos al endpoint correcto
+    const response = await fetch(apiEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -206,22 +206,33 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: "Error desconocido del servidor." }));
-      alert(`Error al guardar los datos del PDF: ${errorData.message || response.statusText}`);
+      const errorData = await response.json().catch(() => ({
+        message: "Error desconocido del servidor.",
+      }));
+      alert(
+        `Error al guardar los datos del PDF: ${
+          errorData.message || response.statusText
+        }`
+      );
       throw new Error("Error en la API al guardar el PDF");
     }
 
-    fetchPdfsFront();
+    // Refresca la lista según sección
+    if (section === "pdfs") fetchPdfs();
+    else fetchPdfsFront();
+
     setPdfFile(null);
     setPdfTitle("");
     setPdfCategory("");
     alert("PDF subido y guardado exitosamente.");
   } catch (err) {
-    const errorMessage = (err instanceof Error) ? err.message : String(err);
-    alert("Ocurrió un error inesperado: " + errorMessage);
-    console.error("Un error inesperado ocurrió durante la subida del PDF:", err);
+    alert(
+      "Ocurrió un error inesperado: " +
+        (err instanceof Error ? err.message : String(err))
+    );
   }
 };
+
 
 const handleDeletePdfFront = async (id: number, fileName: string) => {
   try {
@@ -365,52 +376,7 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
     }
   };
 
-  const handlePdfUpload = async (file: File, title: string, category: string) => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      const fileName = `pdfs/${Date.now()}-${file.name}`;
-
-      const { error: storageError } = await supabase.storage.from("pdfs").upload(fileName, file);
-      if (storageError) throw storageError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("pdfs").getPublicUrl(fileName);
-
-      const endpoint = `${API_BASE}/inventory`;
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title,
-          fileUrl: publicUrl,
-          category,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Error al subir el archivo PDF");
-
-      const newPdf = await response.json();
-      setPdfs((prev) => [
-        ...prev,
-        {
-          ...newPdf,
-          id: Number(newPdf.id),
-          url: newPdf.url ?? newPdf.fileUrl,
-          category: newPdf.category ?? "Sin Categoría",
-        },
-      ]);
-
-      setPdfFile(null);
-      setPdfTitle("");
-      setPdfCategory("");
-    } catch {
-      alert("Error al subir el archivo PDF");
-    }
-  };
+  
 
   const handleDeletePdf = async (id: number, fileName: string) => {
     try {
@@ -508,14 +474,16 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
             {currentSection === "pdfs" && (
               <>
                 <PdfUpload
-                  pdfFile={pdfFile}
-                  setPdfFile={setPdfFile}
-                  pdfTitle={pdfTitle}
-                  setPdfTitle={setPdfTitle}
-                  pdfCategory={pdfCategory}
-                  setPdfCategory={setPdfCategory}
-                  handlePdfUpload={handlePdfUpload}
-                />
+      pdfFile={pdfFile}
+      setPdfFile={setPdfFile}
+      pdfTitle={pdfTitle}
+      setPdfTitle={setPdfTitle}
+      pdfCategory={pdfCategory}
+      setPdfCategory={setPdfCategory}
+      handlePdfUpload={(file, title, category) =>
+        handlePdfUploadGeneral(file, title, category, "pdfs")
+      }
+    />
 
                 <div className="space-y-6 pt-4">
                   {Object.entries(groupedByCategory).map(([category, docs]) => (
@@ -535,14 +503,16 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
             {currentSection === "pdfFront" && (
               <>
                 <PdfUploadFront
-                  pdfFile={pdfFile}
-                  setPdfFile={setPdfFile}
-                  pdfTitle={pdfTitle}
-                  setPdfTitle={setPdfTitle}
-                  pdfCategory={pdfCategory}
-                  setPdfCategory={setPdfCategory}
-                  handlePdfUpload={handlePdfUploadFront}
-                />
+      pdfFile={pdfFile}
+      setPdfFile={setPdfFile}
+      pdfTitle={pdfTitle}
+      setPdfTitle={setPdfTitle}
+      pdfCategory={pdfCategory}
+      setPdfCategory={setPdfCategory}
+      handlePdfUpload={(file, title, category) =>
+        handlePdfUploadGeneral(file, title, category, "pdfs-front")
+      }
+    />
                 <div className="space-y-6 pt-4">
                   {Object.entries(groupedByCategoryFront).map(([category, docs]) => (
                     <div key={category} className="mb-8">

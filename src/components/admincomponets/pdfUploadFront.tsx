@@ -34,9 +34,12 @@ const PdfUploadFront: React.FC<Props> = ({
       className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 text-gray-800"
     >
       <option value="">Selecciona la sección</option>
-      <option value="Por temporada vacacional">Por temporada vacacional</option>
-      <option value="Por destino">Por destino</option>
-      <option value="Informe anual 2024">Informe anual 2024</option>
+      <option value="ESTABLECIMIENTOS HOSP POR MUNICIPIO">ESTABLECIMIENTOS HOSP POR MUNICIPIO</option>
+      <option value="Indicadores de cruceros">Indicadores de cruceros</option>
+      <option value="Personal ocupado estatal">Personal ocupado estatal</option>
+      <option value="PIBE TABLA">PIBE TABLA</option>
+      <option value="Tabla histórica de indicadores turísticos clave 2004-2024">Tabla histórica de indicadores turísticos clave 2004-2024</option>
+
     </select>
 
     <input
