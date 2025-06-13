@@ -198,11 +198,11 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
 
     // 2. Obtiene la URL pública del archivo
     const { data: { publicUrl } } = supabase.storage
-      .from("pdf-front")
+      .from("pdfs-front")
       .getPublicUrl(fileName);
 
     // 3. Guarda los metadatos en el backend (API)
-    const endpoint = `${API_BASE}/pdf-front`;
+    const endpoint = `${API_BASE}/pdfs-front`;
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -236,9 +236,9 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
 
   const handleDeletePdfFront = async (id: number, fileName: string) => {
     try {
-      await supabase.storage.from("pdf-front").remove([fileName]);
+      await supabase.storage.from("pdfs-front").remove([fileName]);
       const token = localStorage.getItem("token") || "";
-      const endpoint = `${API_BASE}/pdf-front/${id}`;
+      const endpoint = `${API_BASE}/pdfs-front/${id}`;
       const response = await fetch(endpoint, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
