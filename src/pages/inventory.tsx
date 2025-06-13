@@ -18,7 +18,7 @@ const PDF_BUTTONS = [
     title: "Establecimientos hospitalarios por municipio",
     fileName: "ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx",
     category: "hospitalidad",
-    link: "https://tu-project-id.supabase.co/storage/v1/object/public/pdfs/ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx"
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ESTABLECIMIENTOS%20HOSP%20POR%20MUNICIPIO.xlsx%20-%20ESTABLECIMIENTOS%20HOSP%20POR%20MUNIC.pdf"
   },
   {
     id: 2,
@@ -46,7 +46,7 @@ const PDF_BUTTONS = [
     title: "Tabla histórica de indicadores turísticos clave 2004-2024",
     fileName: "Tabla histórica de indicadores turísticos clave 2004-2024.xlsx",
     category: "historicos",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Tabla_Indicadores_Turisticos_2004-2024_GENERADO.pdf"
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ilovepdf_merged-1.pdf"
   }
 ];
 
