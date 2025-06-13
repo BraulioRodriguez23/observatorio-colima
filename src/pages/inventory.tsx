@@ -5,6 +5,7 @@ import MensualIndicador from "../components/MensualIndicador";
 import TemporadaIndicador from "../components/TemporadaIndicador";
 import FinesSemanaIndicador from "../components/FinesSemanaIndicador";
 
+
 const TABS = [
   { label: "Corte mensual", value: "mensual" },
   { label: "Temporadas vacacionales", value: "temporada" },
@@ -14,28 +15,39 @@ const TABS = [
 // Configuración de los PDFs que quieres mostrar
 const PDF_BUTTONS = [
   {
-    id: 1,
-    title: "Establecimientos hospitalarios por municipio",
-    fileName: "ESTABLECIMIENTOS HOSP POR MUNICIPIO.xlsx",
-    category: "hospitales"
-  },
+  id: 1,
+  title: "Establecimientos hospitalarios por municipio",
+  fileName: "ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx", // solo el nombre limpio
+  category: "hospitalidad",
+  link: "https://tu-project-id.supabase.co/storage/v1/object/public/pdfs/ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx"
+},
   {
     id: 2, 
     title: "Indicadores de cruceros",
     fileName: "Indicadores de cruceros (descargable).xlsx",
-    category: "cruceros"
+    category: "cruceros",
+     link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Indicadores%20de%20cruceros%20(descargable).xlsx%20-%20Indicadores%20de%20cruceros.pdf"
   },
   {
     id: 3,
     title: "Personal ocupado estatal",
     fileName: "Personal ocupado estatal.pdf", 
-    category: "personal"
+    category: "personal",
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Personal%20ocupado%20estatal%20(1).pdf"
   },
   {
     id: 4,
-    title: "Tabla histórica de indicadores turísticos",
+    title: "PIBE tabla",
+    fileName: "PIBE TABLA (descargable).xlsx",
+    category: "PIBE TABLA",
+    link:"https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA%20(descargable).xlsx%20-%20PIBE%20Estatal.pdf"
+  },
+  {
+    id: 5,
+    title: "Tabla histórica de indicadores turísticos clave 2004-2024",
     fileName: "Tabla histórica de indicadores turísticos clave 2004-2024.xlsx",
-    category: "historicos"
+    category: "historicos",
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Tabla_Indicadores_Turisticos_2004-2024_GENERADO.pdf"
   }
 ];
 
@@ -60,7 +72,7 @@ const IndicadoresPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE}/pdf-front`);
+      const response = await fetch(`${API_BASE}/pdfs-front`);
       if (!response.ok) throw new Error('Error al cargar los PDFs');
       
       const allPdfs: PdfDocument[] = await response.json();
