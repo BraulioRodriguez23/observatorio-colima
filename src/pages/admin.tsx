@@ -125,67 +125,62 @@ const AdminPage: React.FC = () => {
   };
 
   // ------ pdfsFront (CORREGIDO)
-  const fetchPdfsFront = async () => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      const url = `${API_BASE}/pdf-front`;
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Error al cargar los PDFs Front");
-      const data = await response.json();
-      // CORRECCIÓN: Usar setPdfsFront en lugar de setPdfs
-      setPdfsFront(
-        data.map((d: DocumentItem & { fileUrl?: string }) => ({
-          ...d,
-          id: Number(d.id),
-          url: d.url ?? d.fileUrl!,
-          category: d.category ?? "Sin Categoría",
-        }))
-      );
-    } catch {
-      setError("Error al cargar los PDFs Front");
-    }
-  };
+ const fetchPdfsFront = async () => {
+  try {
+    const token = localStorage.getItem("token") || "";
+    const url = `${API_BASE}/pdfs-front`; // <- aquí cambia
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Error al cargar los PDFs Front");
+    const data = await response.json();
+    setPdfsFront(
+      data.map((d: DocumentItem & { fileUrl?: string }) => ({
+        ...d,
+        id: Number(d.id),
+        url: d.url ?? d.fileUrl!,
+        category: d.category ?? "Sin Categoría",
+      }))
+    );
+  } catch {
+    setError("Error al cargar los PDFs Front");
+  }
+};
 
-  const handleEditPdfsFrontSave = async (id: number, newTitle: string, newCategory: string) => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      // CORRECCIÓN: Faltaba un slash antes de id
-      const response = await fetch(`${API_BASE}/pdf-front/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: newTitle, category: newCategory }),
-      });
-      if (!response.ok) throw new Error("No se pudo actualizar el PDF Front");
-      // CORRECCIÓN: Usar setPdfsFront en lugar de setPdfs
-      setPdfsFront((prev) =>
-        prev.map((pdf) =>
-          pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
-        )
-      );
-    } catch {
-      alert("Error al actualizar el PDF Front");
-    }
-  };
+const handleEditPdfsFrontSave = async (id: number, newTitle: string, newCategory: string) => {
+  try {
+    const token = localStorage.getItem("token") || "";
+    const response = await fetch(`${API_BASE}/pdfs-front/${id}`, { // <- aquí cambia
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title: newTitle, category: newCategory }),
+    });
+    if (!response.ok) throw new Error("No se pudo actualizar el PDF Front");
+    setPdfsFront((prev) =>
+      prev.map((pdf) =>
+        pdf.id === id ? { ...pdf, title: newTitle, category: newCategory } : pdf
+      )
+    );
+  } catch {
+    alert("Error al actualizar el PDF Front");
+  }
+};
 
 const handlePdfUploadFront = async (file: File, title: string, category: string) => {
   try {
     const token = localStorage.getItem("token") || "";
-    // Limpia el nombre del archivo para evitar problemas de rutas
     const cleanedFileName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
     const fileName = `${Date.now()}-${cleanedFileName}`;
 
-    // 1. Sube el archivo PDF al bucket pdf-front de Supabase Storage
+    // Cambia aquí también el bucket
     const { error: storageError } = await supabase.storage
-      .from("pdf-front")
+      .from("pdfs-front") // <- aquí cambia
       .upload(fileName, file);
 
     if (storageError) {
-      // Manejo específico de errores de Supabase Storage
       if (storageError.message.includes("Path already exists")) {
         alert("Ya existe un archivo con ese nombre. Por favor, cambia el nombre del archivo.");
       } else if (storageError.message.includes("size exceeds")) {
@@ -196,13 +191,11 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
       throw storageError;
     }
 
-    // 2. Obtiene la URL pública del archivo
     const { data: { publicUrl } } = supabase.storage
-      .from("pdfs-front")
+      .from("pdfs-front") // <- aquí cambia
       .getPublicUrl(fileName);
 
-    // 3. Guarda los metadatos en el backend (API)
-    const endpoint = `${API_BASE}/pdfs-front`;
+    const endpoint = `${API_BASE}/pdfs-front`; // <- aquí cambia
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -213,42 +206,38 @@ const handlePdfUploadFront = async (file: File, title: string, category: string)
     });
 
     if (!response.ok) {
-      // Manejo específico de error del backend
       const errorData = await response.json().catch(() => ({ message: "Error desconocido del servidor." }));
       alert(`Error al guardar los datos del PDF: ${errorData.message || response.statusText}`);
       throw new Error("Error en la API al guardar el PDF");
     }
 
-    // 4. Refresca la lista y limpia los campos
     fetchPdfsFront();
     setPdfFile(null);
     setPdfTitle("");
     setPdfCategory("");
     alert("PDF subido y guardado exitosamente.");
   } catch (err) {
-    // Manejo general de errores inesperados
     const errorMessage = (err instanceof Error) ? err.message : String(err);
     alert("Ocurrió un error inesperado: " + errorMessage);
     console.error("Un error inesperado ocurrió durante la subida del PDF:", err);
   }
 };
 
-
-  const handleDeletePdfFront = async (id: number, fileName: string) => {
-    try {
-      await supabase.storage.from("pdfs-front").remove([fileName]);
-      const token = localStorage.getItem("token") || "";
-      const endpoint = `${API_BASE}/pdfs-front/${id}`;
-      const response = await fetch(endpoint, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error(`Error borrando en API: ${response.status}`);
-      setPdfsFront((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      alert((err as Error).message || "Error al eliminar el PDF convertido");
-    }
-  };
+const handleDeletePdfFront = async (id: number, fileName: string) => {
+  try {
+    await supabase.storage.from("pdfs-front").remove([fileName]); // <- aquí cambia
+    const token = localStorage.getItem("token") || "";
+    const endpoint = `${API_BASE}/pdfs-front/${id}`; // <- aquí cambia
+    const response = await fetch(endpoint, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error(`Error borrando en API: ${response.status}`);
+    setPdfsFront((prev) => prev.filter((p) => p.id !== id));
+  } catch (err) {
+    alert((err as Error).message || "Error al eliminar el PDF convertido");
+  }
+};
 
   const fetchExcels = async () => {
     try {
