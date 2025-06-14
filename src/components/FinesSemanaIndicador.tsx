@@ -165,7 +165,7 @@ function exportToExcel() {
         <h2 className="text-3xl font-bold text-center text-pink-600 mb-6">
           Fines de semana largos 
         </h2>
-
+   
         {loading ? (
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
@@ -187,8 +187,20 @@ function exportToExcel() {
       </div>
 
       <aside className="w-full md:w-80 bg-white rounded-xl shadow p-6 h-fit">
-        <h3 className="text-xl font-semibold mb-4">Filtros fines de semana</h3>
-
+        <h3 className="text-xl font-semibold mb-4 text-black">Filtros fines de semana</h3>
+       <div className="mb-4">
+          <label className="block mb-1 font-semibold ">Indicador</label>
+          <select
+            className="w-full border px-3 py-2 rounded text-black"
+            value={indicador}
+            onChange={e => setIndicador(e.target.value)}
+          >
+            <option value="">Seleccione un indicador</option>
+            {INDICADORES.map(i => (
+              <option key={i.value} value={i.value}>{i.label}</option>
+            ))}
+          </select>
+        </div>
         <div className="mb-4 flex gap-2">
           <div className="w-1/2">
             <label className="block mb-1 font-semibold text-black">Año inicio</label>
@@ -217,19 +229,7 @@ function exportToExcel() {
             </select>
           </div>
         </div>
-         <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Indicador</label>
-          <select
-            className="w-full border px-3 py-2 rounded text-black"
-            value={indicador}
-            onChange={e => setIndicador(e.target.value)}
-          >
-            <option value="">Seleccione un indicador</option>
-            {INDICADORES.map(i => (
-              <option key={i.value} value={i.value}>{i.label}</option>
-            ))}
-          </select>
-        </div>
+         
 
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-black">Fines de semana largos</label>
@@ -259,19 +259,6 @@ function exportToExcel() {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Indicador</label>
-          <select
-            className="w-full border px-3 py-2 rounded text-black"
-            value={indicador}
-            onChange={e => setIndicador(e.target.value)}
-          >
-            <option value="">Seleccione un indicador</option>
-            {INDICADORES.map(i => (
-              <option key={i.value} value={i.value}>{i.label}</option>
-            ))}
-          </select>
-        </div>
 
         <div className="flex gap-2">
           <button

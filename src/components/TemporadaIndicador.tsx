@@ -17,7 +17,7 @@ const INDICADORES = [
 ];
 
 const temporadaAbreviada = (nombre: string) => {
-  const dict: Record<string, string> = {
+  const dict = {
     "Semana santa y pascua": "S. Santa",
     "Semana santa": "S. Santa",
     "Verano": "Verano",
@@ -25,28 +25,38 @@ const temporadaAbreviada = (nombre: string) => {
     "Noviembre": "Nov",
     "Diciembre": "Dic",
     "Invierno": "Inv.",
-  };
-  return dict[nombre] || nombre.split(" ")[0];
+  } as const;
+  return (dict as Record<string, string>)[nombre] || nombre.split(" ")[0];
 };
 
-const TemporadaIndicador: React.FC = () => {
-  interface TemporadaData {
-    year?: string | number;
-    año?: string | number;
-    municipality: string;
-    season: string;
-    [key: string]: string | number | undefined;
-  }
+type TemporadaData = {
+  municipality?: string;
+  season?: string;
+  año?: number;
+  year?: number;
+  occupancyRate?: number;
+  roomOffer?: number;
+  occupiedRooms?: number;
+  availableRooms?: number;
+  stay?: number;
+  density?: number;
+  touristsPerNight?: number;
+  avgSpending?: number;
+  economicImpact?: number;
+  touristFlow?: number;
+  [key: string]: unknown;
+};
 
+const TemporadaIndicador = () => {
   const [data, setData] = useState<TemporadaData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [indicador, setIndicador] = useState<string>("");
-  const [municipio, setMunicipio] = useState<string>("");
-  const [temporada, setTemporada] = useState<string>("");
-  const [añoInicio, setAñoInicio] = useState<string>("");
-  const [añoFin, setAñoFin] = useState<string>("");
+  const [indicador, setIndicador] = useState("");
+  const [municipio, setMunicipio] = useState("");
+  const [temporada, setTemporada] = useState("");
+  const [añoInicio, setAñoInicio] = useState("");
+  const [añoFin, setAñoFin] = useState("");
 
   const [filtros, setFiltros] = useState({
     indicador: "",
@@ -65,7 +75,7 @@ const TemporadaIndicador: React.FC = () => {
         return res.json();
       })
       .then(rawData => setData(rawData))
-      .catch((err: Error) => setError(err.message))
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -77,7 +87,6 @@ const TemporadaIndicador: React.FC = () => {
     ),
   ].sort((a, b) => Number(a) - Number(b));
 
-  // Filtrado y procesamiento de datos para gráfica
   const dataFiltrada = data.filter(d => {
     const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
     const temporadaOK = !filtros.temporada || d.season === filtros.temporada;
@@ -93,10 +102,9 @@ const TemporadaIndicador: React.FC = () => {
     return municipioOK && temporadaOK && añoOK;
   });
 
-  // SOLO recorta % ocupación si se detecta error de cero de más, los otros no se tocan
   const dataFiltradaConCorto = dataFiltrada.map(d => ({
     ...d,
-    temporadaCorta: temporadaAbreviada(d.season),
+    temporadaCorta: temporadaAbreviada(d.season ?? ""),
     temporadaCompleta: `${d.season} ${d.año ?? d.year}`,
     occupancyRate:
       typeof d.occupancyRate === "number" && d.occupancyRate > 100 && d.occupancyRate < 1000
@@ -114,11 +122,22 @@ const TemporadaIndicador: React.FC = () => {
     saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "temporadas_indicadores.xlsx");
   }
 
-  function handleAplicarFiltro() {
+
+  function handleAplicarFiltro(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setFiltros({ indicador, municipio, temporada, añoInicio, añoFin });
   }
 
-  function handleResetFiltro() {
+  interface Filtros {
+    indicador: string;
+    municipio: string;
+    temporada: string;
+    añoInicio: string;
+    añoFin: string;
+  }
+
+  function handleResetFiltro(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.preventDefault();
     setIndicador("");
     setMunicipio("");
     setTemporada("");
@@ -130,7 +149,7 @@ const TemporadaIndicador: React.FC = () => {
       temporada: "",
       añoInicio: "",
       añoFin: "",
-    });
+    } as Filtros);
   }
 
   function getTituloGrafica() {
@@ -149,7 +168,8 @@ const TemporadaIndicador: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4">
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* GRÁFICA */}
       <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 md:p-10 flex flex-col justify-center mx-auto" style={{ maxWidth: "1100px" }}>
         <h2 className="text-4xl font-bold text-center text-pink-600 mb-8">Temporadas vacacionales</h2>
         {loading ? (
@@ -174,58 +194,113 @@ const TemporadaIndicador: React.FC = () => {
       {/* FILTROS */}
       <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0">
         <h3 className="text-2xl font-bold mb-5 text-gray-700">Filtrar datos</h3>
-        <div className="mb-4 flex gap-2">
-          <div className="w-1/2">
-            <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Indicador</label>
-          <select className="w-full border px-3 py-2 rounded text-black" value={indicador} onChange={e => setIndicador(e.target.value)}>
-            <option value="">Seleccione</option>
-            {INDICADORES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
-          </select>
-        </div>
-            
-         
-          <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Temporada</label>
-          <select className="w-full border px-3 py-2 rounded text-black" value={temporada} onChange={e => setTemporada(e.target.value)}>
-            <option value="">Todas</option>
-            {temporadas.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-semibold text-black">Municipio</label>
-          <select className="w-full border px-3 py-2 rounded text-black" value={municipio} onChange={e => setMunicipio(e.target.value)}>
-            <option value="">Todos</option>
-            {municipios.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </div>
-         <label className="block mb-1 font-semibold text-black">Año inicio</label>
-            <select className="w-full border px-3 py-2 rounded text-black" value={añoInicio} onChange={e => setAñoInicio(e.target.value)}>
-              <option value="">--</option>
-              {años.map(a => <option key={a} value={a}>{a}</option>)}
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleAplicarFiltro}>
+          {/* Indicador */}
+          <div className="col-span-1 md:col-span-2">
+            <label className="block mb-1 font-semibold text-black">Indicador</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={indicador}
+              onChange={e => setIndicador(e.target.value)}
+            >
+              <option value="">Seleccione</option>
+              {INDICADORES.map(i => (
+                <option key={i.value} value={i.value}>
+                  {i.label}
+                </option>
+              ))}
             </select>
-         <div className="w-1/2">
+          </div>
+          {/* Temporada */}
+          <div>
+            <label className="block mb-1 font-semibold text-black">Temporada</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={temporada}
+              onChange={e => setTemporada(e.target.value)}
+            >
+              <option value="">Todas</option>
+              {temporadas.map(t => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Municipio */}
+          <div>
+            <label className="block mb-1 font-semibold text-black">Municipio</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={municipio}
+              onChange={e => setMunicipio(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {municipios.map(m => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Año inicio */}
+          <div>
+            <label className="block mb-1 font-semibold text-black">Año inicio</label>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={añoInicio}
+              onChange={e => setAñoInicio(e.target.value)}
+            >
+              <option value="">--</option>
+              {años.map(a => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Año fin */}
+          <div>
             <label className="block mb-1 font-semibold text-black">Año fin</label>
-            <select className="w-full border px-3 py-2 rounded text-black" value={añoFin} onChange={e => setAñoFin(e.target.value)}>
+            <select
+              className="w-full border px-3 py-2 rounded text-black"
+              value={añoFin}
+              onChange={e => setAñoFin(e.target.value)}
+            >
               <option value="">--</option>
-              {años.map(a => <option key={a} value={a}>{a}</option>)}
+              {años.map(a => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
             </select>
           </div>
+          {/* Botones */}
+          <div className="col-span-1 md:col-span-2 flex gap-2">
+            <button
+              type="submit"
+              className="w-1/2 bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition mb-2"
+            >
+              Aplicar filtro
+            </button>
+            <button
+              type="button"
+              className="w-1/2 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg shadow hover:bg-gray-300 transition mb-2"
+              onClick={handleResetFiltro}
+            >
+              Limpiar filtros
+            </button>
           </div>
-        </div>
-      
-        <button className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition mb-3"
-          onClick={handleAplicarFiltro}>
-          Aplicar filtro
-        </button>
-        <button className="w-full bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg shadow hover:bg-gray-300 transition mb-3"
-          onClick={handleResetFiltro}>
-          Limpiar filtros
-        </button>
-        <button className="w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition"
-          onClick={exportToExcel}>
-          Exportar a Excel
-        </button>
+          <div className="col-span-1 md:col-span-2">
+            <button
+              type="button"
+              className="w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition"
+              onClick={exportToExcel}
+            >
+              Exportar a Excel
+            </button>
+          </div>
+        </form>
       </aside>
     </div>
   );

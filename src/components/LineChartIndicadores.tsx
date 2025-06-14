@@ -18,7 +18,7 @@ const formatNumber = (num: number | null | undefined) =>
     ? num.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : "--";
 
-import type { TooltipProps } from "recharts";
+import type { TooltipProps } from "recharts"; 
 
 const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   if (!active || !payload || !payload.length) return null;
@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
         {row.municipality && (<><b>Municipio:</b> {row.municipality}<br /></>)}
         <b>{payload[0].name}:</b>{" "}
         <span style={{ color: payload[0].stroke }}>
-          {formatNumber(payload[0].value)}
+          {formatNumber(typeof payload[0].value === "string" ? Number(payload[0].value) : payload[0].value)}
         </span>
       </div>
     </div>
@@ -104,6 +104,7 @@ const LineChartIndicadores: React.FC<Props> = ({
             dot={{ r: 4, stroke: COLORS[0], strokeWidth: 2, fill: "#fff" }}
             activeDot={{ r: 7 }}
             name={labelY}
+            connectNulls
           />
         </LineChart>
       </ResponsiveContainer>
