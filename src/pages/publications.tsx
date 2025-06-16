@@ -2,6 +2,8 @@ import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
 import { useEffect, useState } from 'react';
+import imagenCarga from '../images/Manzanillo -logo.png';
+import imagenfondo from '../images/ballena-nueva.jpg';
 
 interface PDFDocument {
   id: number;
@@ -33,11 +35,10 @@ const PDFSection = () => {
           `${import.meta.env.VITE_API_BASE_URL}/inventory/`,
           { signal: abortController.signal }
         );
-
         if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
         const data: PDFDocument[] = await response.json();
-        setPdfs(data.map(d => ({ ...d, id: Number(d.id) }))); // Forzar número
+        setPdfs(data.map(d => ({ ...d, id: Number(d.id) })));
         setError(null);
       } catch (err) {
         if (!abortController.signal.aborted) {
@@ -51,7 +52,6 @@ const PDFSection = () => {
     };
 
     fetchDocuments();
-
     return () => abortController.abort();
   }, []);
 
@@ -81,8 +81,13 @@ const PDFSection = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <span className="animate-pulse">Cargando documentos...</span>
+      <div className="flex flex-col items-center justify-center h-screen text-gray-600">
+        <img
+          src={imagenCarga}
+          alt="Cargando"
+          className="w-40 h-40 mb-6 object-contain animate-pulse-scale"
+        />
+        <p className="text-2xl font-semibold">Cargando noticias...</p>
       </div>
     );
   }
@@ -98,17 +103,36 @@ const PDFSection = () => {
   const groupedPdfs = groupByCategory(pdfs);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-pink-50 to-white">
       <Header />
+
+      {/* Hero Section Noticias */}
+      <section className="relative h-96 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={imagenfondo}
+            alt="Turismo Colima"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <div className="relative z-10 text-center px-4 bg-black/40 rounded-xl p-6">
+          <h1 className="text-5xxl md:text-6xl font-bold text-white mb-4 animate-slide-up">
+           Investigación
+          </h1>
+          {/* <p className="text-xl md:text-2xl text-white font-light max-w-2xl mx-auto">
+            Perfil y grado de satisfacción de turistas que visitan el Estado
+          </p> */}
+        </div>
+      </section>
+
       <main className="flex-grow bg-gray-50 py-8 px-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-center text-pink-600 mb-8">
-            Investigación  <h2>
+          
+          <h1 className="text-xxl text-center text-gray-800 mb-8 ">
             Perfil y grado de satisfacción de turistas que visitan el Estado
-          </h2>
-
           </h1>
-         
+
           {Object.entries(groupedPdfs).map(([cat, docs]) => (
             <section key={cat} className="mb-12">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">{cat}</h2>
@@ -136,6 +160,7 @@ const PDFSection = () => {
           ))}
         </div>
       </main>
+
       <Footer />
     </div>
   );

@@ -4,6 +4,7 @@ import Footer from "../components/piedepagina";
 import MensualIndicador from "../components/MensualIndicador";
 import TemporadaIndicador from "../components/TemporadaIndicador";
 import FinesSemanaIndicador from "../components/FinesSemanaIndicador";
+import imagenfondo from '../images/Tecomán-Estero El chupadero.jpg';
 
 const TABS = [
   { label: "Corte mensual", value: "mensual" },
@@ -65,6 +66,23 @@ const IndicadoresPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
+       <section className="relative h-96 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={imagenfondo}
+            alt="Turismo Colima"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative z-10 text-center px-4 bg-black/40 rounded-xl p-6">
+          <h1 className="text-5xxl md:text-6xl font-bold text-white mb-4 animate-slide-up">
+           Indicadores
+          </h1>
+          {/* <p className="text-xl md:text-2xl text-white font-light max-w-2xl mx-auto">
+            Perfil y grado de satisfacción de turistas que visitan el Estado
+          </p> */}
+        </div>
+      </section>
 
       {/* Tabs de indicadores */}
       <div className="flex justify-center mt-6 mb-2">

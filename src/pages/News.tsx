@@ -3,6 +3,7 @@ import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
 import imagenfondo  from '../images/comala-pueblo-mgico-foto-hernando-rivera.jpg'
+import imagenCarga from '../images/colima-logo.png'
 
 // Define the type for a news article
 interface NewsArticle {
@@ -44,9 +45,18 @@ export default function News() {
   }, []); // Empty dependency array ensures this runs only once on mount
 
   // Display loading state
-  if (loading) {
-    return <div className="text-center py-8">Loading news...</div>;
-  }
+if (loading) {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen text-gray-600">
+      <img
+        src={imagenCarga}
+        alt="Cargando"
+        className="w-56 h-32 mb-6 animate-bounce-slow object-contain"
+      />
+      <p className="text-2xl font-semibold">Cargando noticias...</p>
+    </div>
+  );
+}
 
   // Display error state
   if (error) {
