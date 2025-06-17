@@ -9,9 +9,10 @@ import PdfUpload from "../components/admincomponets/PdfUpload";
 import { ExcelUpload } from "../components/admincomponets/ExcelUpload";
 import { createClient } from "@supabase/supabase-js";
 import PdfUploadFront from "../components/admincomponets/pdfUploadFront";
+import UserRegisterForm from "../components/admincomponets/UsersAdmin";
 
 // -------- Types --------
-type Section = "news" | "pdfs" | "excel" | "pdfFront";
+type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users";
 
 interface NewsItem {
   id: string;
@@ -188,6 +189,8 @@ const handlePdfUploadGeneral = async (
     const { error: storageError } = await supabase.storage
       .from(bucket)
       .upload(fileName, file);
+
+    console.log(storageError)
 
     if (storageError) throw storageError;
 
@@ -376,8 +379,6 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
     }
   };
 
-  
-
   const handleDeletePdf = async (id: number, fileName: string) => {
     try {
       await supabase.storage.from("pdfs").remove([fileName]);
@@ -525,6 +526,11 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
                     </div>
                   ))}
                 </div>
+              </>
+            )}
+            {currentSection === "users" && (
+              <>
+                <UserRegisterForm />
               </>
             )}
 

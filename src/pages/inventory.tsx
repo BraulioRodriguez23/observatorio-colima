@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/header";
 import Footer from "../components/piedepagina";
 import MensualIndicador from "../components/MensualIndicador";
 import TemporadaIndicador from "../components/TemporadaIndicador";
 import FinesSemanaIndicador from "../components/FinesSemanaIndicador";
-import imagenfondo from '../images/Tecomán-Estero El chupadero.jpg';
+import imagenfondo from "../images/Tecomán-Estero El chupadero.jpg";
 
 const TABS = [
   { label: "Corte mensual", value: "mensual" },
@@ -12,52 +12,37 @@ const TABS = [
   { label: "Fines de semana largos", value: "puentes" },
 ];
 
-// Aquí tu arreglo de PDFs
-const PDF_BUTTONS = [
-  {
-    id: 1,
-    title: "Establecimientos hospitalarios por municipio",
-    fileName: "ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx",
-    category: "hospitalidad",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ESTABLECIMIENTOS%20HOSP%20POR%20MUNICIPIO.xlsx%20-%20ESTABLECIMIENTOS%20HOSP%20POR%20MUNIC.pdf"
-  },
-  {
-    id: 2,
-    title: "Indicadores de cruceros",
-    fileName: "Indicadores de cruceros (descargable).xlsx",
-    category: "cruceros",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Indicadores%20de%20cruceros%20(descargable).xlsx%20-%20Indicadores%20de%20cruceros.pdf"
-  },
-  {
-    id: 3,
-    title: "Personal ocupado estatal",
-    fileName: "Personal ocupado estatal.pdf",
-    category: "personal",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Personal%20ocupado%20estatal%20(1).pdf"
-  },
-  {
-    id: 4,
-    title: "PIBE tabla",
-    fileName: "PIBE TABLA (descargable).xlsx",
-    category: "PIBE TABLA",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA%20(descargable).xlsx%20-%20PIBE%20Estatal.pdf"
-  },
-  {
-    id: 5,
-    title: "Tabla histórica de indicadores turísticos clave 2004-2024",
-    fileName: "Tabla histórica de indicadores turísticos clave 2004-2024.xlsx",
-    category: "historicos",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ilovepdf_merged-1.pdf"
-  }
-];
-
 const IndicadoresPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>(TABS[0].value);
+
+  const [pdfs, setPdfs] = useState<PdfItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPdfs = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(
+          "https://observatorio-api-dhp4.vercel.app/pdfs-front"
+        );
+        if (!response.ok) throw new Error("Error al cargar los PDFs");
+        const data = await response.json();
+        setPdfs(data);
+      } catch (err) {
+        setError("No se pudieron cargar los PDFs");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPdfs();
+  }, []);
 
   // Función para abrir PDF en nueva ventana
   const handlePdfClick = (url: string, title: string) => {
     if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(url, "_blank", "noopener,noreferrer");
     } else {
       alert(`PDF "${title}" no disponible temporalmente`);
     }
@@ -66,9 +51,9 @@ const IndicadoresPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-       <section className="relative h-96 flex items-center justify-center overflow-hidden">
+      <section className="relative h-96 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <img
             src={imagenfondo}
             alt="Turismo Colima"
             className="w-full h-full object-cover"
@@ -76,7 +61,7 @@ const IndicadoresPage: React.FC = () => {
         </div>
         <div className="relative z-10 text-center px-4 bg-black/40 rounded-xl p-6">
           <h1 className="text-5xxl md:text-6xl font-bold text-white mb-4 animate-slide-up">
-           Indicadores
+            Indicadores
           </h1>
           {/* <p className="text-xl md:text-2xl text-white font-light max-w-2xl mx-auto">
             Perfil y grado de satisfacción de turistas que visitan el Estado
@@ -86,7 +71,7 @@ const IndicadoresPage: React.FC = () => {
 
       {/* Tabs de indicadores */}
       <div className="flex justify-center mt-6 mb-2">
-        {TABS.map(tab => (
+        {TABS.map((tab) => (
           <button
             key={tab.value}
             className={`px-6 py-2 rounded-lg border-b-4 mx-2 transition-all duration-200 ${
@@ -114,21 +99,23 @@ const IndicadoresPage: React.FC = () => {
           Documentos Adicionales
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {PDF_BUTTONS.map((button) => (
+          {pdfs.map((button) => (
             <button
               key={button.id}
-              onClick={() => handlePdfClick(button.link, button.title)}
+              onClick={() => handlePdfClick(button.fileUrl, button.title)}
               className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-lg ${
-                button.link
-                  ? 'border-pink-200 bg-pink-50 hover:border-pink-400 hover:bg-pink-100'
-                  : 'border-gray-200 bg-gray-50 hover:border-gray-400 opacity-75 cursor-not-allowed'
+                button.fileUrl
+                  ? "border-pink-200 bg-pink-50 hover:border-pink-400 hover:bg-pink-100"
+                  : "border-gray-200 bg-gray-50 hover:border-gray-400 opacity-75 cursor-not-allowed"
               }`}
-              disabled={!button.link}
+              disabled={!button.fileUrl}
             >
               <div className="flex items-start space-x-3">
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  button.link ? 'bg-pink-500' : 'bg-gray-400'
-                }`}>
+                <div
+                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                    button.fileUrl ? "bg-pink-500" : "bg-gray-400"
+                  }`}
+                >
                   <svg
                     className="w-4 h-4 text-white"
                     fill="none"
@@ -144,11 +131,19 @@ const IndicadoresPage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <h3 className={`font-semibold text-sm mb-1 ${button.link ? 'text-gray-800' : 'text-gray-500'}`}>
+                  <h3
+                    className={`font-semibold text-sm mb-1 ${
+                      button.fileUrl ? "text-gray-800" : "text-gray-500"
+                    }`}
+                  >
                     {button.title}
                   </h3>
-                  <p className={`text-xs ${button.link ? 'text-gray-600' : 'text-gray-400'}`}>
-                    {button.link ? 'Disponible' : 'No disponible'}
+                  <p
+                    className={`text-xs ${
+                      button.fileUrl ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  >
+                    {button.fileUrl ? "Disponible" : "No disponible"}
                   </p>
                 </div>
               </div>
@@ -157,8 +152,9 @@ const IndicadoresPage: React.FC = () => {
         </div>
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-800">
-            <strong>Nota:</strong> Estos documentos se abren en una nueva ventana.
-            Si algún documento no está disponible, contacta al administrador para subirlo.
+            <strong>Nota:</strong> Estos documentos se abren en una nueva
+            ventana. Si algún documento no está disponible, contacta al
+            administrador para subirlo.
           </p>
         </div>
       </div>
