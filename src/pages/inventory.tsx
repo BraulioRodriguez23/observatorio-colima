@@ -40,7 +40,7 @@ const PDF_BUTTONS = [
     title: "PIBE ",
     fileName: "PIBE TABLA (descargable).xlsx",
     category: "PIBE TABLA",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA%20(descargable).xlsx%20-%20PIBE%20Estatal%20(1).pdf"
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA.pdf"
   },
   {
     id: 5,
