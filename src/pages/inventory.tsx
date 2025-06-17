@@ -16,14 +16,14 @@ const TABS = [
 const PDF_BUTTONS = [
   {
     id: 1,
-    title: "Establecimientos hospitalarios por municipio",
+    title: "Establecimientos de hospedaje por municipio",
     fileName: "ESTABLECIMIENTOS_HOSP_POR_MUNICIPIO.xlsx",
     category: "hospitalidad",
     link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ESTABLECIMIENTOS%20HOSP%20POR%20MUNICIPIO.xlsx%20-%20ESTABLECIMIENTOS%20HOSP%20POR%20MUNIC.pdf"
   },
   {
     id: 2,
-    title: "Indicadores de cruceros",
+    title: "Cruceros",
     fileName: "Indicadores de cruceros (descargable).xlsx",
     category: "cruceros",
     link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Indicadores%20de%20cruceros%20(descargable).xlsx%20-%20Indicadores%20de%20cruceros.pdf"
@@ -37,17 +37,17 @@ const PDF_BUTTONS = [
   },
   {
     id: 4,
-    title: "PIBE tabla",
+    title: "PIBE ",
     fileName: "PIBE TABLA (descargable).xlsx",
     category: "PIBE TABLA",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA%20(descargable).xlsx%20-%20PIBE%20Estatal.pdf"
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//PIBE%20TABLA%20(descargable).xlsx%20-%20PIBE%20Estatal%20(1).pdf"
   },
   {
     id: 5,
     title: "Tabla histórica de indicadores turísticos clave 2004-2024",
     fileName: "Tabla histórica de indicadores turísticos clave 2004-2024.xlsx",
     category: "historicos",
-    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//ilovepdf_merged-1.pdf"
+    link: "https://juqxtlpbddiyfihjajux.supabase.co/storage/v1/object/public/pdfs-front//Tabla%20historica%20indicadores.pdf"
   }
 ];
 
@@ -111,7 +111,7 @@ const IndicadoresPage: React.FC = () => {
       {/* Sección de PDFs adicionales */}
       <div className="max-w-7xl mx-auto w-full px-4 py-8 bg-white rounded-lg shadow-sm mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Documentos Adicionales
+          Documentos adicionales
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {PDF_BUTTONS.map((button) => (
@@ -155,12 +155,7 @@ const IndicadoresPage: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>Nota:</strong> Estos documentos se abren en una nueva ventana.
-            Si algún documento no está disponible, contacta al administrador para subirlo.
-          </p>
-        </div>
+        
       </div>
 
       <Footer />
