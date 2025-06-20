@@ -13,7 +13,7 @@ const Login = () => {
     if (user) {
       navigate('/admin'); // Use navigate to redirect
     }
-  }, [user]); 
+  }, [user, navigate]); 
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // Prevent default form submission
@@ -29,9 +29,13 @@ const Login = () => {
 
       // Redirect the user to the home page or dashboard
       navigate("/admin");
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle errors (e.g., display an error message)
-      setError(err?.message || "Invalid email or password");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Invalid email or password");
+      }
     }
   };
 

@@ -14,7 +14,6 @@ const MESES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-// --- 1. Define la INTERFACE correctamente ---
 interface MensualData {
   municipality: string;
   month: string;
@@ -25,19 +24,16 @@ interface MensualData {
   [key: string]: string | number | undefined;
 }
 
-// --- 2. Tipa la función toDate ---
 function toDate(mes: string, anio: number) {
   const idx = MESES.findIndex(m => m.toLowerCase() === mes.toLowerCase());
   return new Date(anio, idx, 1);
 }
 
 const MensualIndicador: React.FC = () => {
-  // --- 3. Tipa el estado correctamente ---
   const [data, setData] = useState<MensualData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // No hay valores por default
   const [indicador, setIndicador] = useState<string>("");
   const [municipio, setMunicipio] = useState<string>("");
   const [mesInicio, setMesInicio] = useState<string>("Enero");
@@ -73,7 +69,6 @@ const MensualIndicador: React.FC = () => {
   const fechaIni = toDate(filtros.mesInicio, filtros.anioInicio);
   const fechaFin = toDate(filtros.mesFin, filtros.anioFin);
 
-  // --- 4. Filtrado tipado y sin warnings ---
   const dataFiltrada = data
     .filter((d) => {
       if (!d.month || !d.year) return false;
@@ -87,7 +82,6 @@ const MensualIndicador: React.FC = () => {
     })
     .map((d) => {
       const newData = { ...d, mesAnio: `${d.month} ${d.year}` };
-      // SOLO corrige occupancyRate si es atípico
       if (filtros.indicador === "occupancyRate" && typeof d.occupancyRate === "number" && d.occupancyRate > 100) {
         if (d.occupancyRate < 1000) {
           newData.occupancyRate = Number((d.occupancyRate / 10).toFixed(2));
@@ -99,11 +93,31 @@ const MensualIndicador: React.FC = () => {
     });
 
   function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(dataFiltrada);
+    const indicadorSeleccionado = filtros.indicador as keyof MensualData;
+
+    if (!indicadorSeleccionado) {
+      alert("Por favor, seleccione un indicador para exportar.");
+      return;
+    }
+
+    const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
+
+    const dataLimpia = dataFiltrada.map(obj => ({
+      Año: obj.year,
+      Municipio: obj.municipality,
+      Mes: obj.month,
+      [etiqueta]: (obj as MensualData)[indicadorSeleccionado] ?? "N/A"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(dataLimpia);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Mensual");
+    XLSX.utils.book_append_sheet(wb, ws, "IndicadoresMensuales");
+
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "indicadores_mensual.xlsx");
+    saveAs(
+      new Blob([excelBuffer], { type: "application/octet-stream" }),
+      `mensual_${indicadorSeleccionado}.xlsx`
+    );
   }
 
   function handleAplicarFiltro() {
@@ -116,6 +130,7 @@ const MensualIndicador: React.FC = () => {
       anioFin,
     });
   }
+
   function handleResetFiltro() {
     setIndicador("");
     setMunicipio("");
@@ -155,14 +170,14 @@ const MensualIndicador: React.FC = () => {
       </div>
       <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0 text-gray-800">
         <h3 className="text-2xl font-bold mb-5 text-gray-700">Filtrar datos</h3>
-       <div className="mb-4">
+        <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Indicador</label>
           <select className="w-full border px-3 py-2 rounded" value={indicador} onChange={e => setIndicador(e.target.value)}>
             <option value="">Seleccione</option>
             {INDICADORES.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
           </select>
         </div>
-         <div className="mb-4">
+        <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Municipio</label>
           <select className="w-full border px-3 py-2 rounded" value={municipio} onChange={e => setMunicipio(e.target.value)}>
             <option value="">Todos</option>
@@ -199,8 +214,11 @@ const MensualIndicador: React.FC = () => {
           onClick={handleResetFiltro}>
           Limpiar filtros
         </button>
-        <button className="w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition"
-          onClick={exportToExcel}>
+        <button
+          onClick={exportToExcel}
+          className={`w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition`}
+          // disabled={!filtros.indicador} // descomenta si quieres desactivarlo cuando esté vacío
+        >
           Exportar a Excel
         </button>
       </aside>

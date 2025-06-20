@@ -154,13 +154,7 @@ const IndicadoresPage: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>Nota:</strong> Estos documentos se abren en una nueva
-            ventana. Si algún documento no está disponible, contacta al
-            administrador para subirlo.
-          </p>
-        </div>
+      
       </div>
 
       <Footer />

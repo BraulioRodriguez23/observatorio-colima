@@ -114,13 +114,31 @@ const TemporadaIndicador = () => {
         : d.occupancyRate
   }));
 
-  function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(dataFiltradaConCorto);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Temporadas");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "temporadas_indicadores.xlsx");
+function exportToExcel() {
+  const indicadorSeleccionado = filtros.indicador as keyof TemporadaData;
+
+  if (!indicadorSeleccionado) {
+    alert("Seleccione un indicador para exportar.");
+    return;
   }
+
+  const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
+
+  const datosFiltrados = dataFiltradaConCorto.map((fila) => ({
+    Año: fila.año ?? fila.year,
+    Municipio: fila.municipality,
+    Temporada: fila.season,
+    [etiqueta]: (fila as Record<string, unknown>)[indicadorSeleccionado]
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(datosFiltrados);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Temporadas");
+
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), `temporadas_${indicadorSeleccionado}.xlsx`);
+}
+
 
 
   function handleAplicarFiltro(e: React.FormEvent<HTMLFormElement>) {
