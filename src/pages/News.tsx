@@ -157,6 +157,22 @@ if (loading) {
             ))}
           </div>
         </div>
+         <div className="max-w-3xl mx-auto mt-12 text-center">
+  {/* Título */}
+  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+    Más noticias
+  </h2>
+
+  {/* Botón / enlace */}
+  <a
+    href="https://visitacolima.mx/eventos-colima"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block px-6 py-3 bg-pink-600 text-white font-medium rounded-lg shadow hover:bg-pink-700 transition-colors"
+  >
+    Ver más eventos en VisitColima.mx
+  </a>
+</div>
       </main>
   
       {/* CTA Section */}

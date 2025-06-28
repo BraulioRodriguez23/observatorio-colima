@@ -5,13 +5,6 @@ import { saveAs } from "file-saver";
 
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
-  { label: "Oferta cuartos", value: "roomOffer" },
-  { label: "Cuartos ocupados", value: "occupiedRooms" },
-  { label: "Cuartos disponibles", value: "availableRooms" },
-  { label: "Estadía promedio", value: "stay" },
-  { label: "Densidad de ocupacion", value: "density" },
-  { label: "Turistas noche", value: "touristsPerNight" },
-  { label: "Gasto promedio por persona", value: "avgSpending" },
   { label: "Derrama económica", value: "economicImpact" },
   { label: "Afluencia turística", value: "touristFlow" },
 ];

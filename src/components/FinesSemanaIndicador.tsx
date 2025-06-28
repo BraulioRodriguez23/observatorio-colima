@@ -6,14 +6,6 @@ import { saveAs } from "file-saver";
 // --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
   { label: "% ocupación", value: "occupancy_rate" },
-  { label: "Oferta cuartos", value: "room_offer" },
-  { label: "Cuartos ocupados", value: "occupied_rooms" },
-  { label: "Cuartos disponibles", value: "available_rooms" },
-  { label: "Estadía promedio", value: "average_stay" },
-  { label: "Densidad de ocupación", value: "occupancy_density" },
-  { label: "Noches", value: "nights" },
-  { label: "Turistas noche", value: "tourists_per_night" },
-  { label: "Gasto promedio diario", value: "daily_avg_spending" },
   { label: "Derrama económica", value: "economic_impact" },
   { label: "Afluencia turística", value: "tourist_flow" },
 ];
