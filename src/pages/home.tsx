@@ -32,7 +32,7 @@ export default function Home() {
          <section className="py-16 px-4 bg-slate-50">
   <div className="max-w-6xl mx-auto space-y-20">
 
-    <h1 className='text-pink-500 text-center font-bold'>Bienvenidos</h1>
+    <h1 className='text-pink-600 text-center font-bold'>Bienvenidos</h1>
 
     {/* Misión */}
     <div className="grid md:grid-cols-2 gap-8 items-center">
