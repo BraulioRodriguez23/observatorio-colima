@@ -11,7 +11,7 @@ const HorizontalMenu: React.FC = () => {
     { name: 'Inicio', path: '/' },
     { name: 'Indicadores', path: '/inventario' },
     { name: 'Publicaciones', path: '/Publications' },
-    { name: 'Noticias', path: '/News' },
+    { name: 'Eventos', path: '/News' },
     { name: 'Sobre nosotros', path: '/Sobre_nosotros' },
   ];
 

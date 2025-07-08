@@ -246,7 +246,7 @@ function exportToExcel() {
               value={municipio}
               onChange={e => setMunicipio(e.target.value)}
             >
-              <option value="">Todos</option>
+              
               {municipios.map(m => (
                 <option key={m} value={m}>
                   {m}

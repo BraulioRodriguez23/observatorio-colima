@@ -28,7 +28,7 @@ export default function NavTabs() {
             to="/noticias"
             className="py-4 px-1 text-gray-500 hover:text-pink-600 border-b-2 border-transparent hover:border-pink-600"
           >
-            Noticias
+            eventos
           </NavLink>
         </div>
       </div>

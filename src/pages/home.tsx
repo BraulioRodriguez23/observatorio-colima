@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, } from 'react';
 import '../index.css';
 import Hero from '../components/Hero';
 import Header from '../components/header';
@@ -12,12 +12,7 @@ export default function Home() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   // Para no mostrarlo otra vez si ya fue aceptado
-  useEffect(() => {
-    const accepted = localStorage.getItem("disclaimerAccepted");
-    if (accepted) {
-      setShowDisclaimer(false);
-    }
-  }, []);
+  
 
   const handleAccept = () => {
     setShowDisclaimer(false);

@@ -241,7 +241,7 @@ function exportToExcel() {
             value={fin}
             onChange={e => setFin(e.target.value)}
           >
-            <option value="">Todos</option>
+           
             {fines.map(fv => (
               <option key={fv} value={fv}>{fv}</option>
             ))}
