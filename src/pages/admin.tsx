@@ -302,21 +302,6 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
 
     return publicUrl;
   };
-   const handleDeleteAllExcels = async () => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      const config = excelTypes.find((e) => e.value === excelType)!;
-      const url = `${API_BASE}/${config.route}/all`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Error al eliminar todos los Excels");
-      setExcels([]);
-    } catch (err) {
-      alert((err as Error).message || "Error al eliminar todos los Excels");
-    }
-  };
 
   // -------- Handlers --------
   const handleNewsSubmit = async (data: {
@@ -410,22 +395,27 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
     }
   };
 
-  /* const handleDeleteExcel = async (id: number) => {
-    try {
-      const token = localStorage.getItem("token") || "";
-      const config = excelTypes.find(e => e.value === excelType)!;
-      const route = config.route;
-      const endpoint = `${API_BASE}/${route}/${id}`;
-      const response = await fetch(endpoint, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Error al eliminar el Excel");
-      setExcels((prev) => prev.filter((item) => item.id !== id));
-    } catch {
-      alert("Error al eliminar el archivo Excel");
-    }
-  }; */
+const handleDeleteAllExcels = async () => {
+  if (!window.confirm("¿Seguro que quieres borrar TODOS los registros?")) return;
+
+  try {
+    const token = localStorage.getItem("token") || "";
+    const config = excelTypes.find(e => e.value === excelType)!;
+    const url = `${API_BASE}/${config.route}/all`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Error al eliminar todos los Excel");
+
+    const data = await response.json();
+    alert(data.message);
+    setExcels([]);   // limpia el estado, lista vacía en frontend
+  } catch (err) {
+    alert((err as Error).message || "Error al eliminar todos los Excel");
+  }
+};
+
 
   // CORRECCIÓN: Crear groupedByCategory para pdfs normales
   const groupedByCategory = pdfs.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
@@ -549,54 +539,56 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
               </>
             )}
 
-            {currentSection === "excel" && (
-              <>
-                {/* Selector de tipo de Excel con accesibilidad */}
-                <div className="w-1/3 mb-4">
-                  <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
-                    Tipo de Excel
-                  </label>
-                  <select
-                    id="tipo-excel"
-                    value={excelType}
-                    onChange={(e) => setExcelType(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  >
-                    {excelTypes.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+           {currentSection === "excel" && (
+  <>
+    {/* Selector de tipo de Excel */}
+    <div className="w-1/3 mb-4">
+      <label htmlFor="tipo-excel" className="block text-sm font-medium text-gray-700 mb-1">
+        Tipo de Excel
+      </label>
+      <select
+        id="tipo-excel"
+        value={excelType}
+        onChange={(e) => setExcelType(e.target.value)}
+        className="w-full p-2 border rounded"
+      >
+        {excelTypes.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
 
-                {/* Componente de subida de Excel */}
-                <ExcelUpload
-                  excelType={excelType as "mensual" | "temporada" | "puentes"}
-                  onSuccess={() => fetchExcels()}
-                  onError={(msg) => alert(msg)}
-                  onUploadComplete={() => fetchExcels()}
-                />
+    {/* Subida de Excel */}
+    <ExcelUpload
+      excelType={excelType as "mensual" | "temporada" | "puentes"}
+      onSuccess={() => fetchExcels()}
+      onError={(msg) => alert(msg)}
+      onUploadComplete={() => fetchExcels()}
+    />
 
-                {/* Listado de archivos Excel */}
-                <div className="space-y-4 mt-4">
-                  {excels.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between bg-white p-3 rounded shadow"
-                    >
-                      <span>{item.name}</span>
-                      <button
-                        onClick={() => {handleDeleteAllExcels()}}
-                        className="text-red-600 hover:underline"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+    {/* ✅ Botón de Eliminar Todos - AQUÍ está bien */}
+    <button
+      onClick={handleDeleteAllExcels}
+      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mb-4"
+    >
+      Eliminar Todos
+    </button>
+
+    {/* Listado de archivos */}
+    <div className="space-y-4 mt-4">
+      {excels.map((item) => (
+        <div
+          key={item.id}
+          className="flex items-center justify-between bg-white p-3 rounded shadow"
+        >
+          <span>{item.name}</span>
+        </div>
+      ))}
+    </div>
+  </>
+)}
 
             {error && <div className="text-red-600 mt-4">{error}</div>}
           </div>
