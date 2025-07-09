@@ -302,6 +302,21 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
 
     return publicUrl;
   };
+   const handleDeleteAllExcels = async () => {
+    try {
+      const token = localStorage.getItem("token") || "";
+      const config = excelTypes.find((e) => e.value === excelType)!;
+      const url = `${API_BASE}/${config.route}/all`;
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Error al eliminar todos los Excels");
+      setExcels([]);
+    } catch (err) {
+      alert((err as Error).message || "Error al eliminar todos los Excels");
+    }
+  };
 
   // -------- Handlers --------
   const handleNewsSubmit = async (data: {
@@ -395,7 +410,7 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
     }
   };
 
-  const handleDeleteExcel = async (id: number) => {
+  /* const handleDeleteExcel = async (id: number) => {
     try {
       const token = localStorage.getItem("token") || "";
       const config = excelTypes.find(e => e.value === excelType)!;
@@ -410,7 +425,7 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
     } catch {
       alert("Error al eliminar el archivo Excel");
     }
-  };
+  }; */
 
   // CORRECCIÓN: Crear groupedByCategory para pdfs normales
   const groupedByCategory = pdfs.reduce<{ [cat: string]: DocumentItem[] }>((acc, pdf) => {
@@ -572,7 +587,7 @@ const handleDeletePdfFront = async (id: number, fileName: string) => {
                     >
                       <span>{item.name}</span>
                       <button
-                        onClick={() => handleDeleteExcel(item.id)}
+                        onClick={() => {handleDeleteAllExcels()}}
                         className="text-red-600 hover:underline"
                       >
                         Eliminar

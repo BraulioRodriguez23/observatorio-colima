@@ -99,7 +99,7 @@ const IndicadoresPage: React.FC = () => {
       {/* PDFs adicionales */}
       <div className="max-w-7xl mx-auto w-full px-4 py-8 bg-white rounded-lg shadow-sm mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          Documentos Adicionales
+          Documentos adicionales
         </h2>
 
         {loading && (
