@@ -15,7 +15,7 @@ export default function CircleGraph() {
   const generalIndicators = [
     { 
       title: "Afluencia turistica", 
-      value: "1,546,622",
+      value: "1,564,622",
       progress: 49.31,
       icon: DensityIcon
     },
