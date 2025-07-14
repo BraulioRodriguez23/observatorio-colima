@@ -3,7 +3,6 @@ import LineChartIndicadores from "./LineChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-// --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
   { label: "Derrama económica", value: "economicImpact" },
@@ -23,17 +22,6 @@ interface MensualData {
   economicImpact?: number;
   touristFlow?: number;
   [key: string]: string | number | undefined;
-}
-
-// --- LIMPIADOR DE PORCENTAJES ---
-function sanitizeOccupancyRate(value: unknown): number | undefined {
-  if (value === null || value === undefined) return undefined;
-  const num = Number(value);
-  if (isNaN(num)) return undefined;
-  if (num < 0) return 0;
-  if (num > 100 && num < 1000) return +(num / 10).toFixed(2);
-  if (num >= 1000) return +(num / 100).toFixed(2);
-  return +num.toFixed(2);
 }
 
 function toDate(mes: string, anio: number) {
@@ -71,12 +59,7 @@ const MensualIndicador: React.FC = () => {
         return res.json();
       })
       .then((rawData: MensualData[]) => {
-        // LIMPIA SIEMPRE LOS PORCENTAJES AL CARGAR
-        const cleanData = rawData.map(d => ({
-          ...d,
-          occupancyRate: sanitizeOccupancyRate(d.occupancyRate)
-        }));
-        setData(cleanData);
+        setData(rawData);
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -106,14 +89,11 @@ const MensualIndicador: React.FC = () => {
 
   function exportToExcel() {
     const indicadorSeleccionado = filtros.indicador as keyof MensualData;
-
     if (!indicadorSeleccionado) {
       alert("Por favor, seleccione un indicador para exportar.");
       return;
     }
-
     const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
-
     const dataLimpia = dataFiltrada.map(obj => ({
       Año: obj.year,
       Municipio: obj.municipality,

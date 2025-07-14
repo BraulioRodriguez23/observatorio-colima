@@ -10,7 +10,7 @@ const INDICADORES = [
 ];
 
 const temporadaAbreviada = (nombre: string) => {
-  const dict = {
+  const dict: Record<string, string> = {
     "Semana santa y pascua": "S. Santa",
     "Semana santa": "S. Santa",
     "Verano": "Verano",
@@ -18,23 +18,15 @@ const temporadaAbreviada = (nombre: string) => {
     "Noviembre": "Nov",
     "Diciembre": "Dic",
     "Invierno": "Inv.",
-  } as const;
-  return (dict as Record<string, string>)[nombre] || nombre.split(" ")[0];
+  };
+  return dict[nombre] || nombre.split(" ")[0] || nombre;
 };
 
 type TemporadaData = {
-  municipality?: string;
-  season?: string;
-  año?: number;
-  year?: number;
+  municipality: string;
+  season: string;
+  year: number;
   occupancyRate?: number;
-  roomOffer?: number;
-  occupiedRooms?: number;
-  availableRooms?: number;
-  stay?: number;
-  density?: number;
-  touristsPerNight?: number;
-  avgSpending?: number;
   economicImpact?: number;
   touristFlow?: number;
   [key: string]: unknown;
@@ -76,14 +68,14 @@ const TemporadaIndicador = () => {
   const temporadas = [...new Set(data.map(d => d.season).filter(Boolean))];
   const años = [
     ...new Set(
-      data.map(d => Number(d.año ?? d.year)).filter(x => !isNaN(x))
+      data.map(d => Number(d.year)).filter(x => !isNaN(x))
     ),
   ].sort((a, b) => Number(a) - Number(b));
 
   const dataFiltrada = data.filter(d => {
     const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
     const temporadaOK = !filtros.temporada || d.season === filtros.temporada;
-    const añoDato = Number(d.año ?? d.year);
+    const añoDato = Number(d.year);
     let añoOK = true;
     if (filtros.añoInicio && filtros.añoFin) {
       añoOK = añoDato >= Number(filtros.añoInicio) && añoDato <= Number(filtros.añoFin);
@@ -98,53 +90,34 @@ const TemporadaIndicador = () => {
   const dataFiltradaConCorto = dataFiltrada.map(d => ({
     ...d,
     temporadaCorta: temporadaAbreviada(d.season ?? ""),
-    temporadaCompleta: `${d.season} ${d.año ?? d.year}`,
-    occupancyRate:
-      typeof d.occupancyRate === "number" && d.occupancyRate > 100 && d.occupancyRate < 1000
-        ? Math.floor(Number(d.occupancyRate) / 10)
-        : typeof d.occupancyRate === "number" && d.occupancyRate >= 1000
-        ? Math.floor(Number(d.occupancyRate) / 100)
-        : d.occupancyRate
+    temporadaCompleta: `${d.season} ${d.year}`,
   }));
 
-function exportToExcel() {
-  const indicadorSeleccionado = filtros.indicador as keyof TemporadaData;
+  function exportToExcel() {
+    const indicadorSeleccionado = filtros.indicador as keyof TemporadaData;
+    if (!indicadorSeleccionado) {
+      alert("Seleccione un indicador para exportar.");
+      return;
+    }
+    const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
+    const datosFiltrados = dataFiltradaConCorto.map((fila) => ({
+      Año: fila.year,
+      Municipio: fila.municipality,
+      Temporada: fila.season,
+      [etiqueta]: (fila as Record<string, unknown>)[indicadorSeleccionado]
+    }));
 
-  if (!indicadorSeleccionado) {
-    alert("Seleccione un indicador para exportar.");
-    return;
+    const ws = XLSX.utils.json_to_sheet(datosFiltrados);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Temporadas");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), `temporadas_${indicadorSeleccionado}.xlsx`);
   }
-
-  const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
-
-  const datosFiltrados = dataFiltradaConCorto.map((fila) => ({
-    Año: fila.año ?? fila.year,
-    Municipio: fila.municipality,
-    Temporada: fila.season,
-    [etiqueta]: (fila as Record<string, unknown>)[indicadorSeleccionado]
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(datosFiltrados);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Temporadas");
-
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), `temporadas_${indicadorSeleccionado}.xlsx`);
-}
-
-
 
   function handleAplicarFiltro(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setFiltros({ indicador, municipio, temporada, añoInicio, añoFin });
-  }
-
-  interface Filtros {
-    indicador: string;
-    municipio: string;
-    temporada: string;
-    añoInicio: string;
-    añoFin: string;
   }
 
   function handleResetFiltro(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -160,14 +133,14 @@ function exportToExcel() {
       temporada: "",
       añoInicio: "",
       añoFin: "",
-    } as Filtros);
+    });
   }
 
   function getTituloGrafica() {
     const indLabel = INDICADORES.find(i => i.value === filtros.indicador)?.label || "";
     let añoTxt = "";
     const añosUnicos = [
-      ...new Set(dataFiltrada.map(d => Number(d.año ?? d.year)).filter(Boolean))
+      ...new Set(dataFiltrada.map(d => Number(d.year)).filter(Boolean))
     ].sort((a, b) => a - b);
     if (añosUnicos.length) {
       if (añosUnicos.length === 1) añoTxt = `(${añosUnicos[0]})`;
@@ -246,7 +219,7 @@ function exportToExcel() {
               value={municipio}
               onChange={e => setMunicipio(e.target.value)}
             >
-              
+              <option value="">Todos</option>
               {municipios.map(m => (
                 <option key={m} value={m}>
                   {m}
