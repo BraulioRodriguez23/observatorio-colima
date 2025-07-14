@@ -10,7 +10,7 @@ import { ExcelUpload } from "../components/admincomponets/ExcelUpload";
 import { createClient } from "@supabase/supabase-js";
 import PdfUploadFront from "../components/admincomponets/pdfUploadFront";
 import UserRegisterForm from "../components/admincomponets/UsersAdmin";
-import GetAllUser from "../components/admincomponets/GetAllUser";
+import UserList from "../components/admincomponets/GetAllUser";
 // -------- Types --------
 type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users";
 
@@ -536,7 +536,7 @@ const handleDeleteAllExcels = async () => {
             {currentSection === "users" && (
               <>
                 <UserRegisterForm />
-                <GetAllUser />
+                <UserList />
               </>
             )}
 

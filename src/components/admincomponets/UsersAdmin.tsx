@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const UserRegisterForm: React.FC = () => {
+const   UserRegisterForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -39,6 +39,8 @@ const PdfUploadFront: React.FC<Props> = ({
       <option value="Personal ocupado estatal">Personal ocupado estatal</option>
       <option value="PIBE TABLA">PIBE TABLA</option>
       <option value="Tabla histórica de indicadores turísticos clave 2004-2024">Tabla histórica de indicadores turísticos clave 2004-2024</option>
+      <option value="Numeralia de establecimientos de hospedaje">Numeralia de establecimientos de hospedaje</option>
+
 
     </select>
 

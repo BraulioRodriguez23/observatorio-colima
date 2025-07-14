@@ -10,13 +10,24 @@ const INDICADORES = [
   { label: "Afluencia turística", value: "tourist_flow" },
 ];
 
+// --- LIMPIADOR SOLO PARA PORCENTAJE ---
+function sanitizeOccupancyRate(value: string | number | null | undefined) {
+  if (value === null || value === undefined) return null;
+  const num = Number(value);
+  if (isNaN(num)) return null;
+  if (num < 0) return 0;
+  if (num > 100 && num < 1000) return +(num / 10).toFixed(2);
+  if (num >= 1000) return +(num / 100).toFixed(2);
+  return +num.toFixed(2);
+}
+
 // --- INTERFAZ DE DATOS --- //
 interface FinesSemanaRecord {
   id: number;
   year: number;
   bridge_name: string;
   municipality: string;
-  occupancy_rate: number;
+  occupancy_rate: number | null;
   room_offer: number;
   occupied_rooms: number;
   available_rooms: number;
@@ -27,7 +38,7 @@ interface FinesSemanaRecord {
   daily_avg_spending: number;
   economic_impact: number;
   tourist_flow: number;
-  [key: string]: string | number;
+  [key: string]: string | number | null;
 }
 
 const FinesSemanaIndicadorLineal: React.FC = () => {
@@ -59,7 +70,14 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then((rawData: FinesSemanaRecord[]) => setData(rawData))
+      .then((rawData: FinesSemanaRecord[]) => {
+        // Limpieza solo del campo porcentaje
+        const cleanData = rawData.map(d => ({
+          ...d,
+          occupancy_rate: sanitizeOccupancyRate(d.occupancy_rate),
+        }));
+        setData(cleanData);
+      })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -96,39 +114,38 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
       finAnio: `${d.bridge_name} ${d.year}`,
     }))
     .sort((a, b) => {
-      // Ordenar por año y después por nombre
       if (a.year !== b.year) return a.year - b.year;
       return a.bridge_name.localeCompare(b.bridge_name);
     });
 
   // --- EXPORTAR A EXCEL --- //
-function exportToExcel() {
-  const indicadorSeleccionado = filtros.indicador as keyof FinesSemanaRecord;
+  function exportToExcel() {
+    const indicadorSeleccionado = filtros.indicador as keyof FinesSemanaRecord;
 
-  if (!indicadorSeleccionado) {
-    alert("Seleccione un indicador para exportar.");
-    return;
+    if (!indicadorSeleccionado) {
+      alert("Seleccione un indicador para exportar.");
+      return;
+    }
+
+    const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
+
+    const dataLimpia = dataParaGrafica.map(obj => ({
+      Año: obj.year,
+      Municipio: obj.municipality,
+      "Fin de semana largo": obj.bridge_name,
+      [etiqueta]: (obj as FinesSemanaRecord)[indicadorSeleccionado]
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(dataLimpia);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "FinesSemanaLineal");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(
+      new Blob([excelBuffer], { type: "application/octet-stream" }),
+      `fines_semana_${indicadorSeleccionado}.xlsx`
+    );
   }
-
-  const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
-
-  const dataLimpia = dataParaGrafica.map(obj => ({
-    Año: obj.year,
-    Municipio: obj.municipality,
-    "Fin de semana largo": obj.bridge_name,
-    [etiqueta]: (obj as FinesSemanaRecord)[indicadorSeleccionado]
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(dataLimpia);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "FinesSemanaLineal");
-
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-  saveAs(
-    new Blob([excelBuffer], { type: "application/octet-stream" }),
-    `fines_semana_${indicadorSeleccionado}.xlsx`
-  );
-}
 
   // --- ACCIONES DE FILTROS --- //
   function handleAplicarFiltro() {
@@ -191,7 +208,7 @@ function exportToExcel() {
 
       <aside className="w-full md:w-80 bg-white rounded-xl shadow p-6 h-fit">
         <h3 className="text-xl font-semibold mb-4 text-black">Filtros fines de semana</h3>
-       <div className="mb-4">
+        <div className="mb-4">
           <label className="block mb-1 font-semibold text-black ">Indicador</label>
           <select
             className="w-full border px-3 py-2 rounded text-black"
@@ -232,8 +249,6 @@ function exportToExcel() {
             </select>
           </div>
         </div>
-         
-
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-black">Fines de semana largos</label>
           <select
@@ -241,7 +256,6 @@ function exportToExcel() {
             value={fin}
             onChange={e => setFin(e.target.value)}
           >
-           
             {fines.map(fv => (
               <option key={fv} value={fv}>{fv}</option>
             ))}
@@ -255,13 +269,11 @@ function exportToExcel() {
             value={municipio}
             onChange={e => setMunicipio(e.target.value)}
           >
-           
             {municipios.map(m => (
               <option key={m} value={m}>{m}</option>
             ))}
           </select>
         </div>
-
 
         <div className="flex gap-2">
           <button

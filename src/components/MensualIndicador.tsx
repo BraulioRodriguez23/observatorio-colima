@@ -3,6 +3,7 @@ import LineChartIndicadores from "./LineChartIndicadores";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
+// --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
   { label: "% Ocupación", value: "occupancyRate" },
   { label: "Derrama económica", value: "economicImpact" },
@@ -22,6 +23,17 @@ interface MensualData {
   economicImpact?: number;
   touristFlow?: number;
   [key: string]: string | number | undefined;
+}
+
+// --- LIMPIADOR DE PORCENTAJES ---
+function sanitizeOccupancyRate(value: unknown): number | undefined {
+  if (value === null || value === undefined) return undefined;
+  const num = Number(value);
+  if (isNaN(num)) return undefined;
+  if (num < 0) return 0;
+  if (num > 100 && num < 1000) return +(num / 10).toFixed(2);
+  if (num >= 1000) return +(num / 100).toFixed(2);
+  return +num.toFixed(2);
 }
 
 function toDate(mes: string, anio: number) {
@@ -58,7 +70,14 @@ const MensualIndicador: React.FC = () => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then((rawData: MensualData[]) => setData(rawData))
+      .then((rawData: MensualData[]) => {
+        // LIMPIA SIEMPRE LOS PORCENTAJES AL CARGAR
+        const cleanData = rawData.map(d => ({
+          ...d,
+          occupancyRate: sanitizeOccupancyRate(d.occupancyRate)
+        }));
+        setData(cleanData);
+      })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -80,17 +99,10 @@ const MensualIndicador: React.FC = () => {
       if (a.year !== b.year) return a.year - b.year;
       return MESES.indexOf(a.month) - MESES.indexOf(b.month);
     })
-    .map((d) => {
-      const newData = { ...d, mesAnio: `${d.month} ${d.year}` };
-      if (filtros.indicador === "occupancyRate" && typeof d.occupancyRate === "number" && d.occupancyRate > 100) {
-        if (d.occupancyRate < 1000) {
-          newData.occupancyRate = Number((d.occupancyRate / 10).toFixed(2));
-        } else {
-          newData.occupancyRate = Number((d.occupancyRate / 100).toFixed(2));
-        }
-      }
-      return newData;
-    });
+    .map((d) => ({
+      ...d,
+      mesAnio: `${d.month} ${d.year}`,
+    }));
 
   function exportToExcel() {
     const indicadorSeleccionado = filtros.indicador as keyof MensualData;
@@ -180,7 +192,6 @@ const MensualIndicador: React.FC = () => {
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Municipio</label>
           <select className="w-full border px-3 py-2 rounded" value={municipio} onChange={e => setMunicipio(e.target.value)}>
-            
             {municipios.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
         </div>
@@ -217,7 +228,6 @@ const MensualIndicador: React.FC = () => {
         <button
           onClick={exportToExcel}
           className={`w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition`}
-          // disabled={!filtros.indicador} // descomenta si quieres desactivarlo cuando esté vacío
         >
           Exportar a Excel
         </button>

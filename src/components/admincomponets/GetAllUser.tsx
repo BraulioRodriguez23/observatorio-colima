@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 interface User {
-  _id: string;
+  id: number;
   name: string;
   email: string;
 }
@@ -16,7 +16,7 @@ const UserList: React.FC = () => {
     try {
       const res = await fetch("https://observatorio-api-dhp4.vercel.app/users", {
         headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"), // Asegúrate de tener token
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
       const data = await res.json();
@@ -32,7 +32,7 @@ const UserList: React.FC = () => {
     fetchUsers();
   }, []);
 
-  const deleteUser = async (id: string) => {
+  const deleteUser = async (id: number) => {
     if (!confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {
       await fetch(`https://observatorio-api-dhp4.vercel.app/users/${id}`, {
@@ -41,7 +41,7 @@ const UserList: React.FC = () => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
-      setUsers(users.filter(user => user._id !== id));
+      setUsers(users.filter(user => user.id !== id));
     } catch {
       alert("Error al eliminar usuario");
     }
@@ -50,7 +50,7 @@ const UserList: React.FC = () => {
   const handleUpdate = async () => {
     if (!editingUser) return;
     try {
-      await fetch(`https://observatorio-api-dhp4.vercel.app/users/${editingUser._id}`, {
+      await fetch(`https://observatorio-api-dhp4.vercel.app/users/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const UserList: React.FC = () => {
         body: JSON.stringify(editingUser),
       });
       setEditingUser(null);
-      fetchUsers(); // Recargar
+      fetchUsers();
     } catch {
       alert("Error al actualizar usuario");
     }
@@ -71,8 +71,8 @@ const UserList: React.FC = () => {
     <div>
       <h2 className="text-xl font-bold mb-4">Lista de usuarios</h2>
       {users.map(user => (
-        <div key={user._id} className="border p-4 mb-2 rounded flex justify-between items-center">
-          {editingUser?._id === user._id ? (
+        <div key={user.id} className="border p-4 mb-2 rounded flex justify-between items-center">
+          {editingUser?.id === user.id ? (
             <div className="space-x-2">
               <input
                 type="text"
@@ -100,7 +100,7 @@ const UserList: React.FC = () => {
           )}
           <div className="space-x-2">
             <button onClick={() => setEditingUser(user)} className="text-blue-600">Editar</button>
-            <button onClick={() => deleteUser(user._id)} className="text-red-600">Eliminar</button>
+            <button onClick={() => deleteUser(user.id)} className="text-red-600">Eliminar</button>
           </div>
         </div>
       ))}
