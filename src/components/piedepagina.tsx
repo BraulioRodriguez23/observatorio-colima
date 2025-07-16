@@ -15,10 +15,9 @@ export default function Footer() {
               <li><a href="https://visitacolima.mx/" className="hover:underline">Visita Colima</a></li>
               <li><a href="https://visitmanzanillo.mx/" className="hover:underline">Visita Manzanillo</a></li>
               <li><a href="https://www.gob.mx/sectur" className="hover:underline">Sectur Federal</a></li>
-              <li><a href="https://cedocvirtual.sectur.gob.mx/janium-bin/janium_login.pl" className="hover:underline">Cedoc virtual</a></li>
               <li><a href="https://atlasturistico.sectur.gob.mx" className="hover:underline">Atlas turístico</a></li>
               <li><a href="https://www.gob.mx/sectur/acciones-y-programas/instituto-de-competitividad-turistica" className="hover:underline">Instituto de competitividad turística</a></li>
-              <li><a href="https://www.gob.mx/tramites/ficha/inscripcion-a-la-red-de-investigadores-y-centros-de-investigacion-en-turismo-ricit/ICTUR6101" className="hover:underline">RICIT</a></li>
+              <li><a href="https://datatur.sectur.gob.mx" className="hover:underline">Datatur</a></li>
             </ul>
           </div>
 
