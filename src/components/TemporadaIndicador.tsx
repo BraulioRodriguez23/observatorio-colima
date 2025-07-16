@@ -43,13 +43,16 @@ const TemporadaIndicador = () => {
   const [añoInicio, setAñoInicio] = useState("");
   const [añoFin, setAñoFin] = useState("");
 
-  const [filtros, setFiltros] = useState({
+  // Estado para los filtros aplicados
+  const [filtrosAplicados, setFiltrosAplicados] = useState({
     indicador: "",
     municipio: "",
     temporada: "",
     añoInicio: "",
     añoFin: "",
   });
+
+  // Eliminado el estado intermedio de filtros
 
   useEffect(() => {
     setLoading(true);
@@ -73,16 +76,16 @@ const TemporadaIndicador = () => {
   ].sort((a, b) => Number(a) - Number(b));
 
   const dataFiltrada = data.filter(d => {
-    const municipioOK = !filtros.municipio || d.municipality === filtros.municipio;
-    const temporadaOK = !filtros.temporada || d.season === filtros.temporada;
+    const municipioOK = !filtrosAplicados.municipio || d.municipality === filtrosAplicados.municipio;
+    const temporadaOK = !filtrosAplicados.temporada || d.season === filtrosAplicados.temporada;
     const añoDato = Number(d.year);
     let añoOK = true;
-    if (filtros.añoInicio && filtros.añoFin) {
-      añoOK = añoDato >= Number(filtros.añoInicio) && añoDato <= Number(filtros.añoFin);
-    } else if (filtros.añoInicio) {
-      añoOK = añoDato >= Number(filtros.añoInicio);
-    } else if (filtros.añoFin) {
-      añoOK = añoDato <= Number(filtros.añoFin);
+    if (filtrosAplicados.añoInicio && filtrosAplicados.añoFin) {
+      añoOK = añoDato >= Number(filtrosAplicados.añoInicio) && añoDato <= Number(filtrosAplicados.añoFin);
+    } else if (filtrosAplicados.añoInicio) {
+      añoOK = añoDato >= Number(filtrosAplicados.añoInicio);
+    } else if (filtrosAplicados.añoFin) {
+      añoOK = añoDato <= Number(filtrosAplicados.añoFin);
     }
     return municipioOK && temporadaOK && añoOK;
   });
@@ -94,7 +97,7 @@ const TemporadaIndicador = () => {
   }));
 
   function exportToExcel() {
-    const indicadorSeleccionado = filtros.indicador as keyof TemporadaData;
+    const indicadorSeleccionado = filtrosAplicados.indicador as keyof TemporadaData;
     if (!indicadorSeleccionado) {
       alert("Seleccione un indicador para exportar.");
       return;
@@ -117,7 +120,7 @@ const TemporadaIndicador = () => {
 
   function handleAplicarFiltro(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setFiltros({ indicador, municipio, temporada, añoInicio, añoFin });
+    setFiltrosAplicados({ indicador, municipio, temporada, añoInicio, añoFin });
   }
 
   function handleResetFiltro(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -127,7 +130,7 @@ const TemporadaIndicador = () => {
     setTemporada("");
     setAñoInicio("");
     setAñoFin("");
-    setFiltros({
+    setFiltrosAplicados({
       indicador: "",
       municipio: "",
       temporada: "",
@@ -137,7 +140,7 @@ const TemporadaIndicador = () => {
   }
 
   function getTituloGrafica() {
-    const indLabel = INDICADORES.find(i => i.value === filtros.indicador)?.label || "";
+    const indLabel = INDICADORES.find(i => i.value === filtrosAplicados.indicador)?.label || "";
     let añoTxt = "";
     const añosUnicos = [
       ...new Set(dataFiltrada.map(d => Number(d.year)).filter(Boolean))
@@ -147,7 +150,7 @@ const TemporadaIndicador = () => {
       else añoTxt = `(${añosUnicos[0]} - ${añosUnicos[añosUnicos.length - 1]})`;
     }
     return `Evolución del indicador "${indLabel}"` +
-      (filtros.municipio ? " en " + filtros.municipio : "") +
+      (filtrosAplicados.municipio ? " en " + filtrosAplicados.municipio : "") +
       " " + añoTxt;
   }
 
@@ -160,20 +163,28 @@ const TemporadaIndicador = () => {
           <div className="text-center py-20">Cargando...</div>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
-        ) : dataFiltradaConCorto.length === 0 || !filtros.indicador ? (
-          <div className="text-center text-gray-500 py-10">
-            No hay valores válidos para este indicador en las temporadas seleccionadas.
-          </div>
-        ) : (
-          <LineChartIndicadores
-            data={dataFiltradaConCorto}
-            dataKey={filtros.indicador}
-            xKey="temporadaCorta"
-            labelX="Temporada"
-            labelY={INDICADORES.find(i => i.value === filtros.indicador)?.label || ""}
-            titulo={getTituloGrafica()}
-          />
-        )}
+        ) :
+          // Mostrar mensaje si no hay ningún filtro seleccionado
+          (!filtrosAplicados.indicador && !filtrosAplicados.municipio && !filtrosAplicados.temporada && !filtrosAplicados.añoInicio && !filtrosAplicados.añoFin) ? (
+            <div className="text-center text-gray-500 py-10">
+              Seleccione al menos un filtro para ver los datos.
+            </div>
+          ) :
+          // Mostrar mensaje si no hay datos para los filtros seleccionados
+          (dataFiltradaConCorto.length === 0 || !filtrosAplicados.indicador) ? (
+            <div className="text-center text-gray-500 py-10">
+              No hay valores válidos para este indicador en las temporadas seleccionadas.
+            </div>
+          ) : (
+            <LineChartIndicadores
+              data={dataFiltradaConCorto}
+              dataKey={filtrosAplicados.indicador}
+              xKey="temporadaCorta"
+              labelX="Temporada"
+              labelY={INDICADORES.find(i => i.value === filtrosAplicados.indicador)?.label || ""}
+              titulo={getTituloGrafica()}
+            />
+          )}
       </div>
       {/* FILTROS */}
       <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0">
@@ -203,7 +214,7 @@ const TemporadaIndicador = () => {
               value={temporada}
               onChange={e => setTemporada(e.target.value)}
             >
-              
+              <option value="">Seleccione</option>
               {temporadas.map(t => (
                 <option key={t} value={t}>
                   {t}
@@ -219,7 +230,7 @@ const TemporadaIndicador = () => {
               value={municipio}
               onChange={e => setMunicipio(e.target.value)}
             >
-             
+              <option value="">Seleccione</option>
               {municipios.map(m => (
                 <option key={m} value={m}>
                   {m}
