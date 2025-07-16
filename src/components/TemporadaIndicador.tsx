@@ -203,7 +203,7 @@ const TemporadaIndicador = () => {
               value={temporada}
               onChange={e => setTemporada(e.target.value)}
             >
-              <option value="">Todas</option>
+              
               {temporadas.map(t => (
                 <option key={t} value={t}>
                   {t}
@@ -219,7 +219,7 @@ const TemporadaIndicador = () => {
               value={municipio}
               onChange={e => setMunicipio(e.target.value)}
             >
-              <option value="">Todos</option>
+             
               {municipios.map(m => (
                 <option key={m} value={m}>
                   {m}
