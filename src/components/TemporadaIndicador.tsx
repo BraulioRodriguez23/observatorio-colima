@@ -207,21 +207,27 @@ const TemporadaIndicador = () => {
             </select>
           </div>
           {/* Temporada */}
-          <div>
-            <label className="block mb-2  font-semibold text-black">Temporada</label>
-            <select
-              className="w-60 border px-3 py-2 rounded text-black"
-              value={temporada}
-              onChange={e => setTemporada(e.target.value)}
-            >
-              <option value="">Seleccione</option>
-              {temporadas.map(t => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
+         <div className="col-span-1 relative">
+  <label className="block mb-2 font-semibold text-black">Temporada</label>
+  <select
+    className="w-full appearance-none border px-3 py-2 pr-10 rounded text-black"
+    value={temporada}
+    onChange={e => setTemporada(e.target.value)}
+  >
+    <option value="">Seleccione</option>
+    {temporadas.map(t => (
+      <option key={t} value={t}>
+        {t}
+      </option>
+    ))}
+  </select>
+  {/* Flechita personalizada */}
+  <div className="pointer-events-none absolute right-3 top-[55%] -translate-y-1/2 text-gray-500 text-sm">
+    
+  </div>
+</div>
+
+
           <br />
           {/* Municipio */}
           <div>
