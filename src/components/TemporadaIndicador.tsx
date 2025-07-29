@@ -194,7 +194,7 @@ const TemporadaIndicador = () => {
           <div className="col-span-1 md:col-span-2">
             <label className="block mb-1 font-semibold text-black">Indicador</label>
             <select
-              className="w-full border px-3 py-2 rounded text-black"
+              className="w-60 border px-3 py-2 rounded text-black"
               value={indicador}
               onChange={e => setIndicador(e.target.value)}
             >
@@ -208,9 +208,9 @@ const TemporadaIndicador = () => {
           </div>
           {/* Temporada */}
           <div>
-            <label className="block mb-1 font-semibold text-black">Temporada</label>
+            <label className="block mb-2  font-semibold text-black">Temporada</label>
             <select
-              className="w-full border px-3 py-2 rounded text-black"
+              className="w-60 border px-3 py-2 rounded text-black"
               value={temporada}
               onChange={e => setTemporada(e.target.value)}
             >
@@ -222,6 +222,7 @@ const TemporadaIndicador = () => {
               ))}
             </select>
           </div>
+          <br />
           {/* Municipio */}
           <div>
             <label className="block mb-1 font-semibold text-black">Municipio</label>
@@ -238,6 +239,7 @@ const TemporadaIndicador = () => {
               ))}
             </select>
           </div>
+          <br />
           {/* Año inicio */}
           <div>
             <label className="block mb-1 font-semibold text-black">Año inicio</label>
