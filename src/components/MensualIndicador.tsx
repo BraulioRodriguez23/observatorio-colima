@@ -181,7 +181,7 @@ const MensualIndicador: React.FC = () => {
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Fecha de inicio</label>
           <div className="flex gap-2">
-            <select className="border px-4 py-1 pr-2 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
+            <select className="border px-4 py-1 pr-8 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
   {MESES.map(m => <option key={m} value={m}>{m}</option>)}
 </select>
 
@@ -193,7 +193,7 @@ const MensualIndicador: React.FC = () => {
             <div className="mb-6">
               <label className="block mb-1 font-semibold text-gray-700">Fecha de fin</label>
               <div className="flex gap-2">
-              <select className="border px-4 py-1 pr-2 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
+              <select className="border px-4 py-1 pr-8 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
       {MESES.map(m => <option key={m} value={m}>{m}</option>)}
     </select>
 
