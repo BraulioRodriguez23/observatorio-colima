@@ -206,7 +206,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
         )}
       </div>
 
-      <aside className="w-full md:w-80 bg-white rounded-xl shadow p-6 h-fit">
+      <aside className="w-full md:w-auto bg-white rounded-xl shadow p-6 h-fit">
         <h3 className="text-xl font-semibold mb-4 text-black">Filtros fines de semana</h3>
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-black ">Indicador</label>
@@ -252,14 +252,15 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-black">Fines de semana largos</label>
           <select
-            className="w-full border px-3 py-2 rounded text-black"
-            value={fin}
-            onChange={e => setFin(e.target.value)}
-          >
-            {fines.map(fv => (
-              <option key={fv} value={fv}>{fv}</option>
-            ))}
-          </select>
+              className="border px-3 py-2 rounded text-black"
+              value={fin}
+              onChange={e => setFin(e.target.value)}
+            >
+              {fines.map(fv => (
+                <option key={fv} value={fv}>{fv}</option>
+              ))}
+            </select>
+
         </div>
 
         <div className="mb-4">
