@@ -210,7 +210,7 @@ const TemporadaIndicador = () => {
          <div className="col-span-1 relative">
   <label className="block mb-2 font-semibold text-black">Temporada</label>
   <select
-    className="w-full appearance-none border px-3 py-2 pr-10 rounded text-black"
+    className="w-50 appearance-none border px-3 py-2 pr-10 rounded text-black"
     value={temporada}
     onChange={e => setTemporada(e.target.value)}
   >
