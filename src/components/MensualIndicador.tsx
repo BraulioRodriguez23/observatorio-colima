@@ -181,23 +181,25 @@ const MensualIndicador: React.FC = () => {
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">Fecha de inicio</label>
           <div className="flex gap-2">
-            <select className="border px-2 py-1 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
-              {MESES.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-            <select className="border px-2 py-1 rounded" value={anioInicio} onChange={e => setAnioInicio(Number(e.target.value))}>
-              {anios.map(a => <option key={a} value={a}>{a}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="mb-6">
-          <label className="block mb-1 font-semibold text-gray-700">Fecha de fin</label>
-          <div className="flex gap-2">
-            <select className="border px-2 py-1 rounded" value={mesFin} onChange={e => setMesFin(e.target.value)}>
-              {MESES.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-            <select className="border px-2 py-1 rounded" value={anioFin} onChange={e => setAnioFin(Number(e.target.value))}>
-              {anios.map(a => <option key={a} value={a}>{a}</option>)}
-            </select>
+            <select className="border px-4 py-1 pr-2 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
+  {MESES.map(m => <option key={m} value={m}>{m}</option>)}
+</select>
+
+<select className="border px-4 py-1 pr-8 rounded" value={anioInicio} onChange={e => setAnioInicio(Number(e.target.value))}>
+  {anios.map(a => <option key={a} value={a}>{a}</option>)}
+    </select>
+              </div>
+            </div>
+            <div className="mb-6">
+              <label className="block mb-1 font-semibold text-gray-700">Fecha de fin</label>
+              <div className="flex gap-2">
+              <select className="border px-4 py-1 pr-2 rounded" value={mesInicio} onChange={e => setMesInicio(e.target.value)}>
+      {MESES.map(m => <option key={m} value={m}>{m}</option>)}
+    </select>
+
+<select className="border px-4 py-1 pr-8 rounded" value={anioInicio} onChange={e => setAnioInicio(Number(e.target.value))}>
+  {anios.map(a => <option key={a} value={a}>{a}</option>)}
+</select>
           </div>
         </div>
         <button className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition mb-3"
