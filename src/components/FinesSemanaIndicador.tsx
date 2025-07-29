@@ -5,7 +5,7 @@ import { saveAs } from "file-saver";
 
 // --- INDICADORES DISPONIBLES --- //
 const INDICADORES = [
-  { label: "% ocupación", value: "occupancy_rate" },
+  { label: "% Ocupación", value: "occupancy_rate" },
   { label: "Derrama económica", value: "economic_impact" },
   { label: "Afluencia turística", value: "tourist_flow" },
 ];
