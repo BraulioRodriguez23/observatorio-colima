@@ -9,24 +9,24 @@ import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
 const Header: React.FC = () => {
   return (
     <header className="sticky top-0 w-full bg-white bg-opacity-90 shadow-md z-50 px-4 py-2">
-      <div className="flex flex-wrap justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         {/* Logos */}
-        <div className="flex items-center space-x-3">
-          {/* Logo Colima – visible siempre, cambia tamaño según pantalla */}
+        <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3">
+          {/* Logo Colima – siempre visible */}
           <img
             src={logoColima}
             alt="Logo Colima"
             className="h-8 sm:h-10 md:h-12 object-contain"
           />
 
-          {/* Manzanillo – visible en sm+ */}
+          {/* Manzanillo */}
           <img
             src={logoManzanillo}
             alt="Logo Manzanillo"
             className="hidden sm:block h-10 md:h-16 object-contain"
           />
 
-          {/* Comala – visible en md+ */}
+          {/* Comala */}
           <img
             src={logoComala}
             alt="Logo Comala"
@@ -40,7 +40,7 @@ const Header: React.FC = () => {
             className="hidden sm:block h-10 md:h-8 object-contain"
           />
 
-          {/* Gobierno de Colima */}
+          {/* Gobierno Colima */}
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Menú */}
-        <div className="w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="w-full sm:w-auto">
           <HorizontalMenu />
         </div>
       </div>
