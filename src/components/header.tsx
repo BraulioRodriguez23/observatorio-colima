@@ -37,14 +37,14 @@ const Header: React.FC = () => {
           <img
             src={udcLogo}
             alt="Logo UdeC"
-            className="hidden sm:block h-10 md:h-8 object-contain"
+            className="hidden sm:block h-10 md:h-10 object-contain"
           />
 
           {/* Gobierno Colima */}
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:block h-12 md:h-6 object-contain"
+            className="hidden md:block h-12 md:h-8 object-contain"
           />
         </div>
 
