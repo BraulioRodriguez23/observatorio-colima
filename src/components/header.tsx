@@ -23,14 +23,14 @@ const Header: React.FC = () => {
           <img
             src={logoManzanillo}
             alt="Logo Manzanillo"
-            className="hidden sm:block h-10 md:h-16 object-contain"
+            className="hidden sm:block h-10 md:h-14 object-contain"
           />
 
           {/* Comala */}
           <img
             src={logoComala}
             alt="Logo Comala"
-            className="hidden md:block h-12 md:h-20 object-contain"
+            className="hidden md:block h-12 md:h-18 object-contain"
           />
 
           {/* UdeC */}
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:block h-12 md:h-8 object-contain"
+            className="hidden md:block h-12 md:h-6 object-contain"
           />
         </div>
 
