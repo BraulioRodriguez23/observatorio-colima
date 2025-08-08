@@ -44,7 +44,7 @@ const Header: React.FC = () => {
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:block h-12 md:h-8 object-contain"
+            className="hidden md:block h-12 md:h-6 object-contain"
           />
         </div>
 
