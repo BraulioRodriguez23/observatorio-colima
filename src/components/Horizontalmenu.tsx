@@ -16,18 +16,23 @@ const HorizontalMenu: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Botón hamburguesa en móvil */}
-      <div className="md:hidden flex justify-end px-2 py-2">
-        <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+      {/* Botón hamburguesa (móvil). Está a la izquierda dentro del área del menú */}
+      <div className="md:hidden flex items-center justify-start px-2 py-2">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+          className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+        >
+          {isOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Menú */}
+      {/* NAV */}
       <nav
         className={`${
           isOpen ? 'flex' : 'hidden'
-        } flex-col space-y-4 px-1 pb-4 md:flex md:flex-row md:space-x-4 md:space-y-0 md:items-center md:pb-0`}
+        } flex-col space-y-2 w-full bg-white md:bg-transparent md:flex md:flex-row md:items-center md:space-x-2 md:space-y-0 md:justify-end md:w-auto
+           absolute md:static left-0 top-full md:top-auto shadow-md md:shadow-none z-50 px-2 py-2 md:px-0 md:py-0`}
       >
         {tabs.map((tab) => (
           <NavLink
@@ -35,7 +40,7 @@ const HorizontalMenu: React.FC = () => {
             to={tab.path}
             onClick={() => setIsOpen(false)}
             className={({ isActive }) =>
-              `py-2 px-6 rounded-full text-sm transition-all
+              `py-2 px-3 rounded-full text-sm transition-all
                ${
                  isActive || location.pathname === tab.path
                    ? 'bg-gray-800 text-white font-semibold shadow-md'
