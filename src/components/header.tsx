@@ -30,26 +30,26 @@ const Header: React.FC = () => {
           <img
             src={logoComala}
             alt="Logo Comala"
-            className="hidden md:block h-12 md:h-18 object-contain"
+            className="hidden md:block h-12 md:h-20 object-contain"
           />
 
           {/* UdeC */}
           <img
             src={udcLogo}
             alt="Logo UdeC"
-            className="hidden sm:block h-10 md:h-10 object-contain"
+            className="hidden sm:block h-10 md:h-11 object-contain"
           />
 
           {/* Gobierno Colima */}
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:block h-12 md:h-6 object-contain"
+            className="hidden md:block h-12 md:h-10 object-contain"
           />
         </div>
 
         {/* Menú */}
-        <div className="w-full sm:w-auto">
+        <div className="w-full sm:w-auto ml-auto">
           <HorizontalMenu />
         </div>
       </div>

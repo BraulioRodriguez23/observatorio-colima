@@ -18,7 +18,7 @@ const HorizontalMenu: React.FC = () => {
   return (
     <div className="relative">
       {/* Botón hamburguesa en móvil */}
-      <div className="md:hidden flex justify-end px-4 py-4">
+      <div className="md:hidden flex justify-end px-4 py-6">
         <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
