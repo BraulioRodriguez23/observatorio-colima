@@ -8,14 +8,15 @@ import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
 
 const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 w-full bg-white bg-opacity-90 shadow-md z-50 px-4 py-2">
-      <div className="max-w-screen-xl mx-auto flex flex-col sm:flex-row items-center sm:justify-between gap-2">
+    <header className="sticky top-0 w-full bg-white bg-opacity-90 shadow-md z-50 px-2 py-0">
+     <div className="w-full flex flex-col sm:flex-row items-center sm:justify-between gap-0">
+
         {/* Logos (left) */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <img
             src={logoColima}
             alt="Logo Colima"
-            className="h-8 sm:h-10 md:h-12 object-contain max-w-[140px]"
+            className="h-8 sm:h-10 md:h-12 object-contain max-w-[180px]"
           />
 
           <img
@@ -33,13 +34,13 @@ const Header: React.FC = () => {
           <img
             src={udcLogo}
             alt="Logo UdeC"
-            className="hidden sm:inline-block h-10 md:h-11 object-contain max-w-[140px]"
+            className="hidden sm:inline-block h-10 md:h-12 object-contain max-w-[160px]"
           />
 
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:inline-block h-12 md:h-10 object-contain max-w-[140px]"
+            className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[220px]"
           />
         </div>
 
