@@ -35,9 +35,10 @@ const Header: React.FC = () => {
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[300px]"
+            className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[280px]"
           />
         </div>
+        <br />
 
         {/* ===== MENÚ: ocupa el resto y está contenido/centrado hasta un ancho máximo ===== */}
         <div className="flex-1">

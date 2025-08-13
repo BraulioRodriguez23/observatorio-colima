@@ -31,8 +31,8 @@ const HorizontalMenu: React.FC = () => {
       <nav
         className={`${
           isOpen ? 'flex' : 'hidden'
-        } flex-col space-y-2 w-full bg-white md:bg-transparent md:flex md:flex-row md:items-center md:space-x-2 md:space-y-0 md:justify-end md:w-auto
-           absolute md:static left-0 top-full md:top-auto shadow-md md:shadow-none z-50 px-2 py-2 md:px-0 md:py-0`}
+        } flex-col space-y-1 w-full bg-white md:bg-transparent md:flex md:flex-row md:items-center md:space-x-0.5 md:space-y-0 md:justify-end md:w-auto
+     absolute md:static left-0 top-full md:top-auto shadow-md md:shadow-none z-50 px-2 py-2 md:px-0 md:py-0`}
       >
         {tabs.map((tab) => (
           <NavLink
