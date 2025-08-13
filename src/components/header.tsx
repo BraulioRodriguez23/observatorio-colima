@@ -20,22 +20,22 @@ const Header: React.FC = () => {
           <img
             src={logoManzanillo}
             alt="Logo Manzanillo"
-            className="hidden sm:inline-block h-10 md:h-14 object-contain max-w-[120px] block"
+            className="hidden sm:inline-block h-10 md:h-14 object-contain max-w-[120px]"
           />
           <img
             src={logoComala}
             alt="Logo Comala"
-            className="hidden md:inline-block h-12 md:h-20 object-contain max-w-[140px] block"
+            className="hidden md:inline-block h-12 md:h-20 object-contain max-w-[140px]"
           />
           <img
             src={udcLogo}
             alt="Logo UdeC"
-            className="hidden sm:inline-block h-10 md:h-12 object-contain max-w-[160px] block"
+            className="hidden sm:inline-block h-10 md:h-12 object-contain max-w-[160px]"
           />
           <img
             src={gColimaLogo}
             alt="Logo Gobierno de Colima"
-            className="hidden md:inline-block h-16 md:h-14 object-contain max-w-[220px] block"
+            className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[300px]"
           />
         </div>
 
