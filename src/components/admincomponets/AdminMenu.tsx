@@ -14,7 +14,6 @@ const HorizontalMenu: React.FC = () => {
   const tabs = [
     { name: "Inicio",   path: "/admin",           icon: <Home size={20} /> },
     { name: "Perfil",   path: "/admin/Profile",    icon: <User size={20} /> },
-  
     { name: "Salir",    action: handleLogout,      icon: <LogOut size={20} /> }
   ];
 

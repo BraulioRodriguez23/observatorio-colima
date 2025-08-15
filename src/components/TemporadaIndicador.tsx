@@ -12,7 +12,6 @@ const INDICADORES = [
 const temporadaAbreviada = (nombre: string) => {
   const dict: Record<string, string> = {
     "Semana santa y pascua": "S. Santa",
-    "Semana santa": "S. Santa",
     "Verano": "Verano",
     "Septiembre": "Sept",
     "Noviembre": "Nov",
