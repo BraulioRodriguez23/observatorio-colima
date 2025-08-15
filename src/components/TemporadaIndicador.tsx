@@ -9,16 +9,33 @@ const INDICADORES = [
   { label: "Afluencia turística", value: "touristFlow" },
 ];
 
+const normalizarTemporada = (nombre: string = ""): string => {
+  const s = nombre.normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[-_/]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+  if (/semana.*santa|pascua|santa\b/.test(s)) return "Semana Santa y Pascua";
+  if (/verano/.test(s)) return "Verano";
+  if (/invierno/.test(s)) return "Invierno";
+  if (/septiembre/.test(s)) return "Septiembre";
+  if (/noviembre/.test(s)) return "Noviembre";
+  if (/diciembre/.test(s)) return "Diciembre";
+  // fallback: capitaliza
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+};
+
 const temporadaAbreviada = (nombre: string) => {
   const dict: Record<string, string> = {
-    "Semana santa y pascua": "S. Santa",
+    "Semana Santa y Pascua": "S. Santa",
     "Verano": "Verano",
     "Septiembre": "Sept",
     "Noviembre": "Nov",
     "Diciembre": "Dic",
     "Invierno": "Inv.",
   };
-  return dict[nombre] || nombre.split(" ")[0] || nombre;
+  return dict[nombre] || (nombre ? nombre.split(" ")[0] : nombre);
 };
 
 type TemporadaData = {
@@ -61,13 +78,20 @@ const TemporadaIndicador = () => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then(rawData => setData(rawData))
+      .then((rawData: TemporadaData[]) =>
+        setData(
+          rawData.map(d => ({
+            ...d,
+            seasonCanonical: normalizarTemporada(d.season)
+          }))
+        )
+      )
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
   const municipios = [...new Set(data.map(d => d.municipality).filter(Boolean))];
-  const temporadas = [...new Set(data.map(d => d.season).filter(Boolean))];
+  const temporadas = [...new Set(data.map(d => d.seasonCanonical as string).filter(Boolean))];
   const años = [
     ...new Set(
       data.map(d => Number(d.year)).filter(x => !isNaN(x))
@@ -76,7 +100,7 @@ const TemporadaIndicador = () => {
 
   const dataFiltrada = data.filter(d => {
     const municipioOK = !filtrosAplicados.municipio || d.municipality === filtrosAplicados.municipio;
-    const temporadaOK = !filtrosAplicados.temporada || d.season === filtrosAplicados.temporada;
+    const temporadaOK = !filtrosAplicados.temporada || d.seasonCanonical === filtrosAplicados.temporada;
     const añoDato = Number(d.year);
     let añoOK = true;
     if (filtrosAplicados.añoInicio && filtrosAplicados.añoFin) {
@@ -91,8 +115,9 @@ const TemporadaIndicador = () => {
 
   const dataFiltradaConCorto = dataFiltrada.map(d => ({
     ...d,
-    temporadaCorta: temporadaAbreviada(d.season ?? ""),
-    temporadaCompleta: `${d.season} ${d.year}`,
+    seasonCanonical: String(d.seasonCanonical ?? ""),
+    temporadaCorta: temporadaAbreviada(String(d.seasonCanonical ?? "")),
+    temporadaCompleta: `${String(d.seasonCanonical ?? "")} ${d.year}`,
   }));
 
   function exportToExcel() {
@@ -105,7 +130,7 @@ const TemporadaIndicador = () => {
     const datosFiltrados = dataFiltradaConCorto.map((fila) => ({
       Año: fila.year,
       Municipio: fila.municipality,
-      Temporada: fila.season,
+      Temporada: fila.seasonCanonical,
       [etiqueta]: (fila as Record<string, unknown>)[indicadorSeleccionado]
     }));
 
@@ -253,7 +278,7 @@ const TemporadaIndicador = () => {
               value={añoInicio}
               onChange={e => setAñoInicio(e.target.value)}
             >
-              <option value="">--</option>
+              <option value="">Seleccione</option>
               {años.map(a => (
                 <option key={a} value={a}>
                   {a}
@@ -269,7 +294,7 @@ const TemporadaIndicador = () => {
               value={añoFin}
               onChange={e => setAñoFin(e.target.value)}
             >
-              <option value="">--</option>
+              <option value="">Seleccione</option>
               {años.map(a => (
                 <option key={a} value={a}>
                   {a}

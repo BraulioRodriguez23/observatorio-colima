@@ -229,7 +229,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
               value={anioInicio}
               onChange={e => setAnioInicio(e.target.value)}
             >
-              <option value="">--</option>
+              <option value="">Seleccione</option>
               {anios.map(a => (
                 <option key={a} value={a}>{a}</option>
               ))}
@@ -242,7 +242,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
               value={anioFin}
               onChange={e => setAnioFin(e.target.value)}
             >
-              <option value="">--</option>
+              <option value="">Seleccione</option>
               {anios.map(a => (
                 <option key={a} value={a}>{a}</option>
               ))}
@@ -256,6 +256,7 @@ const FinesSemanaIndicadorLineal: React.FC = () => {
               value={fin}
               onChange={e => setFin(e.target.value)}
             >
+              <option value="">Seleccione</option>
               {fines.map(fv => (
                 <option key={fv} value={fv}>{fv}</option>
               ))}
