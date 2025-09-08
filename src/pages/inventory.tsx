@@ -4,7 +4,7 @@ import Footer from "../components/piedepagina";
 import MensualIndicador from "../components/MensualIndicador";
 import TemporadaIndicador from "../components/TemporadaIndicador";
 import FinesSemanaIndicador from "../components/FinesSemanaIndicador";
-import imagenfondo from "../images/Tecomán-Estero El chupadero.jpg";
+import imagenfondo from "../../public/images/Tecomán-Estero El chupadero.jpg";
 
 // --- Tipo para PDFs ---
 interface PdfItem {

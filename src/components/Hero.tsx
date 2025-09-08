@@ -1,5 +1,5 @@
 // Hero.tsx (Componente actualizado)import ballenaImg from '../assets/ballena.jpg';
-import ballenaImg from '../images/Manzanillo-LasHadasClubdeYates.jpg';
+import ballenaImg from '../../public/images/Manzanillo-LasHadasClubdeYates.jpg';
 export default function Hero() {
   return (
     <div

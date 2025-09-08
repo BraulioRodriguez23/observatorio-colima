@@ -1,5 +1,5 @@
-import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png';
-import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
+import udcLogo from '../../public/images/UdeC_DosLineasIzq_Oro.png';
+import gColimaLogo from '../../public/images/Logo SUBSECRETARIA DE TURISMO.png';
 
 export default function Footer() {
   return (

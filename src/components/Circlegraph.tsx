@@ -1,14 +1,14 @@
 // components/Indicators.tsx
 import { motion } from "framer-motion";
-import OccupiedIcon from "../images/cuartos.svg";
-import TouristIcon from "../images/llegada_turistas.svg";
-import NightIcon from "../images/turistas_noche.svg";
-import planeicon from "../images/airplane_icon_strong_magenta.svg";
+import OccupiedIcon from "../../public/images/cuartos.svg";
+import TouristIcon from "../../public/images/llegada_turistas.svg";
+import NightIcon from "../../public/images/turistas_noche.svg";
+import planeicon from "../../public/images/airplane_icon_strong_magenta.svg";
 //import ChartIcon from "../images/porcentaje_ocupacion.svg";
-import StayIcon from "../images/estadia_promedio.svg";
-import DensityIcon from "../images/densidad.svg";
+import StayIcon from "../../public/images/estadia_promedio.svg";
+import DensityIcon from "../../public/images/densidad.svg";
 //import VisitorsIcon from "../images/afluencia_visitantes.svg";
-import MoneyIcon from "../images/derrama_economica.svg";
+import MoneyIcon from "../../public/images/derrama_economica.svg";
 //import { Link } from 'react-router-dom'; 
 
 export default function CircleGraph() {

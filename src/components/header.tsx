@@ -1,10 +1,10 @@
 import React from 'react';
-import logoColima from '../images/colima-logo.png';
-import logoManzanillo from '../images/Manzanillo -logo.png';
-import logoComala from '../images/Comala Pueblo Mágico.png';
+import logoColima from '../../public/images/colima-logo.png';
+import logoManzanillo from '../../public/images/Manzanillo -logo.png';
+import logoComala from '../../public/images/Comala Pueblo Mágico.png';
 import HorizontalMenu from './Horizontalmenu';
-import udcLogo from '../images/UdeC_DosLineasIzq_Oro.png';
-import gColimaLogo from '../images/Logo SUBSECRETARIA DE TURISMO.png';
+import udcLogo from '../../public/images/UdeC_DosLineasIzq_Oro.png';
+import gColimaLogo from '../../public/images/Logo SUBSECRETARIA DE TURISMO.png';
 
 const Header: React.FC = () => {
   return (

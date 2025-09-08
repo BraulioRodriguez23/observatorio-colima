@@ -2,8 +2,8 @@ import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
 import { useEffect, useState } from 'react';
-import imagenCarga from '../images/Manzanillo -logo.png';
-import imagenfondo from '../images/ballena-nueva.jpg';
+import imagenCarga from '../../public/images/Manzanillo -logo.png';
+import imagenfondo from '../../public/images/ballena-nueva.jpg';
 
 interface PDFDocument {
   id: number;

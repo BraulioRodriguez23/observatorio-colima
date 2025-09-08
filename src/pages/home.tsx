@@ -5,8 +5,8 @@ import Header from '../components/header';
 import Indicators from '../components/Circlegraph';
 import Footer from '../components/piedepagina';
 import Disclaimer from '../components/disclaimer'; // importa el componente
-import manza from '../images/Tecomán-Estero El chupadero.jpg';
-import comala from '../images/fondo.jpg';
+import manza from '../../public/images/Tecomán-Estero El chupadero.jpg';
+import comala from '../../public/images/fondo.jpg';
 
 export default function Home() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
