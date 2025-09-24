@@ -15,24 +15,35 @@ const HorizontalMenu: React.FC = () => {
   ];
 
   return (
-    <div className="relative">
-      {/* Botón hamburguesa (móvil). Está a la izquierda dentro del área del menú */}
+    <div className="relative overflow-x-hidden">
+      {/* Botón hamburguesa (móvil). Visible y con color explícito */}
       <div className="md:hidden flex items-center justify-start px-2 py-2">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
-          className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+          aria-expanded={isOpen}
+          aria-controls="mobile-nav"
+          className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 text-gray-800"
         >
           {isOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
+      {/* Backdrop para móvil */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-[55] md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* NAV */}
       <nav
+        id="mobile-nav"
         className={`${
           isOpen ? 'flex' : 'hidden'
         } flex-col space-y-1 w-full bg-white md:bg-transparent md:flex md:flex-row md:items-center md:space-x-0.5 md:space-y-0 md:justify-end md:w-auto
-     absolute md:static left-0 top-full md:top-auto shadow-md md:shadow-none z-50 px-2 py-2 md:px-0 md:py-0`}
+     fixed md:static inset-x-0 top-0 md:top-auto border-b shadow-md md:shadow-none z-[60] px-4 py-2 pt-16 md:px-0 md:py-0 max-h-[100svh] overflow-auto`}
       >
         {tabs.map((tab) => (
           <NavLink

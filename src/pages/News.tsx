@@ -52,6 +52,10 @@ if (loading) {
         src={imagenCarga}
         alt="Cargando"
         className="w-56 h-32 mb-6 animate-bounce-slow object-contain"
+        width="224"
+        height="128"
+        loading="eager"
+        decoding="async"
       />
       <p className="text-2xl font-semibold">Cargando noticias...</p>
     </div>
@@ -74,6 +78,11 @@ if (loading) {
       src={imagenfondo}
       alt="Turismo Colima"
       className="w-full h-full object-cover"
+      loading="lazy"
+      decoding="async"
+      fetchPriority="low"
+      srcSet={`${imagenfondo} 1280w`}
+      sizes="(max-width: 768px) 100vw, 1280px"
     />
   </div>
 
@@ -104,6 +113,10 @@ if (loading) {
                     src={article.imageUrl}
                     alt={article.title}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
                 </div>

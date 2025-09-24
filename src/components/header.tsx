@@ -8,7 +8,7 @@ import gColimaLogo from '../../public/images/Logo SUBSECRETARIA DE TURISMO.png';
 
 const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 left-0 w-full bg-white bg-opacity-90 shadow-md z-50">
+    <header className="sticky top-0 left-0 w-full bg-white bg-opacity-90 shadow-md z-50 text-gray-800 overflow-x-hidden">
       <div className="flex items-center w-full">
         {/* ===== LOGOS: fuera del contenedor centrado para que queden pegados al borde ===== */}
         <div className="flex items-center gap-3 flex-shrink-0 pl-0">
@@ -38,8 +38,6 @@ const Header: React.FC = () => {
             className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[280px]"
           />
         </div>
-        <br />
-
         {/* ===== MENÚ: ocupa el resto y está contenido/centrado hasta un ancho máximo ===== */}
         <div className="flex-1">
           {/* Mantengo el menú dentro de un contenedor centrado pero con margen derecho. */}

@@ -91,3 +91,21 @@ button:focus-visible {
     opacity: 1;
   }
 }
+
+/* ===== Mobile viewport and background fixes ===== */
+/* Fuerza fondo blanco para evitar franjas negras cuando el SO está en modo oscuro */
+html, body {
+  background-color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Corrige el problema de 100vh en móviles (barras del navegador) */
+/* Reinterpreta los utilitarios de Tailwind h-screen/min-h-screen a 100svh cuando esté disponible */
+@supports (height: 100svh) {
+  .h-screen {
+    height: 100svh !important;
+  }
+  .min-h-screen {
+    min-height: 100svh !important;
+  }
+}
