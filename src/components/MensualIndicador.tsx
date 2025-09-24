@@ -197,7 +197,7 @@ const MensualIndicador: React.FC = () => {
       {MESES.map(m => <option key={m} value={m}>{m}</option>)}
     </select>
 
-<select className="border px-4 py-1 pr-8 rounded" value={anioFin} onChange={e => setAnioInicio(Number(e.target.value))}>
+<select className="border px-4 py-1 pr-8 rounded" value={anioFin} onChange={e => setAnioFin(Number(e.target.value))}>
   {anios.map(a => <option key={a} value={a}>{a}</option>)}
 </select>
           </div>
