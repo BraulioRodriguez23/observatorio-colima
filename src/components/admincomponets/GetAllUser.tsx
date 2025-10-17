@@ -14,7 +14,7 @@ const UserList: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("https://observatorio-api-dhp4.vercel.app/users", {
+      const res = await fetch("https://observatorio-api-dhp4.vercel.app/user", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
@@ -35,7 +35,7 @@ const UserList: React.FC = () => {
   const deleteUser = async (id: number) => {
     if (!confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {
-      await fetch(`https://observatorio-api-dhp4.vercel.app/users/${id}`, {
+      await fetch(`https://observatorio-api-dhp4.vercel.app/user/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -50,7 +50,7 @@ const UserList: React.FC = () => {
   const handleUpdate = async () => {
     if (!editingUser) return;
     try {
-      await fetch(`https://observatorio-api-dhp4.vercel.app/users/${editingUser.id}`, {
+      await fetch(`https://observatorio-api-dhp4.vercel.app/user/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -39,23 +39,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Función para iniciar sesión
   const login = async (email: string, password: string) => {
     try {
-      // Simular una llamada al backend para iniciar sesión
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }), // Convertir el cuerpo a JSON
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
-      if (response.ok) {
-        setUser(data.user); // Guardar el usuario en el estado
-        localStorage.setItem('token', data.token); // Guardar el token en localStorage
-      } else {
+      if (!response.ok) {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
+      const token = data.token as string;
+      localStorage.setItem('token', token);
+      // Obtener perfil
+      const meRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!meRes.ok) {
+        throw new Error('No se pudo obtener el perfil del usuario');
+      }
+      const me = await meRes.json();
+      setUser(me);
     } catch (error) {
       console.error('Error:', error);
       throw error;
@@ -71,14 +74,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Verificar si hay un token al cargar la aplicación
   useEffect(() => {
     const token = localStorage.getItem('token');
-
-    if (token) {
-      // Simular la obtención del usuario desde el token (sin verificar en el backend)
-      const userFromToken = { id: 1, name: 'Usuario Demo', email: 'demo@example.com' }; // Datos de ejemplo
-      setUser(userFromToken); // Guardar el usuario en el estado
-    }
-
-    setLoading(false); // Finalizar el loading
+    const load = async () => {
+      if (!token) { setLoading(false); return; }
+      try {
+        const meRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!meRes.ok) {
+          localStorage.removeItem('token');
+          setUser(null);
+        } else {
+          const me = await meRes.json();
+          setUser(me);
+        }
+      } catch (e) {
+        localStorage.removeItem('token');
+        setUser(null);
+      }
+      setLoading(false);
+    };
+    load();
   }, []);
 
   // Valores que se compartirán en el Context

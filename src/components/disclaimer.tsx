@@ -8,13 +8,7 @@ export default function Disclaimer({ onAccept }: DisclaimerProps) {
       <div className="bg-white p-6 rounded-xl shadow-xl max-w-md text-center">
         <h2 className="text-xl font-semibold mb-4 text-black">Aviso importante</h2>
         <p className="mb-4 text-black">
-         El contenido publicado en el Observatorio Turístico de Colima se encuentra actualmente en fase de pruebas y validación. Aunque la plataforma es de acceso público, la información que aquí se presenta está sujeta a revisión, verificación y actualización constante.
-
-La Subsecretaría de Turismo del Estado de Colima trabaja de manera continua en el cruce de datos, la revisión de artículos y la verificación de cifras para garantizar su precisión y confiabilidad.
-
-Por lo anterior, la información disponible en esta página no debe considerarse definitiva ni oficial para efectos jurídicos o administrativos. Su consulta es de carácter informativo y está destinada a facilitar el análisis y la retroalimentación mientras se completa el proceso de validación.
-
-La Subsecretaría de Turismo no asume responsabilidad alguna por decisiones que se tomen con base en los datos o contenidos aquí publicados en esta etapa preliminar.
+         La información publicada en el Observatorio Turístico de Colima está sujeta a revisión y actualización, la Subsecretaría de Turismo del Estado de Colima trabaja de manera continua en el cruce de datos, y la verificación de cifras para garantizar su confiabilidad
         </p>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
