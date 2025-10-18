@@ -5,8 +5,8 @@ import Header from '../components/header';
 import Indicators from '../components/Circlegraph';
 import Footer from '../components/piedepagina';
 import Disclaimer from '../components/disclaimer'; // importa el componente
-/* import manza from '../../public/images/Tecomán-Estero-El-chupadero.webp';
-import comala from '../../public/images/fondo.webp'; */
+import manza from '../../public/images/Tecomán-Estero-El-chupadero.webp';
+import comala from '../../public/images/fondo.webp';
 
 export default function Home() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
@@ -37,8 +37,8 @@ export default function Home() {
     {/* Misión */}
     <div className="grid md:grid-cols-2 gap-8 items-center">
       <img 
-        src='/public/images/Tecomán-Estero-El-chupadero.webp' // Reemplaza con tu imagen real
-        alt="Estero de tecoman"
+        src={manza} // Reemplaza con tu imagen real
+        alt="estero de tecoman"
         className="w-full rounded-xl shadow-md"
       />
       <div>
@@ -69,8 +69,8 @@ Este sitio web tiene como propósito hacer publica la visión integral y actuali
         
       </div>
       <img 
-        src='/public/images/fondo.webp' // Reemplaza con tu imagen real
-        alt="imagen de comala"
+        src={comala} // Reemplaza con tu imagen real
+        alt="estero de comala"
         className="w-full rounded-xl shadow-md -mt-20"
       />
     </div>
