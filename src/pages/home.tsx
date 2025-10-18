@@ -72,7 +72,7 @@ Este sitio web tiene como propósito hacer publica la visión integral y actuali
         src='public/images/fondo.webp' // Reemplaza con tu imagen real
         alt="Visión Colima"
         className="w-full rounded-xl shadow-md -mt-20"
-      />
+      />zzz
     </div>
 
   </div>
