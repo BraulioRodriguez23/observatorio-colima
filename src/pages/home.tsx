@@ -5,8 +5,8 @@ import Header from '../components/header';
 import Indicators from '../components/Circlegraph';
 import Footer from '../components/piedepagina';
 import Disclaimer from '../components/disclaimer'; // importa el componente
-import manza from '../../public/images/Tecomán-Estero El chupadero.jpg';
-import comala from '../../public/images/fondo.jpg';
+
+
 
 export default function Home() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
@@ -37,7 +37,7 @@ export default function Home() {
     {/* Misión */}
     <div className="grid md:grid-cols-2 gap-8 items-center">
       <img 
-        src={manza} // Reemplaza con tu imagen real
+        src='/images/Tecomán-Estero-El-chupadero.webp' // Reemplaza con tu imagen real
         alt="Misión Manzanillo"
         className="w-full rounded-xl shadow-md"
       />
@@ -69,7 +69,7 @@ Este sitio web tiene como propósito hacer publica la visión integral y actuali
         
       </div>
       <img 
-        src={comala} // Reemplaza con tu imagen real
+        src='public/images/fondo.webp' // Reemplaza con tu imagen real
         alt="Visión Colima"
         className="w-full rounded-xl shadow-md -mt-20"
       />

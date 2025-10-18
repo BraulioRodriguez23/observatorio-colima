@@ -1,10 +1,5 @@
 import React from 'react';
-import logoColima from '../../public/images/colima-logo.png';
-import logoManzanillo from '../../public/images/Manzanillo -logo.png';
-import logoComala from '../../public/images/Comala Pueblo Mágico.png';
 import HorizontalMenu from './Horizontalmenu';
-import udcLogo from '../../public/images/UdeC_DosLineasIzq_Oro.png';
-import gColimaLogo from '../../public/images/Logo SUBSECRETARIA DE TURISMO.png';
 
 const Header: React.FC = () => {
   return (
@@ -13,34 +8,34 @@ const Header: React.FC = () => {
         {/* ===== LOGOS: fuera del contenedor centrado para que queden pegados al borde ===== */}
         <div className="flex items-center gap-3 flex-shrink-0 pl-0">
           <img
-            src={logoColima}
+            src="/images/colima-logo.webp"
             alt="Logo Colima"
             className="h-8 sm:h-10 md:h-12 object-contain max-w-[180px] block"
           />
           <img
-            src={logoManzanillo}
+            src="/images/Manzanillo-logo.webp"
             alt="Logo Manzanillo"
             className="hidden sm:inline-block h-10 md:h-14 object-contain max-w-[120px]"
           />
           <img
-            src={logoComala}
+            src="/images/Comala-Pueblo Mágico.webp"
             alt="Logo Comala"
             className="hidden md:inline-block h-12 md:h-20 object-contain max-w-[140px]"
           />
           <img
-            src={udcLogo}
+            src="/images/UdeC_DosLineasIzq_Oro.webp"
             alt="Logo UdeC"
             className="hidden sm:inline-block h-10 md:h-12 object-contain max-w-[160px]"
           />
           <img
-            src={gColimaLogo}
+            src="/images/Logo-SUBSECRETARIA-DE-TURISMO.webp"
             alt="Logo Gobierno de Colima"
             className="hidden md:inline-block h-20 md:h-14 object-contain max-w-[280px]"
           />
         </div>
+
         {/* ===== MENÚ: ocupa el resto y está contenido/centrado hasta un ancho máximo ===== */}
         <div className="flex-1">
-          {/* Mantengo el menú dentro de un contenedor centrado pero con margen derecho. */}
           <div className="w-full max-w-screen-xl mx-auto flex justify-end pr-1">
             <HorizontalMenu />
           </div>

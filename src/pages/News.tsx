@@ -2,8 +2,8 @@ import  { useEffect, useState } from 'react';
 import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
-import imagenfondo  from '../../public/images/comala-pueblo-mgico-foto-hernando-rivera.jpg'
-import imagenCarga from '../../public/images/Comala Pueblo Mágico.png'
+import imagenfondo  from '../../public/images/comala-pueblo-mgico-foto-hernando-rivera.webp'
+import imagenCarga from '../../public/images/Comala-Pueblo Mágico.webp'
 
 // Define the type for a news article
 interface NewsArticle { 

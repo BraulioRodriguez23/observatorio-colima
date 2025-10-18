@@ -1,4 +1,4 @@
-import ballenaImg from '../../public/images/Manzanillo-LasHadasClubdeYates.jpg';
+import ballenaImg from '../../public/images/Manzanillo-LasHadasClubdeYates.webp';
 export default function Hero() {
   return (
     <div className="relative h-screen">

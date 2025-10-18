@@ -2,8 +2,8 @@ import '../index.css';
 import Header from '../components/header';
 import Footer from '../components/piedepagina';
 import { useEffect, useState } from 'react';
-import imagenCarga from '../../public/images/Manzanillo -logo.png';
-import imagenfondo from '../../public/images/ballena-nueva.jpg';
+
+
 
 interface PDFDocument {
   id: number;
@@ -83,7 +83,7 @@ const PDFSection = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-gray-600">
         <img
-          src={imagenCarga}
+          src='images/Manzanillo-logo.webp'
           alt="Cargando"
           className="w-40 h-40 mb-6 object-contain animate-pulse-scale"
         />
@@ -110,7 +110,7 @@ const PDFSection = () => {
       <section className="relative h-96 flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={imagenfondo}
+            src='/images/ballena-nueva.webp'
             alt="Turismo Colima"
             className="w-full h-full object-cover"
           />

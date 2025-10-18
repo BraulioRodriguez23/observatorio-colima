@@ -1,5 +1,5 @@
-import udcLogo from '../../public/images/UdeC_DosLineasIzq_Oro.png';
-import gColimaLogo from '../../public/images/Logo SUBSECRETARIA DE TURISMO.png';
+
+
 
 export default function Footer() {
   return (
@@ -56,12 +56,12 @@ export default function Footer() {
         {/* Logos alineados */}
         <div className="flex justify-center items-center space-x-4 mb-4">
           <img
-            src={udcLogo}
+            src='/images/UdeC_DosLineasIzq_Oro.webp'
             alt="Universidad de Colima"
             className="h-20 object-contain"
           />
           <img
-            src={gColimaLogo}
+            src='/images/Logo-SUBSECRETARIA-DE-TURISMO.webp'
             alt="Gobierno del Estado de Colima"
             className="h-20 object-contain"
           />
