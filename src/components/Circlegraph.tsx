@@ -14,7 +14,7 @@ import MoneyIcon from "../../public/images/derrama_economica.svg";
 export default function CircleGraph() {
   const generalIndicators = [
     { 
-      title: "Afluencia turistica", 
+      title: "Afluencia turística", 
       value: "1,564,622",
       progress: 49.31,
       icon: DensityIcon
@@ -26,7 +26,7 @@ export default function CircleGraph() {
       icon: MoneyIcon
     },
     { 
-      title: "Ocupacion hotelera", 
+      title: "Ocupación hotelera", 
       value: "51.08%",
       progress: 51.08,
       icon: NightIcon
@@ -68,7 +68,7 @@ export default function CircleGraph() {
       icon: planeicon
     },
     { 
-      title: "Personas Beneficiadas con acciones de capacitacion turística", 
+      title: "Personas beneficiadas con acciones de capacitación turística", 
       value: "2,447",
       progress: 90,
       icon: DensityIcon
