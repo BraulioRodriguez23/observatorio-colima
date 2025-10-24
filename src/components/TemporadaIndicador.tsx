@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import LineChartIndicadores from "./LineChartIndicadores";
+import LineChartIndicadores from "./LineChartIndicadores"; // Aquí debe estar la corrección del formato
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -38,6 +38,15 @@ const temporadaAbreviada = (nombre: string) => {
   return dict[nombre] || (nombre ? nombre.split(" ")[0] : nombre);
 };
 
+const SEASON_ORDER = [
+  "Semana Santa y Pascua",
+  "Verano",
+  "Septiembre",
+  "Noviembre",
+  "Diciembre",
+  "Invierno",
+];
+
 type TemporadaData = {
   municipality: string;
   season: string;
@@ -45,8 +54,29 @@ type TemporadaData = {
   occupancyRate?: number;
   economicImpact?: number;
   touristFlow?: number;
+  seasonCanonical?: string; 
   [key: string]: unknown;
 };
+
+// FUNCIÓN DE DESDUPLICACIÓN (mantiene la corrección anterior)
+const deduplicateData = (data: TemporadaData[]): TemporadaData[] => {
+    const uniqueMap = new Map<string, TemporadaData>();
+
+    data.forEach(d => {
+        const canonicalSeason = normalizarTemporada(d.season);
+        const uniqueKey = `${d.municipality}-${canonicalSeason}-${d.year}`;
+        
+        if (!uniqueMap.has(uniqueKey)) {
+            uniqueMap.set(uniqueKey, {
+                ...d,
+                seasonCanonical: canonicalSeason,
+            });
+        }
+    });
+
+    return Array.from(uniqueMap.values());
+};
+
 
 const TemporadaIndicador = () => {
   const [data, setData] = useState<TemporadaData[]>([]);
@@ -59,7 +89,6 @@ const TemporadaIndicador = () => {
   const [añoInicio, setAñoInicio] = useState("");
   const [añoFin, setAñoFin] = useState("");
 
-  // Estado para los filtros aplicados
   const [filtrosAplicados, setFiltrosAplicados] = useState({
     indicador: "",
     municipio: "",
@@ -68,27 +97,29 @@ const TemporadaIndicador = () => {
     añoFin: "",
   });
 
-  // Eliminado el estado intermedio de filtros
-
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/season-stats`)
+    const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/season-stats`;
+    if (!apiUrl) {
+        setError("Error de configuración: La URL de la API no está definida.");
+        setLoading(false);
+        return;
+    }
+
+    fetch(apiUrl)
       .then(res => {
         if (!res.ok) throw new Error("No se pudo cargar");
         return res.json();
       })
-      .then((rawData: TemporadaData[]) =>
-        setData(
-          rawData.map(d => ({
-            ...d,
-            seasonCanonical: normalizarTemporada(d.season)
-          }))
-        )
-      )
+      .then((rawData: TemporadaData[]) => {
+        // Aplicar desduplicación
+        const uniqueData = deduplicateData(rawData);
+        setData(uniqueData);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, []); 
 
   const municipios = [...new Set(data.map(d => d.municipality).filter(Boolean))];
   const temporadas = [...new Set(data.map(d => d.seasonCanonical as string).filter(Boolean))];
@@ -113,12 +144,36 @@ const TemporadaIndicador = () => {
     return municipioOK && temporadaOK && añoOK;
   });
 
-  const dataFiltradaConCorto = dataFiltrada.map(d => ({
-    ...d,
-    seasonCanonical: String(d.seasonCanonical ?? ""),
-    temporadaCorta: temporadaAbreviada(String(d.seasonCanonical ?? "")),
-    temporadaCompleta: `${String(d.seasonCanonical ?? "")} ${d.year}`,
-  }));
+  // Asegurar que solo haya un municipio en los datos finales si no se seleccionó uno (mantiene la corrección anterior).
+  let dataConUnMunicipio = dataFiltrada;
+  const municipiosEnDataFiltrada = [...new Set(dataFiltrada.map(d => d.municipality))].filter(Boolean);
+  
+  if (!filtrosAplicados.municipio && municipiosEnDataFiltrada.length > 1) {
+    const primerMunicipio = municipiosEnDataFiltrada[0];
+    dataConUnMunicipio = dataFiltrada.filter(d => d.municipality === primerMunicipio);
+  }
+
+  // Ordenamiento
+  const dataFiltradaConCorto = dataConUnMunicipio
+    .map(d => ({
+      ...d,
+      seasonCanonical: String(d.seasonCanonical ?? ""),
+      temporadaCorta: temporadaAbreviada(String(d.seasonCanonical ?? "")),
+      temporadaCompleta: `${String(d.seasonCanonical ?? "")} ${d.year}`,
+    }))
+    .sort((a, b) => {
+        if (a.year !== b.year) {
+            return Number(a.year) - Number(b.year);
+        }
+        const indexA = SEASON_ORDER.indexOf(a.seasonCanonical);
+        const indexB = SEASON_ORDER.indexOf(b.seasonCanonical);
+        
+        if (indexA === -1 || indexB === -1) {
+            return a.seasonCanonical.localeCompare(b.seasonCanonical);
+        }
+
+        return indexA - indexB;
+    });
 
   function exportToExcel() {
     const indicadorSeleccionado = filtrosAplicados.indicador as keyof TemporadaData;
@@ -127,7 +182,7 @@ const TemporadaIndicador = () => {
       return;
     }
     const etiqueta = INDICADORES.find(i => i.value === indicadorSeleccionado)?.label || indicadorSeleccionado;
-    const datosFiltrados = dataFiltradaConCorto.map((fila) => ({
+    const datosFiltrados = dataFiltrada.map((fila) => ({
       Año: fila.year,
       Municipio: fila.municipality,
       Temporada: fila.seasonCanonical,
@@ -167,14 +222,17 @@ const TemporadaIndicador = () => {
     const indLabel = INDICADORES.find(i => i.value === filtrosAplicados.indicador)?.label || "";
     let añoTxt = "";
     const añosUnicos = [
-      ...new Set(dataFiltrada.map(d => Number(d.year)).filter(Boolean))
+      ...new Set(dataFiltradaConCorto.map(d => Number(d.year)).filter(Boolean))
     ].sort((a, b) => a - b);
     if (añosUnicos.length) {
       if (añosUnicos.length === 1) añoTxt = `(${añosUnicos[0]})`;
       else añoTxt = `(${añosUnicos[0]} - ${añosUnicos[añosUnicos.length - 1]})`;
     }
+    
+    const municipioGraficado = filtrosAplicados.municipio || (municipiosEnDataFiltrada.length > 0 ? municipiosEnDataFiltrada[0] : "");
+
     return `Evolución del indicador "${indLabel}"` +
-      (filtrosAplicados.municipio ? " en " + filtrosAplicados.municipio : "") +
+      (municipioGraficado ? " en " + municipioGraficado : " (Múltiples Municipios)") +
       " " + añoTxt;
   }
 
@@ -188,27 +246,25 @@ const TemporadaIndicador = () => {
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
         ) :
-          // Mostrar mensaje si no hay ningún filtro seleccionado
           (!filtrosAplicados.indicador && !filtrosAplicados.municipio && !filtrosAplicados.temporada && !filtrosAplicados.añoInicio && !filtrosAplicados.añoFin) ? (
             <div className="text-center text-gray-500 py-10">
               Seleccione al menos un filtro para ver los datos.
             </div>
           ) :
-          // Mostrar mensaje si no hay datos para los filtros seleccionados
-          (dataFiltradaConCorto.length === 0 || !filtrosAplicados.indicador) ? (
-            <div className="text-center text-gray-500 py-10">
-              No hay valores válidos para este indicador en las temporadas seleccionadas.
-            </div>
-          ) : (
-            <LineChartIndicadores
-              data={dataFiltradaConCorto}
-              dataKey={filtrosAplicados.indicador}
-              xKey="temporadaCorta"
-              labelX="Temporada"
-              labelY={INDICADORES.find(i => i.value === filtrosAplicados.indicador)?.label || ""}
-              titulo={getTituloGrafica()}
-            />
-          )}
+            (dataFiltradaConCorto.length === 0 || !filtrosAplicados.indicador) ? (
+              <div className="text-center text-gray-500 py-10">
+                No hay valores válidos para este indicador en las temporadas seleccionadas.
+              </div>
+            ) : (
+              <LineChartIndicadores
+                data={dataFiltradaConCorto}
+                dataKey={filtrosAplicados.indicador}
+                xKey="temporadaCompleta"
+                labelX="Temporada"
+                labelY={INDICADORES.find(i => i.value === filtrosAplicados.indicador)?.label || ""}
+                titulo={getTituloGrafica()}
+              />
+            )}
       </div>
       {/* FILTROS */}
       <aside className="w-full md:w-96 bg-white rounded-xl shadow-lg p-8 h-fit mt-8 md:mt-0">
@@ -218,7 +274,7 @@ const TemporadaIndicador = () => {
           <div className="col-span-1 md:col-span-2">
             <label className="block mb-1 font-semibold text-black">Indicador</label>
             <select
-              className="w-60 border px-3 py-2 rounded text-black"
+              className="w-full border px-3 py-2 rounded text-black" 
               value={indicador}
               onChange={e => setIndicador(e.target.value)}
             >
@@ -231,30 +287,26 @@ const TemporadaIndicador = () => {
             </select>
           </div>
           {/* Temporada */}
-         <div className="col-span-1 relative">
-  <label className="block mb-2 font-semibold text-black">Temporada</label>
-  <select
-    className="w-50 appearance-none border px-3 py-2 pr-10 rounded text-black"
-    value={temporada}
-    onChange={e => setTemporada(e.target.value)}
-  >
-    <option value="">Seleccione</option>
-    {temporadas.map(t => (
-      <option key={t} value={t}>
-        {t}
-      </option>
-    ))}
-  </select>
-  {/* Flechita personalizada */}
-  <div className="pointer-events-none absolute right-3 top-[55%] -translate-y-1/2 text-gray-500 text-sm">
-    
-  </div>
-</div>
-
-
-          <br />
-          {/* Municipio */}
-          <div>
+          <div className="col-span-1 md:col-span-2 relative">
+            <label className="block mb-1 font-semibold text-black">Temporada</label>
+            <select
+              className="w-full appearance-none border px-3 py-2 pr-10 rounded text-black"
+              value={temporada}
+              onChange={e => setTemporada(e.target.value)}
+            >
+              <option value="">Seleccione</option>
+              {temporadas.map(t => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+            <svg className="pointer-events-none absolute right-3 top-[55%] translate-y-2 text-gray-500 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+            </svg>
+          </div>
+          
+          <div className="col-span-1 md:col-span-2">
             <label className="block mb-1 font-semibold text-black">Municipio</label>
             <select
               className="w-full border px-3 py-2 rounded text-black"
@@ -269,8 +321,7 @@ const TemporadaIndicador = () => {
               ))}
             </select>
           </div>
-          <br />
-          {/* Año inicio */}
+
           <div>
             <label className="block mb-1 font-semibold text-black">Año inicio</label>
             <select
@@ -286,7 +337,6 @@ const TemporadaIndicador = () => {
               ))}
             </select>
           </div>
-          {/* Año fin */}
           <div>
             <label className="block mb-1 font-semibold text-black">Año fin</label>
             <select
@@ -303,16 +353,16 @@ const TemporadaIndicador = () => {
             </select>
           </div>
           {/* Botones */}
-          <div className="col-span-1 md:col-span-2 flex gap-2">
+          <div className="col-span-1 md:col-span-2 flex gap-2 pt-4">
             <button
               type="submit"
-              className="w-1/2 bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition mb-2"
+              className="w-1/2 bg-blue-600 text-white font-bold py-2 rounded-lg shadow hover:bg-blue-700 transition"
             >
               Aplicar filtro
             </button>
             <button
               type="button"
-              className="w-1/2 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg shadow hover:bg-gray-300 transition mb-2"
+              className="w-1/2 bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg shadow hover:bg-gray-300 transition"
               onClick={handleResetFiltro}
             >
               Limpiar filtros
@@ -323,6 +373,7 @@ const TemporadaIndicador = () => {
               type="button"
               className="w-full bg-green-500 text-white font-bold py-2 rounded-lg shadow hover:bg-green-600 transition"
               onClick={exportToExcel}
+              disabled={!filtrosAplicados.indicador}
             >
               Exportar a Excel
             </button>
