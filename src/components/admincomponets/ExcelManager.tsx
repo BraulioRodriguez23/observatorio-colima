@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExcelUpload } from './ExcelUpload';
 import { ExcelList, ExcelColumn, ExcelRecord } from './ExcelList';
+import { SingleRecordForm } from './SingleRecordForm';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -146,7 +147,13 @@ const ExcelManager: React.FC = () => {
       {error && <div className="p-3 bg-red-100 text-red-700 rounded-md text-sm font-medium border border-red-200">{error}</div>}
       {success && <div className="p-3 bg-green-100 text-green-700 rounded-md text-sm font-medium border border-green-200">{success}</div>}
 
-     <ExcelUpload 
+     <SingleRecordForm
+        excelType={excelType}
+        onSuccess={(msg) => { setSuccess(msg); fetchRecords(); }}
+        onError={(msg) => setError(msg)}
+      />
+
+      <ExcelUpload 
         excelType={excelType} 
         onSuccess={(msg) => {
           setSuccess(msg);
