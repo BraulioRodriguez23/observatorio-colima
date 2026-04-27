@@ -26,7 +26,6 @@ const AdminUsers: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
-  const [token] = useState(localStorage.getItem("token") || "");
 
   // Toast auto-hide
   useEffect(() => {
@@ -38,20 +37,35 @@ const AdminUsers: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line
   }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/user`, {
+      const token = localStorage.getItem("token") || "";
+      // CORRECCIÓN 404: Agregada la barra al final de la ruta "/user/"
+      const res = await axios.get(`${API_BASE}/user/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUsers(res.data);
-    } catch {
+
+      // VALIDACIÓN INTELIGENTE: Buscamos el arreglo sin importar cómo lo envuelva la API
+      const data = res.data;
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else if (data && Array.isArray(data.data)) {
+        setUsers(data.data);
+      } else if (data && Array.isArray(data.users)) {
+        setUsers(data.users);
+      } else {
+        console.warn("Formato desconocido de la API:", data);
+        setUsers([]); 
+      }
+    } catch (err) {
+      console.error(err);
       setToast({ type: "error", message: "Error al obtener usuarios." });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleEdit = (user: User) => {
@@ -61,9 +75,10 @@ const AdminUsers: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("¿Eliminar este usuario?")) return;
+    if (!window.confirm("¿Estás seguro de eliminar este usuario?")) return;
     setLoading(true);
     try {
+      const token = localStorage.getItem("token") || "";
       await axios.delete(`${API_BASE}/user/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -71,8 +86,9 @@ const AdminUsers: React.FC = () => {
       fetchUsers();
     } catch {
       setToast({ type: "error", message: "Error al eliminar." });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleModalClose = () => {
@@ -85,16 +101,20 @@ const AdminUsers: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      const token = localStorage.getItem("token") || "";
+      
       if (editingUser) {
+        // Al editar usamos el ID
         await axios.put(
           `${API_BASE}/user/${editingUser.id}`,
-          { ...form, password: undefined },
+          { ...form, password: form.password || undefined }, 
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setToast({ type: "success", message: "Usuario actualizado." });
       } else {
+        // CORRECCIÓN 404: Agregada la barra al final "/user/"
         await axios.post(
-          `${API_BASE}/user`,
+          `${API_BASE}/user/`, 
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -109,15 +129,16 @@ const AdminUsers: React.FC = () => {
         message = err.response?.data?.message || message;
       }
       setToast({ type: "error", message });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 px-2 sm:px-6 py-8">
       {/* Toast/alerta */}
       {toast && (
-        <div className={`fixed top-7 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg font-semibold shadow-2xl text-lg
+        <div className={`fixed top-7 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg font-semibold shadow-2xl text-lg transition-all duration-300
           ${toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}>
           {toast.message}
         </div>
@@ -147,7 +168,7 @@ const AdminUsers: React.FC = () => {
                 <th className="py-3 px-4 font-semibold text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-8 text-center text-blue-600 font-medium">
@@ -161,12 +182,16 @@ const AdminUsers: React.FC = () => {
                   </td>
                 </tr>
               ) : users.map((u) => (
-                <tr key={u.id} className="border-t hover:bg-blue-50 transition">
-                  <td className="py-2 px-4">{u.id}</td>
-                  <td className="py-2 px-4">{u.name}</td>
-                  <td className="py-2 px-4">{u.email}</td>
-                  <td className="py-2 px-4 capitalize">{u.role}</td>
-                  <td className="py-2 px-4 text-center flex gap-3 justify-center">
+                <tr key={u.id} className="hover:bg-blue-50 transition">
+                  <td className="py-3 px-4">{u.id}</td>
+                  <td className="py-3 px-4">{u.name}</td>
+                  <td className="py-3 px-4">{u.email}</td>
+                  <td className="py-3 px-4 capitalize">
+                    <span className={`px-2 py-1 rounded text-sm font-semibold ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {u.role}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-center flex gap-3 justify-center">
                     <button
                       className="bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded text-blue-700 font-semibold transition"
                       onClick={() => handleEdit(u)}
@@ -189,70 +214,75 @@ const AdminUsers: React.FC = () => {
 
       {/* MODAL */}
       {modalOpen && (
-        <div className="fixed z-40 inset-0 bg-black/40 flex items-center justify-center">
+        <div className="fixed z-40 inset-0 bg-black/40 flex items-center justify-center p-4">
           <form
             onSubmit={handleSubmit}
-            className="bg-white w-full max-w-lg mx-2 p-8 rounded-3xl shadow-2xl border border-blue-200 animate-fadein"
+            className="bg-white w-full max-w-lg p-8 rounded-3xl shadow-2xl border border-blue-200 animate-fadein"
           >
             <h2 className="text-2xl mb-6 font-bold text-blue-700 text-center">
               {editingUser ? "Editar usuario" : "Nuevo usuario"}
             </h2>
-            <div className="mb-4">
-              <label className="block text-base font-semibold mb-1 text-gray-700">Nombre</label>
-              <input
-                name="name"
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                className="border px-4 py-2 rounded-lg w-full focus:outline-blue-400 text-lg"
-                required
-                autoFocus
-                placeholder="Nombre completo"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-base font-semibold mb-1 text-gray-700">Correo</label>
-              <input
-                name="email"
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                className="border px-4 py-2 rounded-lg w-full focus:outline-blue-400 text-lg"
-                type="email"
-                required
-                placeholder="ejemplo@correo.com"
-              />
-            </div>
-            {!editingUser && (
-              <div className="mb-4">
-                <label className="block text-base font-semibold mb-1 text-gray-700">Contraseña</label>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-base font-semibold mb-1 text-gray-700">Nombre</label>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  className="border px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                  required
+                  autoFocus
+                  placeholder="Nombre completo"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-base font-semibold mb-1 text-gray-700">Correo</label>
+                <input
+                  name="email"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  className="border px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                  type="email"
+                  required
+                  placeholder="ejemplo@correo.com"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-base font-semibold mb-1 text-gray-700">Contraseña {editingUser && "(Dejar en blanco para no cambiar)"}</label>
                 <input
                   name="password"
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
-                  className="border px-4 py-2 rounded-lg w-full focus:outline-blue-400 text-lg"
+                  className="border px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
                   type="password"
                   minLength={6}
-                  required
+                  required={!editingUser} // Solo obligatoria si es un nuevo usuario
                   placeholder="Mínimo 6 caracteres"
                 />
               </div>
-            )}
-            <div className="mb-6">
-              <label className="block text-base font-semibold mb-1 text-gray-700">Rol</label>
-              <select
-                value={form.role}
-                onChange={e => setForm({ ...form, role: e.target.value })}
-                className="border px-4 py-2 rounded-lg w-full focus:outline-blue-400 text-lg"
-              >
-                {roles.map(r => (
-                  <option value={r.value} key={r.value}>{r.label}</option>
-                ))}
-              </select>
+              
+              <div>
+                <label className="block text-base font-semibold mb-1 text-gray-700">Rol</label>
+                <select
+                  value={form.role}
+                  onChange={e => setForm({ ...form, role: e.target.value })}
+                  className="border px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 text-lg"
+                >
+                  {roles.map(r => (
+                    <option value={r.value} key={r.value}>{r.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="flex justify-between gap-3 mt-2">
+
+            <div className="flex justify-between gap-3 mt-8">
               <button
                 type="button"
                 onClick={handleModalClose}
-                className="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-lg font-semibold text-lg transition"
+                className="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-lg font-semibold text-gray-700 text-lg transition"
               >
                 Cancelar
               </button>
@@ -267,13 +297,14 @@ const AdminUsers: React.FC = () => {
           </form>
         </div>
       )}
+      
       {/* animación modal */}
       <style>{`
         .animate-fadein {
           animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(30px);}
+          from { opacity: 0; transform: translateY(20px);}
           to { opacity: 1; transform: none;}
         }
       `}</style>
