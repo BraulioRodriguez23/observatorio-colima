@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ExcelUpload } from './ExcelUpload';
 import { ExcelList, ExcelColumn, ExcelRecord } from './ExcelList';
 import { SingleRecordForm } from './SingleRecordForm';
+import { EditRecordModal } from './EditRecordModal';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -44,6 +45,7 @@ const ExcelManager: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [editingRecord, setEditingRecord] = useState<ExcelRecord | null>(null);
 
   const fetchRecords = async () => {
     setLoading(true);
@@ -168,10 +170,24 @@ const ExcelManager: React.FC = () => {
         columns={getColumns(excelType)} 
         onDelete={handleDelete} 
         onDeleteBatch={handleDeleteBatch} 
+        onEdit={setEditingRecord}
         loading={loading} 
         viewMode={viewMode} 
         type={excelType} 
       />
+
+      {editingRecord && (
+        <EditRecordModal
+          excelType={excelType}
+          record={editingRecord}
+          onSuccess={(msg) => {
+            setSuccess(msg);
+            fetchRecords();
+          }}
+          onError={(msg) => setError(msg)}
+          onClose={() => setEditingRecord(null)}
+        />
+      )}
     </div>
   );
 };

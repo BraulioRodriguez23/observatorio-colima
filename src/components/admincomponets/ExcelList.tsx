@@ -50,7 +50,7 @@ const groupByBatch = (data: ExcelRecord[], type: ExcelType) => {
   }, {});
 };
 
-const renderTable = (items: ExcelRecord[], columns: ExcelColumn[], onDelete: (id: number) => void) => (
+const renderTable = (items: ExcelRecord[], columns: ExcelColumn[], onDelete: (id: number) => void, onEdit?: (record: ExcelRecord) => void) => (
   <table className="min-w-full divide-y divide-gray-200">
     <thead className="bg-gray-50">
       <tr>
@@ -71,6 +71,14 @@ const renderTable = (items: ExcelRecord[], columns: ExcelColumn[], onDelete: (id
             </td>
           ))}
           <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
+            {onEdit && (
+              <button 
+                onClick={() => onEdit(item)} 
+                className="text-blue-600 hover:text-blue-900 font-medium transition-colors mr-3"
+              >
+                Editar
+              </button>
+            )}
             <button 
               onClick={() => onDelete(Number(item.id))} 
               className="text-red-600 hover:text-red-900 font-medium transition-colors"
@@ -84,7 +92,7 @@ const renderTable = (items: ExcelRecord[], columns: ExcelColumn[], onDelete: (id
   </table>
 );
 
-export const ExcelList: React.FC<ExcelListProps> = ({ data, columns, onDelete, onDeleteBatch, loading = false, viewMode, type }) => {
+export const ExcelList: React.FC<ExcelListProps & { onEdit?: (record: ExcelRecord) => void }> = ({ data, columns, onDelete, onDeleteBatch, onEdit, loading = false, viewMode, type }) => {
   if (loading) {
     return <div className="mt-6 p-8 bg-white rounded-lg shadow text-center text-gray-500 animate-pulse">Cargando registros...</div>;
   }
@@ -112,13 +120,13 @@ export const ExcelList: React.FC<ExcelListProps> = ({ data, columns, onDelete, o
               )}
             </div>
             <div className="overflow-x-auto">
-              {renderTable(items, columns, onDelete)}
+              {renderTable(items, columns, onDelete, onEdit)}
             </div>
           </div>
         ))
       ) : (
         <div className="bg-white rounded-lg shadow overflow-x-auto">
-          {renderTable(data, columns, onDelete)}
+          {renderTable(data, columns, onDelete, onEdit)}
         </div>
       )}
     </div>
