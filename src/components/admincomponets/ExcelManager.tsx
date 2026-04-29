@@ -118,14 +118,18 @@ const ExcelManager: React.FC = () => {
         try {
           const route = ADMIN_TABS.find(t => t.value === excelType)?.route;
           const token = localStorage.getItem('token');
-          await Promise.all(
-            ids.map(id =>
-              fetch(`${API_URL}/${route}/${id}`, {
-                method: 'DELETE', 
-                headers: { Authorization: `Bearer ${token}` },
-              })
-            )
-          );
+          
+          const res = await fetch(`${API_URL}/${route}/delete-batch`, {
+            method: 'POST', 
+            headers: { 
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}` 
+            },
+            body: JSON.stringify({ ids })
+          });
+          
+          if (!res.ok) throw new Error('Error al borrar lote desde el servidor');
+          
           setSuccess('Lote eliminado correctamente.');
           fetchRecords();
         } catch (err) {
