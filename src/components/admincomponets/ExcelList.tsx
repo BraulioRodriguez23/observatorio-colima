@@ -75,18 +75,20 @@ const renderTable = (items: ExcelRecord[], columns: ExcelColumn[], onDelete: (id
             {column.label}
           </th>
         ))}
-        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 z-10 shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)]">
+          Acciones
+        </th>
       </tr>
     </thead>
     <tbody className="bg-white divide-y divide-gray-200">
       {items.map((item, idx) => (
-        <tr key={item.id ? String(item.id) : `row-${idx}`} className="hover:bg-gray-50 transition-colors">
+        <tr key={item.id ? String(item.id) : `row-${idx}`} className="hover:bg-gray-50 transition-colors group">
           {columns.map((col) => (
             <td key={col.key} className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
               {formatValue(item[col.key], col.format)}
             </td>
           ))}
-          <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
+          <td className="px-4 py-3 whitespace-nowrap text-right text-sm sticky right-0 bg-white group-hover:bg-gray-50 z-10 shadow-[-10px_0_15px_-3px_rgba(0,0,0,0.05)] transition-colors">
             {onEdit && (
               <button 
                 onClick={() => onEdit(item)} 
