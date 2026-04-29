@@ -3,6 +3,7 @@ import { ExcelUpload } from './ExcelUpload';
 import { ExcelList, ExcelColumn, ExcelRecord } from './ExcelList';
 import { SingleRecordForm } from './SingleRecordForm';
 import { EditRecordModal } from './EditRecordModal';
+import { ConfirmModal } from './ConfirmModal';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,21 +21,21 @@ const getColumns = (type: ExcelType): ExcelColumn[] => {
   if (type === 'mensual') {
     return [
       { key: 'id', label: 'ID' }, { key: 'year', label: 'Año' }, { key: 'month', label: 'Mes' },
-      { key: 'municipality', label: 'Municipio' }, { key: 'occupancyRate', label: 'Ocupación (%)' },
-      { key: 'touristFlow', label: 'Turistas' }, { key: 'economicImpact', label: 'Impacto Económico' },
+      { key: 'municipality', label: 'Municipio' }, { key: 'occupancyRate', label: 'Ocupación (%)', format: 'percentage' },
+      { key: 'touristFlow', label: 'Turistas', format: 'number' }, { key: 'economicImpact', label: 'Impacto Económico', format: 'currency' },
     ];
   }
   if (type === 'temporada') {
     return [
       { key: 'id', label: 'ID' }, { key: 'year', label: 'Año' }, { key: 'season', label: 'Temporada' },
-      { key: 'municipality', label: 'Municipio' }, { key: 'occupancyRate', label: 'Ocupación (%)' },
-      { key: 'economicImpact', label: 'Derrama Económica' }, { key: 'touristFlow', label: 'Afluencia Turística' },
+      { key: 'municipality', label: 'Municipio' }, { key: 'occupancyRate', label: 'Ocupación (%)', format: 'percentage' },
+      { key: 'economicImpact', label: 'Derrama Económica', format: 'currency' }, { key: 'touristFlow', label: 'Afluencia Turística', format: 'number' },
     ];
   }
   return [
     { key: 'id', label: 'ID' }, { key: 'year', label: 'Año' }, { key: 'bridge_name', label: 'Puente' },
-    { key: 'municipality', label: 'Municipio' }, { key: 'occupancy_rate', label: 'Ocupación (%)' },
-    { key: 'economic_impact', label: 'Derrama' }, { key: 'tourist_flow', label: 'Afluencia' },
+    { key: 'municipality', label: 'Municipio' }, { key: 'occupancy_rate', label: 'Ocupación (%)', format: 'percentage' },
+    { key: 'economic_impact', label: 'Derrama', format: 'currency' }, { key: 'tourist_flow', label: 'Afluencia', format: 'number' },
   ];
 };
 
@@ -46,6 +47,20 @@ const ExcelManager: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editingRecord, setEditingRecord] = useState<ExcelRecord | null>(null);
+  
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    isLoading: boolean;
+    onConfirm: (() => Promise<void>) | null;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    isLoading: false,
+    onConfirm: null
+  });
 
   const fetchRecords = async () => {
     setLoading(true);
@@ -65,46 +80,63 @@ const ExcelManager: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este registro individual?')) return;
-    try {
-      const route = ADMIN_TABS.find(t => t.value === excelType)?.route;
-      const res = await fetch(`${API_URL}/${route}/${id}`, { 
-        method: 'DELETE', 
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
-      });
-      if (!res.ok) throw new Error('Error al borrar');
-      setSuccess('Registro eliminado con éxito.');
-      fetchRecords();
-    } catch (err) {
-      console.error(err);
-      setError('Ocurrió un error al intentar eliminar el registro.');
-    }
+  const handleDelete = (id: number) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar Registro',
+      message: '¿Estás seguro de que deseas eliminar este registro individual? Esta acción no se puede deshacer.',
+      isLoading: false,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isLoading: true }));
+        try {
+          const route = ADMIN_TABS.find(t => t.value === excelType)?.route;
+          const res = await fetch(`${API_URL}/${route}/${id}`, { 
+            method: 'DELETE', 
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+          });
+          if (!res.ok) throw new Error('Error al borrar');
+          setSuccess('Registro eliminado con éxito.');
+          fetchRecords();
+        } catch (err) {
+          console.error(err);
+          setError('Ocurrió un error al intentar eliminar el registro.');
+        } finally {
+          setConfirmModal(prev => ({ ...prev, isOpen: false, isLoading: false }));
+        }
+      }
+    });
   };
 
-  const handleDeleteBatch = async (ids: number[]) => {
-    if (!window.confirm(`ATENCIÓN: ¿Seguro de eliminar todo el lote (${ids.length} registros)? Esta acción no se puede deshacer.`)) return;
-    setLoading(true);
-    try {
-      const route = ADMIN_TABS.find(t => t.value === excelType)?.route;
-      const token = localStorage.getItem('token');
-      await Promise.all(
-        ids.map(id =>
-          fetch(`${API_URL}/${route}/${id}`, {
-            method: 'DELETE', 
-            headers: { Authorization: `Bearer ${token}` },
-          })
-        )
-      );
-      setSuccess('Lote eliminado correctamente.');
-      fetchRecords();
-    } catch (err) {
-      console.error(err);
-      setError('Error eliminando algunos registros del lote.');
-      fetchRecords(); 
-    } finally {
-      setLoading(false);
-    }
+  const handleDeleteBatch = (ids: number[]) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar Lote Completo',
+      message: `ATENCIÓN: ¿Estás seguro de que deseas eliminar todo el lote (${ids.length} registros)? Esta acción no se puede deshacer y borrará permanentemente la información.`,
+      isLoading: false,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isLoading: true }));
+        try {
+          const route = ADMIN_TABS.find(t => t.value === excelType)?.route;
+          const token = localStorage.getItem('token');
+          await Promise.all(
+            ids.map(id =>
+              fetch(`${API_URL}/${route}/${id}`, {
+                method: 'DELETE', 
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            )
+          );
+          setSuccess('Lote eliminado correctamente.');
+          fetchRecords();
+        } catch (err) {
+          console.error(err);
+          setError('Error eliminando algunos registros del lote.');
+          fetchRecords(); 
+        } finally {
+          setConfirmModal(prev => ({ ...prev, isOpen: false, isLoading: false }));
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -116,7 +148,7 @@ const ExcelManager: React.FC = () => {
   }, [excelType]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6">
+    <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6 relative">
       <div className="flex flex-wrap gap-2">
         {ADMIN_TABS.map(tab => (
           <button 
@@ -188,6 +220,17 @@ const ExcelManager: React.FC = () => {
           onClose={() => setEditingRecord(null)}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        isLoading={confirmModal.isLoading}
+        onConfirm={() => {
+          if (confirmModal.onConfirm) confirmModal.onConfirm();
+        }}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

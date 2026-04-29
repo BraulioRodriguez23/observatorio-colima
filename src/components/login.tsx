@@ -103,14 +103,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Enlace para recuperar contraseña */}
-        <p className="mt-4 text-center text-sm text-gray-600">
-          ¿Olvidaste tu contraseña?{" "}
-          <a href="#" className="text-blue-500 hover:underline">
-            Recupérala aquí
-          </a>
-          .
-        </p>
       </div>
     </div>
   );
