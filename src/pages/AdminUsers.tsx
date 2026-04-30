@@ -19,13 +19,21 @@ const roles = [
 
 const initialForm = { name: "", email: "", password: "", role: "admin" };
 
+import { useAuth } from "../context/user";
+import { Navigate } from "react-router-dom";
+
 const AdminUsers: React.FC = () => {
+  const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ ...initialForm });
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
+
+  if (user && user.email !== "sergio@ucol.mx" && user.role !== "admin") {
+    return <Navigate to="/admin" />;
+  }
 
   // Toast auto-hide
   useEffect(() => {

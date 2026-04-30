@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "../../context/user";
 
 type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users";
 
@@ -11,13 +12,19 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   currentSection,
   onSectionChange,
 }) => {
+  const { user } = useAuth();
+  
   const sections = [
     { id: "news", label: "Noticias" },
     { id: "pdfs", label: "PDFs" },
     { id: "excel", label: "Excels" },
     { id: "pdfFront", label: "Archivos adicionales" },
-    { id: "users", label: "Usuarios" },
   ];
+
+  // Solo mostrar la sección "Usuarios" si es el administrador principal o tiene el rol 'admin'
+  if (user && (user.email === 'sergio@ucol.mx' || user.role === 'admin')) {
+    sections.push({ id: "users", label: "Usuarios" });
+  }
 
   return (
     <div className="w-64 bg-white shadow-lg fixed h-full">

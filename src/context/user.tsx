@@ -5,6 +5,7 @@ interface User {
   id: number;
   name: string;
   email: string;
+  role: string;
 }
 
 // Definir el tipo para el contexto

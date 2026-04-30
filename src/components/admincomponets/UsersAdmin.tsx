@@ -17,7 +17,10 @@ const UserRegisterForm: React.FC = () => {
     try {
       const response = await fetch("https://observatorio-api-dhp4.vercel.app/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify({ name, email, password }),
       });
       
