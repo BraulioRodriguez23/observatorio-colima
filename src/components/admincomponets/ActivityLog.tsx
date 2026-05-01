@@ -42,7 +42,7 @@ const ActivityLogPanel: React.FC = () => {
     if (loading) return <p className='text-gray-500 p-4'>Cargando registros...</p>;
     return (
         <div className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm'>
-            <h2 className='text-xl font-semibold mb-4 text-gray-800'></h2>
+            <h2 className='text-xl font-semibold mb-4 text-gray-800'>Registro de Actividad</h2>
             <div className='overflow-x-auto'>
                 <table className='min-w-full text-sm'>
                     <thead className='bg-gray-50 text-gray-600'>
