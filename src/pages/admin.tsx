@@ -10,12 +10,13 @@ import { createClient } from "@supabase/supabase-js";
 import PdfUploadFront from "../components/admincomponets/pdfUploadFront";
 import UserRegisterForm from "../components/admincomponets/UsersAdmin";
 import UserList from "../components/admincomponets/GetAllUser";
+import ActivityLog from "../components/admincomponets/ActivityLog";
 
 // AQUÍ IMPORTAMOS EL MANAGER QUE ARREGLAMOS
 import ExcelManager from "../components/admincomponets/ExcelManager";
 
 // -------- Types --------
-type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users";
+type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users" | "activityLog";
 
 interface NewsItem {
   id: string;
@@ -216,10 +217,10 @@ const AdminPage: React.FC = () => {
 
       if (!response.ok) throw new Error("Error al procesar la noticia");
       const newsItem = await response.json();
-      
+
       if (editingNews) setNews(news.map((item) => (item.id === editingNews.id ? newsItem : item)));
       else setNews((prev) => [...prev, newsItem]);
-      
+
       setEditingNews(null);
     } catch {
       alert("Error al procesar la noticia");
@@ -292,7 +293,7 @@ const AdminPage: React.FC = () => {
         <AdminHeader />
         <AdminLayout>
           <div className="space-y-6">
-            
+
             {currentSection === "news" && (
               <>
                 <NewsForm initialData={editingNews || undefined} onSubmit={handleNewsSubmit} onCancel={() => setEditingNews(null)} />
@@ -338,6 +339,10 @@ const AdminPage: React.FC = () => {
             {/* AQUÍ ESTÁ EL CAMBIO MÁGICO. TODO SE DELEGA A TU EXCEL MANAGER */}
             {currentSection === "excel" && (
               <ExcelManager />
+            )}
+
+            {currentSection === "activityLog" && (
+              <ActivityLog />
             )}
 
             {error && <div className="text-red-600 mt-4">{error}</div>}

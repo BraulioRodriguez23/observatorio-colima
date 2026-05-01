@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../../context/user";
 
-type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users";
+type Section = "news" | "pdfs" | "excel" | "pdfFront" | "users" | "activityLog";
 
 interface AdminSidebarProps {
   currentSection: Section;
@@ -13,12 +13,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onSectionChange,
 }) => {
   const { user } = useAuth();
-  
+
   const sections = [
     { id: "news", label: "Noticias" },
     { id: "pdfs", label: "PDFs" },
     { id: "excel", label: "Excels" },
     { id: "pdfFront", label: "Archivos adicionales" },
+    { id: "activityLog", label: "Registro de actividad" },
   ];
 
   // Solo mostrar la sección "Usuarios" si es el administrador principal o tiene el rol 'admin'
@@ -36,11 +37,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <button
             key={section.id}
             onClick={() => onSectionChange(section.id as Section)}
-            className={`w-full text-left p-3 rounded-lg transition-all ${
-              currentSection === section.id
-                ? "bg-blue-100 text-blue-600 font-semibold"
-                : "hover:bg-gray-100 text-gray-600"
-            }`}
+            className={`w-full text-left p-3 rounded-lg transition-all ${currentSection === section.id
+              ? "bg-blue-100 text-blue-600 font-semibold"
+              : "hover:bg-gray-100 text-gray-600"
+              }`}
           >
             {section.label}
           </button>
