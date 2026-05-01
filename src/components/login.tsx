@@ -22,8 +22,6 @@ const Login = () => {
     // Clear previous errors
     setError("");
 
-    console.log(email, password);
-
     try {
       // Call the login function from AuthContext
       await login(email, password);
