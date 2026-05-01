@@ -4,6 +4,7 @@ const UserRegisterForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("editor");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -21,7 +22,7 @@ const UserRegisterForm: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, role }),
       });
       
       if (!response.ok) {
@@ -88,6 +89,18 @@ const UserRegisterForm: React.FC = () => {
             required
             minLength={6}
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+          <select
+            className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+            value={role}
+            onChange={e => setRole(e.target.value)}
+          >
+            <option value="editor">Editor</option>
+            <option value="admin">Administrador</option>
+          </select>
         </div>
 
         <button
