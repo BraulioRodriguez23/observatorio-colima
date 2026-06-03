@@ -17,7 +17,8 @@ const UserRegisterForm: React.FC = () => {
     setSuccess(null);
     
     try {
-      const response = await fetch("https://observatorio-api-dhp4.vercel.app/auth/register", {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+      const response = await fetch(`${API_BASE}/user/`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

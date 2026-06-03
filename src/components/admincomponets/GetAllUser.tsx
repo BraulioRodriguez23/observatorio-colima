@@ -12,9 +12,11 @@ const UserList: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+
   const fetchUsers = async () => {
     try {
-      const res = await fetch("https://observatorio-api-dhp4.vercel.app/user/", {
+      const res = await fetch(`${API_BASE}/user/`, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
@@ -46,7 +48,7 @@ const UserList: React.FC = () => {
   const deleteUser = async (id: number) => {
     if (!confirm("¿Estás seguro de eliminar este usuario?")) return;
     try {
-      const res = await fetch(`https://observatorio-api-dhp4.vercel.app/user/${id}`, {
+      const res = await fetch(`${API_BASE}/user/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -63,7 +65,7 @@ const UserList: React.FC = () => {
   const handleUpdate = async () => {
     if (!editingUser) return;
     try {
-      const res = await fetch(`https://observatorio-api-dhp4.vercel.app/user/${editingUser.id}`, {
+      const res = await fetch(`${API_BASE}/user/${editingUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
