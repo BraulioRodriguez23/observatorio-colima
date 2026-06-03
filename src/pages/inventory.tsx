@@ -31,7 +31,8 @@ const IndicadoresPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("https://observatorio-api-dhp4.vercel.app/pdfs-front");
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+        const response = await fetch(`${API_BASE}/pdfs-front`);
         if (!response.ok) throw new Error("Error al cargar los PDFs");
         const data = await response.json();
         setPdfs(data);
