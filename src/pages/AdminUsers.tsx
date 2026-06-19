@@ -32,10 +32,6 @@ const AdminUsers: React.FC = () => {
   const [toast, setToast] = useState<Toast | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  if (user && user.email !== "sergio@ucol.mx" && user.role !== "admin") {
-    return <Navigate to="/admin" />;
-  }
-
   // Toast auto-hide
   useEffect(() => {
     if (toast) {
@@ -47,6 +43,10 @@ const AdminUsers: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  if (user && user.email !== "sergio@ucol.mx" && user.role !== "admin") {
+    return <Navigate to="/admin" />;
+  }
 
   const fetchUsers = async () => {
     setLoading(true);
