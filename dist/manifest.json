@@ -1,0 +1,33 @@
+{
+  "name": "Observatorio Turístico de Colima",
+  "short_name": "Obs. Colima",
+  "description": "Panel de administración y consulta de datos turísticos del estado de Colima",
+  "start_url": "/admin",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1d4ed8",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Panel Admin",
+      "short_name": "Admin",
+      "description": "Ir al panel de administración",
+      "url": "/admin",
+      "icons": [
+        {
+          "src": "/icon-512.png",
+          "sizes": "512x512"
+        }
+      ]
+    }
+  ]
+}
